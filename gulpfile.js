@@ -20,6 +20,7 @@ var chmod = require('gulp-chmod');
 var jst = require('gulp-jst-concat');
 var gutil = require('gulp-util');
 var debug = require('gulp-debug');
+var concatJST = require('gulp-jade-jst-concat');
 var joinData = require('gulp-join-data');
 var express = require('express');
 
@@ -142,7 +143,7 @@ gulp.task('templates-dynamic',
 function processStaticTemplates(role){
 	var DATA = JSON.parse(fs.readFileSync(settings[role].data + "/data.json", "utf-8"));
 
-	var src = settings[role].templates + '/static/*.jade';
+	var src = [settings[role].templates + '/static/*.jade', "!" + settings[role].templates + '/static/_*.jade'];
 	var dest = settings[role].dist;
 	gulp.src(src)
 		.pipe(jade({
@@ -153,15 +154,17 @@ function processStaticTemplates(role){
 }
 
 function processDynamicTemplates(role){
-	var src = settings[role].templates + '/dynamic/*.jade';
+	var src = [settings[role].templates + '/dynamic/*.jade',, "!" + settings[role].templates + '/dynamic/_*.jade'];
 	var dest = settings[role].dist;
 	gulp.src(src)
 		.pipe(jade({
+			namespace: "JST",
 			client: true
 		}))
-		.pipe(jst('templates.js', {
-	      renameKeys: ['^.*dynamic/(.*).js$', '$1']
-	    }))
+		// .pipe(jst('templates.js', {
+	 //      renameKeys: ['^.*dynamic/(.*).html$', '$1']
+	 //    }))
+		.pipe(concatJST('templates.js'))
 		.pipe(gulp.dest(settings[role].src + "/js"))
 }
 
