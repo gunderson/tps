@@ -6,20 +6,20 @@
   The API is a RESTful API that facilitates CRUD from both the front-end and CMS
 
  *************************************************/
-
+ 
+var argv = require('yargs').argv;
 var fs = require('fs');
 var path = require('path');
 var _ = require("underscore");
 var gulp = require('gulp');
+var sequence = require("run-sequence");
 var sass = require('gulp-sass');
 var jade = require('gulp-jade');
 var rename = require('gulp-rename');
 var watch = require('gulp-watch');
 var livereload = require('gulp-livereload');
 var chmod = require('gulp-chmod');
-var jst = require('gulp-jst-concat');
 var gutil = require('gulp-util');
-var debug = require('gulp-debug');
 var concatJST = require('gulp-jade-jst-concat');
 var joinData = require('gulp-join-data');
 var express = require('express');
@@ -29,6 +29,10 @@ var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
+
+
+var debug = require('gulp-debug');
+var tap = require('gulp-tap');
 
 /*************************************************
  SETTINGS
@@ -45,7 +49,7 @@ var settings = {
 		src: "./src/api",
 		templates: "./src/api/jade",
 		styles: "./src/api/sass",
-		data: "./src/api/data/data.json",
+		data: "./src/api/data",
 		assets: "./src/api/assets",
 		dist: "./dist/api",
 		port: 3030
@@ -69,7 +73,7 @@ var settings = {
 		port: 3000
 	},
 	livereloadport: 35729
-}
+};
 
 /*************************************************
  PROCESS STYLES
@@ -89,9 +93,6 @@ function processStyles(role){
 	var src = settings[role].styles + '/*.sass';
 	var dest = settings[role].dist;
 
-	gutil.log(src)
-	gutil.log(dest)
-
 	return gulp.src(src)
 		.pipe(sass({sourceComments: 'normal'}))
 		.pipe(gulp.dest(dest));
@@ -100,10 +101,9 @@ function processStyles(role){
 // Define tasks
 settings["static-renders"].forEach(function(role){
 	gulp.task('styles-' + role, function () {
-		gutil.log("Running Task:", role +':styles')
 		return processStyles(role);
 	});
-})
+});
 
 /*************************************************
  PROCESS TEMPLATES
@@ -117,7 +117,7 @@ gulp.task('templates',
 	function(cb){
 		cb();
 	}
-)
+);
 
 gulp.task('templates-static',
 	[
@@ -127,7 +127,7 @@ gulp.task('templates-static',
 	function(cb){
 		cb();
 	}
-)
+);
 
 gulp.task('templates-dynamic',
 	[
@@ -138,7 +138,7 @@ gulp.task('templates-dynamic',
 	function(cb){
 		cb();
 	}
-)
+);
 
 function processStaticTemplates(role){
 	var DATA = JSON.parse(fs.readFileSync(settings[role].data + "/data.json", "utf-8"));
@@ -150,7 +150,7 @@ function processStaticTemplates(role){
 			locals: DATA
 		}))
         .pipe(chmod(755))
-		.pipe(gulp.dest(dest))
+		.pipe(gulp.dest(dest));
 }
 
 function processDynamicTemplates(role){
@@ -158,14 +158,10 @@ function processDynamicTemplates(role){
 	var dest = settings[role].dist;
 	gulp.src(src)
 		.pipe(jade({
-			namespace: "JST",
 			client: true
 		}))
-		// .pipe(jst('templates.js', {
-	 //      renameKeys: ['^.*dynamic/(.*).html$', '$1']
-	 //    }))
 		.pipe(concatJST('templates.js'))
-		.pipe(gulp.dest(settings[role].src + "/js"))
+		.pipe(gulp.dest(settings[role].src + "/js"));
 }
 
 // Define tasks
@@ -208,7 +204,7 @@ settings["dynamic-renders"].forEach(function(role){
 	gulp.task('scripts-' + role, function () {
 		return processBrowserify(role);
 	});
-})
+});
 
 var getBundleName = function () {
   var version = require('./package.json').version;
@@ -243,9 +239,9 @@ function processBrowserify(role){
 }
 
 gulp.task("copy-api", function(){
-	var src = settings["api"].assets;
-	var dest = settings["api"].dist;
-	gulp.src(src + "/**/*.*")
+	var src = settings.api.src;
+	var dest = settings.api.dist;
+	return gulp.src(src + "/**/*.*")
 		.pipe(gulp.dest(dest));
 });
 
@@ -253,7 +249,7 @@ gulp.task("copy-api", function(){
  PROCESS DATA
  *************************************************/
 
-gulp.task("process-data",
+gulp.task("data",
 	[
 		"process-data-api",
 		"process-data-cms",
@@ -268,7 +264,6 @@ function processData(role) {
 	var src = [settings[role].data + '/*.json', '!**/data.json'];
 	var dest = settings[role].data;
 	gulp.src(src)
-        // .pipe(debug({verbose: true}))
 		.pipe(joinData("data.json"))
 		.pipe(gulp.dest(settings[role].data));
 }
@@ -295,10 +290,10 @@ gulp.task("copy-assets",
 	}
 );
 
-function copyassets(set) {
-	var src = settings[set].assets;
-	var dest = settings[set].dist;
-	gulp.src(src + "/assets/**/*.*")
+function copyassets(role) {
+	var src = settings[role].assets;
+	var dest = settings[role].dist;
+	gulp.src(src + "/**/*.*")
 		.pipe(gulp.dest(dest + "/assets"));
 }
 
@@ -358,12 +353,9 @@ gulp.task('watch',
 			gulp.watch(settings[role].dist + '/*.css', notifyLiveReload);
 		});
 
-		watch(settings['api'].src + "/**/*", function(files, cb){
-			gulp.start("copy-api", cb);
-			apiServer.close();
-			startApiServer();
-
-		})
+		gulp.watch(settings.api.src + "/**/*", function(files, cb){
+			return gulp.start("restart-api-server");
+		});
 
 	}
 );
@@ -378,12 +370,25 @@ function notifyLiveReload(event) {
  START SERVERS
  *************************************************/
 
-gulp.task('servers', function(cb) {
+gulp.task('servers',["scripts"], function(cb) {
 	settings["static-renders"].forEach(function(role, i){
 		startStaticServer(role, i);
 	});
 	startApiServer();
 	cb();
+});
+
+gulp.task("restart-api-server",["copy-api"], function(cb){
+	var task = this;
+	gutil.log("Restarting".yellow + " API Server");
+	apiServer.on("close", function(){
+		gutil.log("Closed".yellow + " API Server");
+		startApiServer(function(){
+			gutil.log("Restarted".green + " API Server");
+			cb();
+		});
+	}).close();
+	// return this;
 });
 
 function startStaticServer(role, index){
@@ -396,26 +401,34 @@ function startStaticServer(role, index){
 		// maxAge: '1d',
 		// redirect: false,
 		setHeaders: function (res, path, stat) {
-			res.set('x-timestamp', Date.now())
+			res.set('x-timestamp', Date.now());
 		}
 	};
 	
 	server.use(require('connect-livereload')());
 
 	var p = path.resolve(settings[role].dist);
-	gutil.log("serving from: ", p)
 
 	server
 		.use("/", express.static(p, options))
 		.listen(settings[role].port, "0.0.0.0");
 }
 var apiServer;
-function startApiServer(){
-	apiServer = express();
+var apiApp;
+function startApiServer(cb){
+	cb = cb || gutil.noop;
 	var role = "api";
-	
-	require( settings[role].dist + "/index")(apiServer);
-	apiServer.listen(settings[role].port, "0.0.0.0");
+
+	apiApp = express();
+	apiServer = require('http').createServer(apiApp);
+
+	var appPath = settings[role].dist + "/js/index";
+	//load module fresh each time
+	var Module = require('module');
+    delete require.cache[Module._resolveFilename(appPath, module)];
+	require(appPath)(apiApp, apiServer);
+
+	return apiServer.listen(settings[role].port, "0.0.0.0", cb);
 }
 
 

@@ -1,0 +1,45 @@
+$menu-link-color: #69f
+$menu-link-hover-color: #96f
+$menu-handle-size: 35px
+
+#main-menu
+	font-family: $header-font-family
+	color: #ccc
+	z-index: 2
+	@include transition(transform 0.5s ease-out)
+	.menu-open &
+		transform: translate3d(-$menu-width,0,0)
+	position: absolute
+	top: 0
+	right: -$menu-width
+	height: 100%
+	margin: 25px 0
+	width: $menu-width
+	background-color: #000
+	a
+		text-decoration: none
+		display: block
+		height: 40px
+		line-height: 20px
+		margin: 10px
+		padding: 10px
+		border-bottom: 1px solid #222
+		color: $menu-link-color
+		&:hover
+			color: $menu-link-hover-color
+	.handle
+		display: table
+		position: absolute
+		top: 0
+		left: -$menu-handle-size
+		width: $menu-handle-size
+		height: $menu-handle-size
+		background-color: #000
+		color: #ccc
+		&:hover
+			color: #fff
+		.contents
+			font-size: 20px
+			display: table-cell
+			vertical-align: middle
+			text-align: center
