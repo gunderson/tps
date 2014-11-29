@@ -249,7 +249,7 @@ gulp.task("copy-api", function(){
  PROCESS DATA
  *************************************************/
 
-gulp.task("data",
+gulp.task("process-data",
 	[
 		"process-data-api",
 		"process-data-cms",
@@ -261,7 +261,7 @@ gulp.task("data",
 );
 
 function processData(role) {
-	var src = [settings[role].data + '/*.json', '!**/data.json'];
+	var src = [settings[role].data + '/*.json', '!**/data.json', '!**/copy.json'];
 	var dest = settings[role].data;
 	gulp.src(src)
 		.pipe(joinData("data.json"))
@@ -271,6 +271,37 @@ function processData(role) {
 
 settings["dynamic-renders"].forEach(function(role){
 	gulp.task("process-data-" + role, function (cb) {
+		processData(role);
+		cb();
+	});
+});
+
+/*************************************************
+ PROCESS COPY
+ *************************************************/
+
+gulp.task("process-copy",
+	[
+		"process-copy-api",
+		"process-copy-cms",
+		"process-copy-front-end"
+	],
+	function(cb) {
+		cb();
+	}
+);
+
+function processData(role) {
+	var src = [settings[role].data + '/copy/*.json', '!**/data.json', '!**/copy.json'];
+	var dest = settings[role].data;
+	gulp.src(src)
+		.pipe(joinData("copy.json"))
+		.pipe(gulp.dest(settings[role].data));
+}
+
+
+settings["dynamic-renders"].forEach(function(role){
+	gulp.task("process-copy-" + role, function (cb) {
 		processData(role);
 		cb();
 	});

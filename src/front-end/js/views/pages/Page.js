@@ -63,6 +63,9 @@ var Page = Backbone.Layout.extend({
 			});
 		return this;
 	},
+	transitionInComplete: function(){
+
+	},
 	transitionOut: function(next){
 		var _this = this;
 		this.$el.removeClass('active');
@@ -99,6 +102,9 @@ var Page = Backbone.Layout.extend({
 				}
 			});
 		return this;
+	},
+	transitionOutComplete: function(){
+
 	}
 });
 
