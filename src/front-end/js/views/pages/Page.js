@@ -10,13 +10,19 @@ var Page = Backbone.Layout.extend({
 	row: 0,
 
 	fetch: function(){
+		var promise = new $.Deferred();
+		this.once("afterRender", function(){
+			promise.resolve();
+		});
+		
 		if (this.model){
 			this.model
 				.fetch()
 				.done(this.render);
-		} else {
+		} else if (!this.hasRendered) {
 			this.render();
 		}
+		return promise;
 	},
 	transitionIn: function(prev){
 		var _this = this;

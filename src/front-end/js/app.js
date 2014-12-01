@@ -75,11 +75,11 @@ module.exports = Backbone.Layout.extend({
         	var newPage = this.views["#" + route];
         	if (!newPage) return;
 
-        	newPage.fetch();
-        	newPage.once("afterRender", function(){
-        		currentPage && currentPage.transitionOut(newPage);
-        		newPage.transitionIn(currentPage);
-        	});
+        	newPage.fetch()
+                .done(function(){
+            		currentPage && currentPage.transitionOut(newPage);
+            		newPage.transitionIn(currentPage);
+            	});
 
         	this.page = newPage;
         }
