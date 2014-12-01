@@ -1,0 +1,6 @@
+html
+	head
+		script.
+			window.location.href = "#{meta.og.url}/#{post.id}/#{request.params.network}";
+	body
+		img(src="#{site.cdn}/#{post.img}")
