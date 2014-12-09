@@ -1,6 +1,5 @@
 {
-	"message":{},
-	"status":{
+	"message":{
 		"200": "success",
 		"404": "not found",
 		"500": "forbidden"

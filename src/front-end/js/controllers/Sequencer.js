@@ -1,0 +1,158 @@
+var Backbone = require("backbone");
+var _ = require("underscore");
+
+var audioContext = new AudioContext();
+var tickTimer = 0;
+
+function Sequencer(options){
+	var defaults = {};
+
+	options = _.extend({}, defaults, options);
+
+	if (options.audiocontext) audiocontext = options.audiocontext;
+
+	return _.extend({
+		play: play,
+		stop: stop,
+		reset: reset,
+		tick: tick,
+		getStatus: getStatus,
+		//getters & setters
+		get bpm(){
+			return _beatsPerMinute;
+		},
+		set bpm (val){
+			return setBPM(val);
+		}
+	}, Backbone.Events);
+}
+
+function play(){
+	if (!this.playing){
+		this.playing = true;
+		if (_startTime === 0){
+			_startTime = audioContext.currentTime * 1000;
+		}
+		this.trigger("play");
+		this.tick();
+	}
+}
+
+function stop(){
+	this.playing = false;
+	clearTimeout(_tickTimer);
+	clearTimeout(_16thTimer);
+	this.trigger("stop");
+}
+
+function reset(){
+	stop();
+	_startTime		= 0;
+	beatCount		= 0;
+	current16th		= 0;
+	countInBeat		= 0;
+	currentBeat		= 0;
+	currentMeasure	= 0;
+	beatInMeasure	= 0;
+}
+
+//getters and setters
+
+function setBPM(bpm){
+	_beatsPerMinute = bpm;
+	recalculateTiming();
+	return bpm;
+}
+
+//clock
+var _beatsPerMeasure		= 4,
+	_ticksPerBeat			= 16,
+	_beatsPerMinute			= 120,
+	_beatsPerSecond			= _beatsPerMinute / 60,
+	_ticksPerSecond			= _ticksPerBeat * _beatsPerSecond,
+	_millisPerTick			= 1000 / _ticksPerSecond,
+	_millisPer16th			= _ticksPerBeat * 0.25 * _millisPerTick,
+	_scheduleAhead			= 200,
+
+	_tickTimer				= 0,
+	_16thTimer				= 0,
+
+	_lastTick				= 0,
+	_lastTickTime			= 0,
+	_currentTick			= -1,
+
+	_last16th				= 0,
+	_lastBeat				= 0,
+	_lastMeasure			= 0,
+	_startTime				= 0;
+
+function tick(){
+	var now 			= audioContext.currentTime * 1000,
+		duration		= now - _startTime,
+		_this			= this;
+
+	_lastTick 			= _currentTick;
+	_currentTick		= (duration / _millisPerTick) >> 0;
+
+	var lastTickTime	= _lastTick * _millisPerTick,
+		nextTickTime	= _lastTickTime + _millisPerTick,
+		nextTickDelta	=  nextTickTime - now,
+		next16th		= (((duration / _millisPer16th) >> 0) + 1),
+		next16thTime	= next16th * _millisPer16th,
+		next16thDelta	= next16thTime - now;
+
+
+	if (
+		// if next16thTime is less than now + _scheduleAhead
+		next16thTime < now + _scheduleAhead &&
+		// and next16th > last16th
+		next16th > _last16th
+	){
+		_last16th = next16th;
+		// schedule 16ths for next16thTime in audiocontext
+
+		// if this 16th is divisible by 4
+		if (next16th % 4 === 0){
+			//trigger a beat
+			_lastBeat++;
+
+			// if this beat is divisible by _beatsPerMeasure
+			if (_lastBeat % _beatsPerMeasure === 0){
+				//trigger a measure
+				_lastMeasure++;
+			}
+		}
+
+		//send out current info to listeners at the same time that the audiocontext triggers
+		_16thTimer = setTimeout(function(){
+			_this.trigger("16th", getStatus());
+		}, next16thDelta);
+
+	}
+
+	//schedule next tick
+	_tickTimer = setTimeout(function(){
+		_this.tick.call(_this);
+	}, nextTickDelta);
+
+	this.trigger("tick", {currentTick: _currentTick});
+}
+
+function getStatus(){
+	return {		
+		current16th: _last16th,
+		countInBeat: _last16th % 4,
+		currentBeat: _lastBeat,
+		currentMeasure: _lastMeasure,
+		beatInMeasure: _lastBeat % _beatsPerMeasure
+	};
+}
+
+function recalculateTiming(){
+	_beatsPerSecond = _beatsPerMinute / 60;
+	_ticksPerSecond = _ticksPerBeat * _beatsPerSecond;
+	_millisPerTick = 1000 / _ticksPerSecond;
+	_millisPer16th = _ticksPerBeat * 0.25 * _millisPerTick;
+}
+
+module.exports = Sequencer;

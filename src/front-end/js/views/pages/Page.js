@@ -11,17 +11,21 @@ var Page = Backbone.Layout.extend({
 
 	fetch: function(){
 		var promise = new $.Deferred();
-		this.once("afterRender", function(){
-			promise.resolve();
-		});
 		
 		if (this.model){
+			this.once("afterRender", promise.resolve);
 			this.model
 				.fetch()
 				.done(this.render);
 		} else if (!this.hasRendered) {
+			this.once("afterRender", promise.resolve);
 			this.render();
+		} else {
+			_.defer(function(){
+				promise.resolve();
+			});
 		}
+
 		return promise;
 	},
 	transitionIn: function(prev){
@@ -64,13 +68,10 @@ var Page = Backbone.Layout.extend({
 				display:"block",
 				duration: PAGE_TRANSITION_TIME,
 				complete: function(){
-					_this.trigger("transitionEnd");
+					_this.trigger("transitionInComplete");
 				}
 			});
 		return this;
-	},
-	transitionInComplete: function(){
-
 	},
 	transitionOut: function(next){
 		var _this = this;
@@ -104,13 +105,10 @@ var Page = Backbone.Layout.extend({
 				display:"none",
 				duration: PAGE_TRANSITION_TIME,
 				complete: function(){
-					_this.trigger("transitionEnd");
+					_this.trigger("transitionOutComplete");
 				}
 			});
 		return this;
-	},
-	transitionOutComplete: function(){
-
 	}
 });
 

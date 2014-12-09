@@ -1,0 +1,35 @@
+#transportBar
+	display: block
+	width: 100%
+	height: $footer-height
+	background-color: #000
+	z-index: 2
+
+	.button
+		font-size: 12px
+		text-transform: uppercase
+		line-height: 20px
+		display: inline-block
+		// width: 100px
+		background-color: #000
+		margin: 5px
+		padding: 5px
+		text-align: center
+		color: #888
+		cursor: pointer
+
+		&:hover
+			background-color: #444
+			color: #fff
+
+		&.active
+			background-color: #222
+			color: #ccc
+
+	.play-button
+	.stop-button
+	.loop-button
+	.clear-solo-mute-button
+
+	.bpm-display
+		display: inline-block

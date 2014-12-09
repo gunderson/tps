@@ -39,6 +39,9 @@ var tap = require('gulp-tap');
  *************************************************/
 
 var settings = {
+	"languages": [
+		"en"
+	],
 	"dynamic-renders": [
 		"front-end", "cms", "api"
 	],
@@ -141,16 +144,19 @@ gulp.task('templates-dynamic',
 );
 
 function processStaticTemplates(role){
-	var DATA = JSON.parse(fs.readFileSync(settings[role].data + "/data.json", "utf-8"));
+	for (var i in settings.languages){
+		var lang = settings.languages[i];
+		var DATA = JSON.parse(fs.readFileSync(settings[role].data + "/"+lang+".json", "utf-8"));
 
-	var src = [settings[role].templates + '/static/*.jade', "!" + settings[role].templates + '/static/_*.jade'];
-	var dest = settings[role].dist;
-	gulp.src(src)
-		.pipe(jade({
-			locals: DATA
-		}))
-        .pipe(chmod(755))
-		.pipe(gulp.dest(dest));
+		var src = [settings[role].templates + '/static/*.jade', "!" + settings[role].templates + '/static/_*.jade'];
+		var dest = settings[role].dist;
+		gulp.src(src)
+			.pipe(jade({
+				locals: DATA
+			}))
+	        .pipe(chmod(755))
+			.pipe(gulp.dest(dest));
+	}
 }
 
 function processDynamicTemplates(role){
@@ -261,47 +267,23 @@ gulp.task("process-data",
 );
 
 function processData(role) {
-	var src = [settings[role].data + '/*.json', '!**/data.json', '!**/copy.json'];
-	var dest = settings[role].data;
-	gulp.src(src)
-		.pipe(joinData("data.json"))
-		.pipe(gulp.dest(settings[role].data));
+	for (var i in settings.languages){
+		var lang = settings.languages[i];
+		var src = [settings[role].src + '/../data/**/*.json', settings[role].data + '/'+ lang +'/**/*.json'];
+		var dest = settings[role].data;
+		gulp.src(src)
+			.pipe(joinData({
+				fileName: lang + ".json",
+				dest: dest,
+				bases: [lang, "data"]
+			}))
+			.pipe(gulp.dest(dest));
+	}
 }
 
 
 settings["dynamic-renders"].forEach(function(role){
 	gulp.task("process-data-" + role, function (cb) {
-		processData(role);
-		cb();
-	});
-});
-
-/*************************************************
- PROCESS COPY
- *************************************************/
-
-gulp.task("process-copy",
-	[
-		"process-copy-api",
-		"process-copy-cms",
-		"process-copy-front-end"
-	],
-	function(cb) {
-		cb();
-	}
-);
-
-function processData(role) {
-	var src = [settings[role].data + '/copy/*.json', '!**/data.json', '!**/copy.json'];
-	var dest = settings[role].data;
-	gulp.src(src)
-		.pipe(joinData("copy.json"))
-		.pipe(gulp.dest(settings[role].data));
-}
-
-
-settings["dynamic-renders"].forEach(function(role){
-	gulp.task("process-copy-" + role, function (cb) {
 		processData(role);
 		cb();
 	});

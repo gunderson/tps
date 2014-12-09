@@ -6,13 +6,20 @@ var _ = require("underscore");
 var MainMenu = require("./views/ui/main-menu");
 var HomePage = require("./views/pages/home");
 var AboutPage = require("./views/pages/about");
-var ContentsPage = require("./views/pages/contents");
+var SequencerPage = require("./views/pages/sequencer");
+
+
+var Sequencer = require("./controllers/Sequencer");
+var sequencer = new Sequencer();
+
+var sequencerStatus = sequencer.getStatus();
+
 
 
 var pages = {
 	"#home"	 : new HomePage({route: "/"}),
     "#about" : new AboutPage({route: "/about"}),
-	"#contents" : new ContentsPage({route: "/contents"}),
+	"#sequencer" : new SequencerPage({controller: sequencer, route: "/sequencer"}),
 };
 
 var overlays = {
