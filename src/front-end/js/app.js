@@ -8,13 +8,10 @@ var HomePage = require("./views/pages/home");
 var AboutPage = require("./views/pages/about");
 var SequencerPage = require("./views/pages/sequencer");
 
-
 var Sequencer = require("./controllers/Sequencer");
 var sequencer = new Sequencer();
 
 var sequencerStatus = sequencer.getStatus();
-
-
 
 var pages = {
 	"#home"	 : new HomePage({route: "/"}),
@@ -77,6 +74,11 @@ module.exports = Backbone.Layout.extend({
         params.app = this;
         // only do this if new route is different from the last
         if (this.currentRoute != route) {
+
+            $("html")
+                .removeClass(this.currentRoute + "-page")
+                .addClass(route + "-page");
+
         	//determine new page
         	var currentPage = this.page;
         	var newPage = this.views["#" + route];

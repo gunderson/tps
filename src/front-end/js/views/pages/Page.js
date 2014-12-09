@@ -31,11 +31,11 @@ var Page = Backbone.Layout.extend({
 	transitionIn: function(prev){
 		var _this = this;
 		this.$el.addClass('active');
-		
+
 		if (!prev){
 			console.log("No Previous Page");
 			this.$el.show();
-			this.trigger("transitionEnd");
+			this.trigger("transitionInComplete");
 			return this;
 		}
 
@@ -109,7 +109,10 @@ var Page = Backbone.Layout.extend({
 				}
 			});
 		return this;
-	}
+	},
+
+	//sequencer specific implementation
+
 });
 
 module.exports = Page;
