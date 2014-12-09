@@ -160,13 +160,15 @@ function processStaticTemplates(role){
 }
 
 function processDynamicTemplates(role){
-	var src = [settings[role].templates + '/dynamic/*.jade',, "!" + settings[role].templates + '/dynamic/_*.jade'];
+	var src = [settings[role].templates + '/dynamic/**/*.jade',, "!" + settings[role].templates + '/dynamic/**/_*.jade'];
 	var dest = settings[role].dist;
 	gulp.src(src)
 		.pipe(jade({
 			client: true
 		}))
-		.pipe(concatJST('templates.js'))
+		.pipe(concatJST('templates.js', {
+			basepath: settings[role].templates + '/dynamic'
+		}))
 		.pipe(gulp.dest(settings[role].src + "/js"));
 }
 

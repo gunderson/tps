@@ -1,10 +1,10 @@
 var Backbone = require("backbone");
-var _ = require("underscore");
 
 var audioContext = new AudioContext();
 var tickTimer = 0;
 
 function Sequencer(options){
+
 	var defaults = {};
 
 	options = _.extend({}, defaults, options);
@@ -125,7 +125,14 @@ function tick(){
 
 		//send out current info to listeners at the same time that the audiocontext triggers
 		_16thTimer = setTimeout(function(){
-			_this.trigger("16th", getStatus());
+			_this.trigger("16th", 
+				_.extend(
+					getStatus(), 
+					{
+						schedule: (next16thTime + _scheduleAhead) / 1000
+					}
+				)
+			);
 		}, next16thDelta);
 
 	}
@@ -138,7 +145,7 @@ function tick(){
 	this.trigger("tick", {currentTick: _currentTick});
 }
 
-function getStatus(){
+function getStatus(schedule){
 	return {		
 		current16th: _last16th,
 		countInBeat: _last16th % 4,

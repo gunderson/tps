@@ -7,6 +7,7 @@ var MainMenu = require("./views/ui/main-menu");
 var HomePage = require("./views/pages/home");
 var AboutPage = require("./views/pages/about");
 var SequencerPage = require("./views/pages/sequencer");
+var SoundBoardPage = require("./views/pages/sound-board");
 
 var Sequencer = require("./controllers/Sequencer");
 var sequencer = new Sequencer();
@@ -16,7 +17,8 @@ var sequencerStatus = sequencer.getStatus();
 var pages = {
 	"#home"	 : new HomePage({route: "/"}),
     "#about" : new AboutPage({route: "/about"}),
-	"#sequencer" : new SequencerPage({controller: sequencer, route: "/sequencer"}),
+    "#sequencer" : new SequencerPage({controller: sequencer, route: "/sequencer"}),
+	"#sound-board" : new SoundBoardPage({controller: sequencer, route: "/sound-board"}),
 };
 
 var overlays = {

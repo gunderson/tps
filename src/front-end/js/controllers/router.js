@@ -6,7 +6,8 @@ var Router = Backbone.Router.extend({
 		"": "home",
 		"home": "home",
 		"about": "about",
-		"sequencer": "sequencer"
+		"sequencer": "sequencer",
+		"sound-board": "sound-board"
 	}
 });
 
