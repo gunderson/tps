@@ -6,7 +6,8 @@ var Instrument = Backbone.Layout.extend({
 	el: false,
 	events:{
 		"click .load": "onClickLoad",
-		"click .trigger": "onClickTrigger"
+		"click .trigger": "onClickTrigger",
+		"change .noteValue": "onChangeNote"
 	},
 	initialize: function(options){
 		this.instrument = options.instrument;
@@ -19,6 +20,10 @@ var Instrument = Backbone.Layout.extend({
 		return {
 			instrument: this.instrument
 		};
+	},
+
+	onChangeNote: function(e){
+		this.$(".noteValueDisplay").text(e.target.value);
 	},
 
 	onClickLoad: function(e){
