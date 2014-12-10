@@ -1,4 +1,11 @@
 var jade = require('jade/runtime'); module.exports = {
+"sequencer/fader": function(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+
+buf.push("<div class=\"fader\"></div>");;return buf.join("");
+},
 "sequencer/pattern-detail": function(locals) {
 var buf = [];
 var jade_mixins = {};
@@ -13,19 +20,19 @@ var jade_interp;
 
 ;return buf.join("");
 },
-"sequencer/scene-manager": function(locals) {
+"sequencer/scene": function(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-;return buf.join("");
+buf.push("<div class=\"scene\"><div class=\"tracks\"></div></div>");;return buf.join("");
 },
-"sequencer/track-manager": function(locals) {
+"sequencer/track": function(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-;return buf.join("");
+buf.push("<div class=\"track\"><div class=\"content\"></div></div>");;return buf.join("");
 },
 "sound-board/instrument": function(locals) {
 var buf = [];

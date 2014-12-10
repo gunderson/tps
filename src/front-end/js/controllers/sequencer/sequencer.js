@@ -17,6 +17,7 @@ function Sequencer(options){
 		reset: reset,
 		tick: tick,
 		getStatus: getStatus,
+		model: options.model,
 		//getters & setters
 		get bpm(){
 			return _beatsPerMinute;

@@ -93,7 +93,7 @@ gulp.task('styles',
 );
 
 function processStyles(role){
-	var src = settings[role].styles + '/*.sass';
+	var src = settings[role].styles + '/**/*.sass';
 	var dest = settings[role].dist;
 
 	return gulp.src(src)
@@ -160,7 +160,7 @@ function processStaticTemplates(role){
 }
 
 function processDynamicTemplates(role){
-	var src = [settings[role].templates + '/dynamic/**/*.jade',, "!" + settings[role].templates + '/dynamic/**/_*.jade'];
+	var src = [settings[role].templates + '/dynamic/**/*.jade', "!" + settings[role].templates + '/dynamic/**/_*.jade'];
 	var dest = settings[role].dist;
 	gulp.src(src)
 		.pipe(jade({
