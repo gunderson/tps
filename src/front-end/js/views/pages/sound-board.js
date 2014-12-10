@@ -24,7 +24,7 @@ var Page = AbstractPage.extend({
 	col:5,
 	el: "#sound-board",
 	views: {
-		// "#instruments": instrumentViews
+		"#instruments": instrumentViews
 	},
 	initialize: function(){
 		var _this = this;
@@ -36,9 +36,6 @@ var Page = AbstractPage.extend({
 
 	},
 	beforeRender: function(){
-		this.setViews({
-			"#instruments": instrumentViews
-		});
 	},
 	afterRender: function(){
 		console.log("I'm rendered", this.el);

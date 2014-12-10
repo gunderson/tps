@@ -4,6 +4,7 @@ require("backbone.layoutmanager");
 var Instrument = Backbone.Layout.extend({
 	template:"sound-board/instrument",
 	el: false,
+	keep: true,
 	events:{
 		"click .load": "onClickLoad",
 		"click .trigger": "onClickTrigger",
