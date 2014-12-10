@@ -37,8 +37,6 @@ module.exports = Backbone.Layout.extend({
     }, pages, overlays),
 
     initialize: function () {
-        console.log('app.initialize');
-
         // assign controller to each view
         _.each(this.views, function(v){
     		v.controller = this.controller;
@@ -51,9 +49,7 @@ module.exports = Backbone.Layout.extend({
         this.router.pages = pages;
         this.listenTo(this.router, 'route', this.onRoute);
         Backbone.history.start();
-
     },
-
 
     onOrientationChange: function (e) {
         // alert('onOrientationChange', window.orientation);

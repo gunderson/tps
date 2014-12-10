@@ -186,6 +186,7 @@ settings["static-renders"].forEach(function(role){
 settings["dynamic-renders"].forEach(function(role){
 	gulp.task('templates-dynamic-' + role, function (cb) {
 		processDynamicTemplates(role);
+		gulp.start('scripts');
 		cb();
 	});
 });

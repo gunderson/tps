@@ -1,0 +1,5 @@
+.instrument(class="#{instrument.name}")
+	h1 #{instrument.name}  #{instrument.type}
+	input.noteValue(type="range", step="1", min="#{instrument.range.first}", max="#{instrument.range.last}", value="30")
+	button.trigger Trigger
+	button.load Load
