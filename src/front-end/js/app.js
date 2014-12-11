@@ -12,6 +12,7 @@ var SoundBoardPage = require("./views/pages/sound-board");
 var Sequencer = require("./controllers/sequencer/sequencer");
 var SequencerModel = require("./models/sequencer/sequencer");
 var sequencer = new Sequencer({model:new SequencerModel()});
+sequencer.model.controller = sequencer;
 
 var sequencerStatus = sequencer.getStatus();
 

@@ -6,7 +6,9 @@ var TrackCollection = require("../../collections/sequencer/tracks");
 var SequencerModel = Backbone.Model.extend({
 	defaults: function(){
 		return {
-			tracks: new TrackCollection(),
+			bpm: 120,
+			beatsPerMeasure: 4,
+			tracks: new TrackCollection([], {controller:this.controller}),
 			scenes: new SceneCollection([{}])
 		};
 	}

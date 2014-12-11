@@ -1,12 +1,19 @@
 require("backbone");
 var _ = require("underscore");
 
-var SceneModel = Backbone.Model.extend({
+var Scene = Backbone.Model.extend({
 	defaults: function(){
-		return {
-			sceneId: 0
-		};
-	}
-});
+		sceneId: 0
+	},
+	initialize: function(){
 
-module.exports = SceneModel;
+	},
+	onDeleteTrack: function(){
+
+	},
+	cleanup:function(){
+	}
+})
+
+
+module.exports = Scene;

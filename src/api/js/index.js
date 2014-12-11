@@ -7,10 +7,10 @@ var dataServiceUtils = require("./utils/DataService");
 var TwitterDataCollection = require("./collections/TwitterDataCollection");
 var SerialPort = require("serialport");
 
-var serialPort = new SerialPort.SerialPort("/dev/tty.usbmodem1411", {
-  baudrate: 19200,
-  parser: SerialPort.parsers.readline("\n")
-});
+// var serialPort = new SerialPort.SerialPort("/dev/tty.usbmodem1411", {
+//   baudrate: 19200,
+//   parser: SerialPort.parsers.readline("\n")
+// });
 
 var options = {};
 
@@ -28,13 +28,13 @@ module.exports = function (app, server, _options){
 
 	router = express.Router();
 
-	/********************************************************** 
+	/**********************************************************
 	 *
 	 * Listeners for development to restart the server as the script changes
 	 *
 	 **********************************************************/
-	 
-	if (options.env === "dev"){	
+
+	if (options.env === "dev"){
 		server.on('connection', closeConnection);
 		server.once('close', function(socket) {
 			server.removeListener('connection', closeConnection);
@@ -42,7 +42,7 @@ module.exports = function (app, server, _options){
 	}
 
 
-	/********************************************************** 
+	/**********************************************************
 	 *
 	 * Params for dynamic urls
 	 *
@@ -54,7 +54,7 @@ module.exports = function (app, server, _options){
 	});*/
 
 
-	/********************************************************** 
+	/**********************************************************
 	 *
 	 * Routes
 	 *

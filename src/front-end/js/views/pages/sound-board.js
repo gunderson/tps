@@ -30,7 +30,7 @@ var Page = AbstractPage.extend({
 		var _this = this;
 		AbstractPage.prototype.initialize.call(this);
 		SoundManager.loading.done(function(){
-			console.log("instruments loaded:",instruments);
+			// console.log("instruments loaded:",instruments);
 		});
 
 
@@ -43,7 +43,7 @@ var Page = AbstractPage.extend({
 		AbstractPage.prototype.transitionIn.apply(this, arguments);
 	},
 	transitionInComplete: function(){
-	
+
 	},
 	transitionOut: function(){
 		AbstractPage.prototype.transitionOut.apply(this, arguments);
