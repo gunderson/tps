@@ -17,7 +17,7 @@ var SceneManager = Backbone.Layout.extend({
 	beforeRender: function(){
 		var _this = this;
 		var views = [];
-		this.sceneCollection.each(function(sceneModel){
+		this.sceneCollection.each(function(sceneModel, i){
 			console.log(sceneModel);
 			views.push(new SceneView({
 				model: sceneModel,
