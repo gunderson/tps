@@ -1,33 +1,33 @@
 var jade = require('jade/runtime'); module.exports = {
-"sequencer/pattern-detail": function(locals) {
+"pattern-detail": function(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
 ;return buf.join("");
 },
-"sequencer/pattern-overview": function(locals) {
+"pattern-overview": function(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
 ;return buf.join("");
 },
-"sequencer/scene-manager": function(locals) {
+"scene-manager": function(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
 ;return buf.join("");
 },
-"sequencer/track-manager": function(locals) {
+"track-manager": function(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
 ;return buf.join("");
 },
-"sound-board/instrument": function(locals) {
+"instrument": function(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
