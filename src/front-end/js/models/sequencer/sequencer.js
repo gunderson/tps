@@ -7,7 +7,7 @@ var SequencerModel = Backbone.Model.extend({
 	defaults: function(){
 		return {
 			tracks: new TrackCollection(),
-			scenes: new SceneCollection()
+			scenes: new SceneCollection([{}])
 		};
 	}
 });

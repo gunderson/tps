@@ -20,7 +20,7 @@ var TrackManager = Backbone.Layout.extend({
 			views.push(new TrackView(this));
 		});
 		this.insertViews({
-			".tracks": views
+			"#user-tracks": views
 		});
 	},
 	addTrack: function(){

@@ -11,7 +11,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-;return buf.join("");
+buf.push("<div class=\"pattern\"></div>");;return buf.join("");
 },
 "sequencer/pattern-overview": function(locals) {
 var buf = [];
@@ -24,8 +24,8 @@ var jade_interp;
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
-
-buf.push("<div class=\"scene\"><div class=\"tracks\"></div></div>");;return buf.join("");
+;var locals_for_with = (locals || {});(function (sceneId) {
+buf.push("<div class=\"scene\"><div class=\"scene-id track\">" + (jade.escape((jade_interp = sceneId) == null ? '' : jade_interp)) + "</div><div class=\"tracks\"></div></div>");}.call(this,"sceneId" in locals_for_with?locals_for_with.sceneId:typeof sceneId!=="undefined"?sceneId:undefined));;return buf.join("");
 },
 "sequencer/track": function(locals) {
 var buf = [];

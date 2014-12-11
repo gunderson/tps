@@ -36,7 +36,6 @@ var Page = AbstractPage.extend({
 				});*/
 		});
 
-		console.log(controller)
 
 		this.setViews({
 			"#transportBar": new TransportBar({

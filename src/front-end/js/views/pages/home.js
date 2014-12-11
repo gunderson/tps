@@ -6,7 +6,13 @@ var AbstractPage = require("./Page");
 var Page = AbstractPage.extend({
 	row:0,
 	col:0,
-	el: "#home"
+	el: "#home",
+	events: {
+		"click button": "onClickTriggerButton"
+	},
+	onClickTriggerButton: function(){
+		$.get("http://localhost:3030/pulse/trigger/1");
+	}
 });
 
 module.exports = Page;
