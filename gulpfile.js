@@ -6,7 +6,7 @@
   The API is a RESTful API that facilitates CRUD from both the front-end and CMS
 
  *************************************************/
- 
+
 var argv = require('yargs').argv;
 var fs = require('fs');
 var path = require('path');
@@ -243,7 +243,7 @@ function processBrowserify(role){
 	};
 
 	return bundle();
-	
+
 
 }
 
@@ -342,7 +342,7 @@ gulp.task('watch',
 
 			watch([
 					settings[role].styles + '/**/*.sass'
-				], 
+				],
 				function (files, cb) {
 					gulp.start("styles-" + role, cb);
 				}
@@ -350,16 +350,16 @@ gulp.task('watch',
 
 			watch([
 					settings[role].src + '/js/**/*.js'
-				], 
+				],
 				function (files, cb) {
 					gulp.start("scripts-" + role, cb);
 				}
 			);
 
 			watch([
-					settings[role].src + '/**/*.jade', 
+					settings[role].src + '/**/*.jade',
 					settings[role].data + "/**/*.json"
-				], 
+				],
 				function (files, cb) {
 					gulp.start("templates-" + role, cb);
 				}
@@ -420,7 +420,7 @@ function startStaticServer(role, index){
 			res.set('x-timestamp', Date.now());
 		}
 	};
-	
+
 	server.use(require('connect-livereload')());
 
 	var p = path.resolve(settings[role].dist);
@@ -449,6 +449,11 @@ function startApiServer(cb){
 
 
 
-gulp.task('default', function() {
+gulp.task('default', [
+    'styles',
+    'templates',
+    'scripts',
+    'copy-assets'
+], function() {
   // place code for your default task here
 });

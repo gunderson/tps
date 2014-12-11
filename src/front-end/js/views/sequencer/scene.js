@@ -9,12 +9,15 @@ var SceneView = Backbone.Layout.extend({
 		this.trackCollection = options.trackCollection;
 	},
 	beforeRender: function(){
-		// var patterns = this.trackCollection.map(function(){
-		// 	return new PatternDetailView({pattern:this.at(_this.sceneId)});
-		// });
-		// this.insertViews(patterns);
+		var _this = this;
+		var patterns = this.trackCollection.map(function(track){
+			return new PatternDetailView({
+				pattern: track.get("patterns").findWhere({sceneId:_this.sceneId})
+			});
+		});
+		this.insertViews({".patterns":patterns});
 	},
-	
+
 });
 
 module.exports = SceneView;
