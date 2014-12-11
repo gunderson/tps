@@ -1,0 +1,45 @@
+#track-manager
+	background-color: #333
+	height: 50%
+	overflow-x: auto
+	overflow-y: hidden
+	.tracks
+		min-width: 100%
+		white-space: nowrap
+	.track
+		order: 1
+		vertical-align: top
+		display: inline-block
+		width: $track-width
+		height: 100%
+		background-color: #222
+		border-right: 1px solid #000
+		.content
+			display: flex
+			height: 100%
+	#master
+		order: 0
+	#user-tracks
+		order: 1
+		display: inline-block
+		height: 100%
+	#add-new-track-button
+		order: 2
+		.content
+			justify-content: center
+			flex-direction: column
+			text-align: center
+			align-content: center
+			.text
+				color: #ccc
+				width: 100%
+				margin: 10px 0
+				display: block
+			button.add-button
+				display: block
+				width: 50px
+				height: 50px
+				padding: 10px
+				line-height: 30px
+				font-size: 30px
+				margin: 10px auto

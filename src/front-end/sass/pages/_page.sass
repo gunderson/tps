@@ -1,4 +1,4 @@
-#pages, .page, .page .content, .cover
+#pages, .page, .cover
 	width: 100%
 	height: 100%
 	position: relative
@@ -23,12 +23,15 @@
 		z-index: 2
 
 .page
+	overflow-y: auto
 	transform: translate(0,0)
 	display: none
 	position: absolute
 	top: 0
 	left: 0
 	z-index: 0
+	padding: $header-height 0
+
 	.background
 		width: 100%
 		height: 100%
@@ -36,9 +39,14 @@
 		z-index: 0
 		background-size: cover
 		background-position: 50% 50%
+		top:0
 	.content
-		overflow-y: auto
+		width: 100%
 		transform: translate3d(0,0,0)
+		position: relative
 		position: relative
 		padding: 20px
 		z-index: 1
+
+		h1
+			margin: 10px

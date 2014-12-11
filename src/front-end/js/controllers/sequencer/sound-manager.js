@@ -1,4 +1,4 @@
-var Klang = require("../lib/klang-1.0.5-19")();
+var Klang = require("../../lib/klang-1.0.5-19")();
 var _ = require("underscore");
 var $ = require("jquery");
 

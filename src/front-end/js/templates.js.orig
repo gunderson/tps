@@ -1,4 +1,7 @@
 var jade = require('jade/runtime'); module.exports = {
+<<<<<<< HEAD
+"pattern-detail": function(locals) {
+=======
 "sequencer/fader": function(locals) {
 var buf = [];
 var jade_mixins = {};
@@ -7,6 +10,7 @@ var jade_interp;
 buf.push("<div class=\"fader\"></div>");;return buf.join("");
 },
 "sequencer/pattern-detail": function(locals) {
+>>>>>>> df72f80578e6fb9cd4bdcc07cdb801264cce147c
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
@@ -20,14 +24,22 @@ var jade_interp;
 
 ;return buf.join("");
 },
+<<<<<<< HEAD
+"scene-manager": function(locals) {
+=======
 "sequencer/scene": function(locals) {
+>>>>>>> df72f80578e6fb9cd4bdcc07cdb801264cce147c
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
 ;var locals_for_with = (locals || {});(function (sceneId) {
 buf.push("<div class=\"scene\"><div class=\"scene-id track\">" + (jade.escape((jade_interp = sceneId) == null ? '' : jade_interp)) + "</div><div class=\"tracks\"></div></div>");}.call(this,"sceneId" in locals_for_with?locals_for_with.sceneId:typeof sceneId!=="undefined"?sceneId:undefined));;return buf.join("");
 },
+<<<<<<< HEAD
+"track-manager": function(locals) {
+=======
 "sequencer/track": function(locals) {
+>>>>>>> df72f80578e6fb9cd4bdcc07cdb801264cce147c
 var buf = [];
 var jade_mixins = {};
 var jade_interp;

@@ -2,7 +2,9 @@ require("backbone");
 require("backbone.layoutmanager");
 var AbstractPage = require("./Page");
 var TransportBar = require("../sequencer/transportBar");
-var SoundManager = require("../../controllers/Sound-manager")();
+var SoundManager = require("../../controllers/sequencer/sound-manager")();
+var SceneManager = require("../sequencer/scene-manager");
+var TrackManager = require("../sequencer/track-manager");
 
 var sequencerStatus;
 var controller;
@@ -14,6 +16,7 @@ var Page = AbstractPage.extend({
 		AbstractPage.prototype.initialize.call(this);
 
 		controller = options.controller;
+		model = options.model;
 		sequencerStatus = controller.getStatus();
 		
 		SoundManager.loading.done(function(){
@@ -33,8 +36,19 @@ var Page = AbstractPage.extend({
 				});*/
 		});
 
+
 		this.setViews({
-			"#transportBar": new TransportBar({controller: controller})
+			"#transportBar": new TransportBar({
+				controller: controller
+			}),
+			"#scene-manager": new SceneManager({
+				sceneCollection: controller.model.get("scenes"),
+				trackCollection: controller.model.get("tracks")
+			}),
+			"#track-manager": new TrackManager({
+				sceneCollection: controller.model.get("scenes"),
+				trackCollection: controller.model.get("tracks"),
+			}),
 		});
 
 		this.on("transitionInComplete", this.transitionInComplete);

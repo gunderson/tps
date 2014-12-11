@@ -2,7 +2,7 @@ require("backbone");
 require("backbone.layoutmanager");
 var _ = require("underscore");
 var AbstractPage = require("./Page");
-var SoundManager = require("../../controllers/Sound-manager")();
+var SoundManager = require("../../controllers/sequencer/sound-manager")();
 var instruments = require("../../music/Instruments");
 var InstrumentView = require("./sound-board/instrument");
 
@@ -38,7 +38,6 @@ var Page = AbstractPage.extend({
 	beforeRender: function(){
 	},
 	afterRender: function(){
-		console.log("I'm rendered", this.el);
 	},
 	transitionIn: function(){
 		AbstractPage.prototype.transitionIn.apply(this, arguments);
