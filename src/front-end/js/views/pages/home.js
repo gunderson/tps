@@ -10,8 +10,8 @@ var Page = AbstractPage.extend({
 	events: {
 		"click button": "onClickTriggerButton"
 	},
-	onClickTriggerButton: function(){
-		$.get("http://localhost:3030/pulse/trigger/1");
+	onClickTriggerButton: function(e){
+		$.get("http://localhost:3030/pulse/trigger/" + $(e.target).data("trigger"));
 	}
 });
 
