@@ -47,11 +47,13 @@ var Visualizer = function(options) {
             ctx.fillRect((i >> 3) * (barWidth + 1), canvas.height - barHeight, barWidth, barHeight);
         }
         //detect a peak
-        i = 0x39;
+        i = 0x3f;
+        if (prevStreamData2[i] > prevStreamData[i] && prevStreamData[i] < streamData[i]){
+            $.get("http://localhost:3030/pulse/trigger/2");
+        }
+        i = 0x1f;
         if (prevStreamData2[i] > prevStreamData[i] && prevStreamData[i] < streamData[i]){
             $.get("http://localhost:3030/pulse/trigger/1");
-        } else {
-            // console.log(prevStreamData2[i] , prevStreamData[i] , streamData[i])
         }
     }
 
