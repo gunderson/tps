@@ -1,14 +1,13 @@
 /**
  * Makes a request to the Soundcloud API and returns the JSON data.
  */
-var SoundcloudLoader = function(player,uiUpdater) {
+var SoundcloudLoader = function(player) {
     var self = this;
     var client_id = "32e4c49c70a9e7e041bf913de7ec38ae"; // to get an ID go to http://developers.soundcloud.com/
     this.sound = {};
     this.streamUrl = "";
     this.errorMessage = "";
     this.player = player;
-    this.uiUpdater = uiUpdater;
 
     /**
      * Loads the JSON stream data object from the URL of the track (as given in the location bar of the browser when browsing Soundcloud),
@@ -67,7 +66,6 @@ var SoundcloudLoader = function(player,uiUpdater) {
             }
             if(this.streamPlaylistIndex>=0 && this.streamPlaylistIndex<=this.sound.track_count-1) {
                this.player.setAttribute('src',this.streamUrl());
-               this.uiUpdater.update(this);
                this.player.play();
             }
         }

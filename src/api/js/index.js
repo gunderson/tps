@@ -7,10 +7,10 @@ var dataServiceUtils = require("./utils/DataService");
 var TwitterDataCollection = require("./collections/TwitterDataCollection");
 var SerialPort = require("serialport");
 
-// var serialPort = new SerialPort.SerialPort("/dev/tty.usbmodem1411", {
-//   baudrate: 19200,
-//   parser: SerialPort.parsers.readline("\n")
-// });
+var serialPort = new SerialPort.SerialPort("/dev/tty.usbmodem1411", {
+  baudrate: 19200,
+  parser: SerialPort.parsers.readline("\n")
+});
 
 var options = {};
 
@@ -67,7 +67,7 @@ module.exports = function (app, server, _options){
 	      // console.log('results ' + results);
 	      setAsJSON(res);
 	      serialPort.once("data", function(data){
-	      	console.log(data);
+	      	// console.log(data);
 	      	results = {results: data};
 	      	res.header("Access-Control-Allow-Origin", "*");
 	      	res.send(JSON.stringify(results));
