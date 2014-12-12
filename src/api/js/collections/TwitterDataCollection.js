@@ -1,90 +1,83 @@
 var Backbone = require("Backbone");
 var _ = require("underscore");
 var fs = require("fs");
+var HeaderUtils = require("../utils/HeaderUtils");
 var Twit = require('twit');
-var dataServiceUtils = require("../utils/DataService");
+var TweetModel = require("../models/TweetModel");
+var constants = require("../constants");
+var Q = require("q");
+var Db = require('mongodb').Db,
+    MongoClient = require('mongodb').MongoClient,
+    Server = require('mongodb').Server;
 
 var T = new Twit({
-    consumer_key:         "w4vvYl5k33zXzfkGac9UyTZib",
-    consumer_secret:      "biKcNyJ4tXdjP6I7pYezHzw6Mg06qucwMDpLUvCxCs8J9WaIAR",
-    access_token:         "9146482-KfCHb2cuoEsggw8U5f3HbkcUgS7Zb2YLJ74AJ0Nqmk",
-    access_token_secret:  "v6FMEkgm4LmGMqFce9YLKvv6o55FQY6znTn0gExIGTv1l"
+	consumer_key:         "w4vvYl5k33zXzfkGac9UyTZib",
+	consumer_secret:      "biKcNyJ4tXdjP6I7pYezHzw6Mg06qucwMDpLUvCxCs8J9WaIAR",
+	access_token:         "9146482-KfCHb2cuoEsggw8U5f3HbkcUgS7Zb2YLJ74AJ0Nqmk",
+	access_token_secret:  "v6FMEkgm4LmGMqFce9YLKvv6o55FQY6znTn0gExIGTv1l"
 });
 
 var TwitterDataCollection = Backbone.Collection.extend({
-	filePath: "",
-	ttl: 1000 * 10,
-	timestamp: 0,
 	response: null,
-	namespace: "",
+	model: TweetModel,
+	url: "mongodb://localhost:27017/audio-vortex",
 	initialize: function(models, options){
 		_.extend(this, options);
-		this.on("reset add", function(){
-			console.log("reset");
-		});
+		
 	},
 	fetch: function(){
+		var deferred = Q.defer();
 		var _this = this;
 
-		//if timed out, or no data in this
-		var deltaTime = Date.now() - this.timestamp;
-
-		// local data is fresh, return data
-		if (deltaTime < this.ttl){
-			// console.log("use local data");
-			return sendData(this.response, this.toJSON() );
-		} else {
-			// check the cache
-			fs.readFile(this.filePath, function (err, readableData) {
-				if (err) throw err;
-				
-				data = JSON.parse(readableData.toString());
-
-				if (data[_this.namespace] ){
-					//if the data exists in the cache
-					_this.timestamp = data[_this.namespace].timestamp;
-
-					if (Date.now() - _this.timestamp < _this.ttl) {	
-						// data in cache is fresh, return data
-						// console.log("use data from cache");
-						_this.set(data[_this.namespace].data);
-						return sendData(_this.response, data[_this.namespace].data);
-					}
-				}
-				// console.log("get new data");
-				getNewData(_.bind(_this.parse, _this));
-			});
-		}
+		T.get('search/tweets', {
+				q: '#audiovortex',
+				count: 100
+			},
+			//callback
+			function(err, data){
+				_this.parse(err, data);
+				deferred.resolve();
+			}
+		);
+		return deferred.promise;
 	},
 	parse: function(err, data){
-		this.timestamp = Date.now();
-		data = data.statuses;
-		this.reset(data);
-		sendData(this.response, data);
-		this.save();
-		return data;
+		_.each(data.statuses, function(status){
+			status._id = status.id;
+			status.soundcloud_url = parseSoundcloudURL(status.entities.urls);
+		});
+		this.add(data.statuses);
+		return data.statuses;
 	},
 	save: function(){
 		var _this = this;
-		fs.readFile(this.filePath, function (err, readableData) {
-			//add to namespace
-			var newData = JSON.parse(readableData);
-			newData[_this.namespace] = {
-				timestamp: _this.timestamp,
-				data: _this.toJSON()
-			};
-			//write to file
-			fs.writeFile(_this.filePath, JSON.stringify(newData), {encoding: "utf-8"} );
+		var db = new Db('audio-vortex', new Server('localhost', 27017), {safe:false});
+		db.open(function(err, db) {
+			// Fetch a collection to insert document into
+			var collection = db.collection("tweets");
+			// Insert a multiple documents
+			collection.insert(
+				_this.toJSON(), 
+				{w:1}, 
+				function(err, result) {
+					db.close();
+					sendData(_this.response, {"result": result});
+					
+				}
+			);
 		});
 	}
 });
 
-function getNewData(cb){
-	T.get('search/tweets', { q: '#WGW', count: 100 }, cb);
+function parseSoundcloudURL(array){
+	return _.find(function(obj){
+		return obj.expanded_url.indexOf("soundcloud.com");
+	});
 }
 
 function sendData(response, data){
-	dataServiceUtils.setAsJSON(response);
+	HeaderUtils.addJSONHeader(response);
+	HeaderUtils.addCORSHeader(response);
 	response.send(JSON.stringify(data));
 }
 

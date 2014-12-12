@@ -3,7 +3,7 @@ var path = require("path");
 var express = require("express");
 var _ = require("underscore");
 var request = require("request");
-var dataServiceUtils = require("./utils/DataService");
+var HeaderUtils = require("./utils/HeaderUtils");
 var TwitterDataCollection = require("./collections/TwitterDataCollection");
 var SerialPort = require("serialport");
 
@@ -14,15 +14,10 @@ var serialPort = new SerialPort.SerialPort("/dev/tty.usbmodem1411", {
 
 var options = {};
 
-var twitterData = new TwitterDataCollection([], {
-	filePath: path.resolve(__dirname, "../data/data.json"),
-	namespace: "twitter"
-});
-
 module.exports = function (app, server, _options){
 
 	options = _.extend(options, {
-		serverTimeout: 2000,
+		serverTimeout: 10000,
 		env: "dev"
 	}, _options);
 
@@ -63,51 +58,53 @@ module.exports = function (app, server, _options){
 	router.get("/pulse/trigger/:id", function(req, res, next){
 
 		serialPort.write(req.params.id, function(err, results) {
-	      // console.log('err ' + err);
-	      // console.log('results ' + results);
-	      setAsJSON(res);
-	      serialPort.once("data", function(data){
-	      	// console.log(data);
-	      	results = {results: data};
-	      	res.header("Access-Control-Allow-Origin", "*");
-	      	res.send(JSON.stringify(results));
-	      });
-	    });
+		// console.log('err ' + err);
+		// console.log('results ' + results);
+		serialPort.once("data", function(data){
+			// console.log(data);
+			results = {results: data};
+			HeaderUtils
+				.addJSONHeader(res)
+				.addCORSHeader(res);
+			res.send(JSON.stringify(results));
+		  });
+		});
 	});
 
 	router.get("/twitter/cycle", function(req, res, next){
+		var twitterData = new TwitterDataCollection([]);
 		twitterData.response = res;
-		twitterData.fetch();
-	});
-
-	router.get("/twitter/:since", function(req, res, next){
-		getTwitterAccessToken(function(token){
-			console.log(token);
-			setAsJSON(res);
-			res.send('{ "since": "'+ req.params.since +'" }');
-			next();
-		});
+		twitterData.fetch()
+			.done(function(){
+				twitterData.save();
+			});
+		//
 	});
 
 	router.get("/",function (req, res, next) {
 		var pathToFile = path.resolve(__dirname, "../data/data.json");
 		fs.readFile(pathToFile, function (err, data) {
 			if (err) throw err;
-			setAsJSON(res);
+			HeaderUtils.addJSONHeader(res);
 			res.send(data);
 			next();
 		});
 	});
 
+
+	// API Routes
+	// GET latest songs with status ok
+	// PUT song status (:id) with json data
+		// if order is changed
+			// update other tweets order
+	// DELETE song (:id)
+
+
+
 	app.use('/', router);
 
 };
 
-
-function setAsJSON(res){
-	res.set("content-type", "application/json");
-	return res;
-}
 
 function closeConnection(socket) {
 	// force a short timeout on client connections so we can cycle the server quickly

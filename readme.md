@@ -8,21 +8,42 @@ CMS
 
 API
 
+## Dependancies
+
+Node.js, mongodb and Ruby
+
+* on OSX
+
+````bash
+# ruby comes installed
+brew install nodejs
+brew install mongodb
+````
+
+Start mongodb
+
+````bash
+nohup mongodb --dbpath=/data/db --port 27017
+````
+
 ## Project Setup
 
-Presumed installed: Node.js and Ruby
+Presumed installed: 
 
 * Requires SASS gem
+
 ````bash
-$ sudo gem install sass
+sudo gem install sass
 ````
 * Requires Gulp
+
 ````bash
-$ npm install -g gulp
+npm install -g gulp
 ````
 * Install
+
 ````bash
-$ npm install && gulp
+npm install && gulp
 ````
 
 ## Development Process
