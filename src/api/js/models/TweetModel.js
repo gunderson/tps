@@ -10,7 +10,7 @@ var TweetModel = Backbone.Model.extend({
 			editedBy: ["api"], // users
 			editAction: ["create"],
 			editedAt: [Date.now()],
-			soundcloudURL: null
+			soundcloud_url: null
 		};
 	}
 });

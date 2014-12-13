@@ -20,12 +20,14 @@ var T = new Twit({
 var TwitterDataCollection = Backbone.Collection.extend({
 	response: null,
 	model: TweetModel,
-	url: "mongodb://localhost:27017/audio-vortex",
+	remote_uri: "localhost",
+	remote_port: 27017,
+	remote_db: "audio-vortex",
 	initialize: function(models, options){
 		_.extend(this, options);
 		
 	},
-	fetch: function(){
+	fetchRemote: function(){
 		var deferred = Q.defer();
 		var _this = this;
 
@@ -35,13 +37,13 @@ var TwitterDataCollection = Backbone.Collection.extend({
 			},
 			//callback
 			function(err, data){
-				_this.parse(err, data);
+				_this.parseRemote(err, data);
 				deferred.resolve();
 			}
 		);
 		return deferred.promise;
 	},
-	parse: function(err, data){
+	parseRemote: function(err, data){
 		_.each(data.statuses, function(status){
 			status._id = status.id;
 			status.soundcloud_url = parseSoundcloudURL(status.entities.urls);
@@ -49,36 +51,81 @@ var TwitterDataCollection = Backbone.Collection.extend({
 		this.add(data.statuses);
 		return data.statuses;
 	},
-	save: function(){
+	fetch: function(options){
+		var deferred = Q.defer();
 		var _this = this;
-		var db = new Db('audio-vortex', new Server('localhost', 27017), {safe:false});
+
+		var defaults = {
+			limit: 100
+		};
+		options = _.extend({}, defaults, options);
+
+		var db = new Db(this.remote_db, new Server(this.remote_uri, this.remote_port), {safe:false});
 		db.open(function(err, db) {
 			// Fetch a collection to insert document into
 			var collection = db.collection("tweets");
 			// Insert a multiple documents
-			collection.insert(
-				_this.toJSON(), 
-				{w:1}, 
+			collection.find(
 				function(err, result) {
-					db.close();
-					sendData(_this.response, {"result": result});
-					
+					result.toArray(function(err, docs){
+						sendData(_this.response, {"result": docs});
+						db.close();
+						deferred.resolve();
+					});
 				}
 			);
+		});
+		return deferred.promise;
+	},
+	parse: function(){
+
+	},
+	save: function(){
+		var deferrals = this.map(function(model){return Q.defer();});
+		var deferredAll = Q.all(_.pluck(deferrals, "promise"));
+		var _this = this;
+
+		var db = new Db(this.remote_db, new Server(this.remote_uri, this.remote_port), {safe:false});
+		db.open(function(err, db) {
+			// Fetch a collection to insert document into
+			var collection = db.collection("tweets");
+			// Insert a multiple documents
+			_this.each(function(model,i){
+				var deferral = deferrals[i];
+				collection.update(
+					{
+						_id: model.id
+					},
+					model.toJSON(), 
+					{
+						upsert:true,
+						w:1
+					}, 
+					function(err, result) {
+						deferral.resolve();
+					}
+				);
+			});
+		});
+
+		return deferredAll.done(function(){
+			db.close();
+			sendData(_this.response, {"result": "updated tweets"});
 		});
 	}
 });
 
 function parseSoundcloudURL(array){
-	return _.find(function(obj){
-		return obj.expanded_url.indexOf("soundcloud.com");
+	var obj = _.find(array, function(obj){
+		return obj.expanded_url.indexOf("soundcloud.com") > -1;
 	});
+	return obj.expanded_url;
 }
 
 function sendData(response, data){
 	HeaderUtils.addJSONHeader(response);
 	HeaderUtils.addCORSHeader(response);
-	response.send(JSON.stringify(data));
+	response.send(JSON.stringify(data, null, "\t") + "\n");
 }
 
 module.exports = TwitterDataCollection;

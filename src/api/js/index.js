@@ -74,11 +74,20 @@ module.exports = function (app, server, _options){
 	router.get("/twitter/cycle", function(req, res, next){
 		var twitterData = new TwitterDataCollection([]);
 		twitterData.response = res;
-		twitterData.fetch()
+		twitterData.fetchRemote()
 			.done(function(){
 				twitterData.save();
+				// next();
 			});
-		//
+	});
+
+	router.get("/tweets", function(req, res, next){
+		var twitterData = new TwitterDataCollection([]);
+		twitterData.response = res;
+		twitterData.fetch()
+			.done(function(){
+				next();
+			});
 	});
 
 	router.get("/",function (req, res, next) {
