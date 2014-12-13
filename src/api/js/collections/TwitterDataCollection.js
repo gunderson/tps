@@ -27,7 +27,7 @@ var TwitterDataCollection = Backbone.Collection.extend({
 		_.extend(this, options);
 		
 	},
-	fetchRemote: function(){
+	fetchFromTwitter: function(){
 		var deferred = Q.defer();
 		var _this = this;
 
@@ -37,13 +37,13 @@ var TwitterDataCollection = Backbone.Collection.extend({
 			},
 			//callback
 			function(err, data){
-				_this.parseRemote(err, data);
+				_this.parseFromTwitter(err, data);
 				deferred.resolve();
 			}
 		);
 		return deferred.promise;
 	},
-	parseRemote: function(err, data){
+	parseFromTwitter: function(err, data){
 		_.each(data.statuses, function(status){
 			status._id = status.id;
 			status.soundcloud_url = parseSoundcloudURL(status.entities.urls);

@@ -74,7 +74,7 @@ module.exports = function (app, server, _options){
 	router.get("/twitter/cycle", function(req, res, next){
 		var twitterData = new TwitterDataCollection([]);
 		twitterData.response = res;
-		twitterData.fetchRemote()
+		twitterData.fetchFromTwitter()
 			.done(function(){
 				twitterData.save();
 				// next();
