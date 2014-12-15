@@ -6,7 +6,9 @@ var TweetModel = Backbone.Model.extend({
 	idAttribute: "_id",
 	defaults: function(){
 		return {
-			moderationStatus: constants.MODERATION_STATUS.UNMODERATED,
+			// moderationStatus: constants.MODERATION_STATUS.UNMODERATED,
+			moderationStatus: constants.MODERATION_STATUS.PUBLISHED,
+			queueStatus: constants.QUEUE_STATUS.QUEUED,
 			editedBy: ["api"], // users
 			editAction: ["create"],
 			editedAt: [Date.now()],

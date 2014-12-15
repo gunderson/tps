@@ -76,15 +76,29 @@ module.exports = function (app, server, _options){
 		twitterData.response = res;
 		twitterData.fetchFromTwitter()
 			.done(function(){
-				twitterData.save();
-				// next();
+				twitterData.save()
+					.done(next);
 			});
 	});
 
-	router.get("/tweets", function(req, res, next){
+	router.get("/tweets/next", function(req, res, next){
 		var twitterData = new TwitterDataCollection([]);
 		twitterData.response = res;
-		twitterData.fetch()
+		twitterData.getNext()
+			.done(function(){
+				next();
+			});
+	}
+
+	router.get("/tweets", function(req, res, next){
+		var availableCommands = ["since"];
+		var query = _.filter(req.query, function(param, key){
+			return availableCommands.indexOf(key) > -1;
+		});
+
+		var twitterData = new TwitterDataCollection([]);
+		twitterData.response = res;
+		twitterData.fetch(query)
 			.done(function(){
 				next();
 			});

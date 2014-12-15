@@ -6,9 +6,9 @@ module.exports = {
 		ACCEPTED: 5,
 		PUBLISHED: 10
 	},
-	PLAY_STATUS: {
-		UNPLAYED: 0,
-		PLAYED: 10,
-		QUEUED: 20
+	QUEUE_STATUS: {
+		UNQUEUED: 0,
+		QUEUED: 10,
+		PLAYING: 20,
 	}
 };

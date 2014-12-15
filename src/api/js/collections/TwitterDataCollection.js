@@ -44,11 +44,16 @@ var TwitterDataCollection = Backbone.Collection.extend({
 		return deferred.promise;
 	},
 	parseFromTwitter: function(err, data){
-		_.each(data.statuses, function(status){
-			status._id = status.id;
-			status.soundcloud_url = parseSoundcloudURL(status.entities.urls);
-		});
-		this.add(data.statuses);
+		var tweets = data.statuses;
+		var soundcloudTweets = _(tweets)
+			.each(function(tweet){
+				tweet._id = tweets.id;
+				tweet.soundcloud_url = parseSoundcloudURL(tweet.entities.urls);
+			})
+			.filter(function(tweet){
+				return tweet.soundcloud_url;
+			});
+		this.add(soundcloudTweets);
 		return data.statuses;
 	},
 	fetch: function(options){
@@ -56,19 +61,20 @@ var TwitterDataCollection = Backbone.Collection.extend({
 		var _this = this;
 
 		var defaults = {
-			limit: 100
+			limit: 100,
+			query:{}
 		};
 		options = _.extend({}, defaults, options);
 
-		var db = new Db(this.remote_db, new Server(this.remote_uri, this.remote_port), {safe:false});
+		var db = getDB.call(this);
 		db.open(function(err, db) {
 			// Fetch a collection to insert document into
-			var collection = db.collection("tweets");
-			// Insert a multiple documents
-			collection.find(
+			var tweets = db.collection("tweets");
+			// find a multiple documents
+			tweets.find(query,
 				function(err, result) {
 					result.toArray(function(err, docs){
-						sendData(_this.response, {"result": docs});
+						sendData(_this.response, {"data": docs});
 						db.close();
 						deferred.resolve();
 					});
@@ -77,22 +83,116 @@ var TwitterDataCollection = Backbone.Collection.extend({
 		});
 		return deferred.promise;
 	},
-	parse: function(){
+	advance: function(){
+		var _this = this;
+		return this.stop()
+			.then(this.getNext)
+			.then(function(song){
+				this.play(song.id);
+			});
+	},
+	play: function(id){
+		var deferred = Q.defer();
+		var query = {
+			_id: id
+		};
+		var command = {
+			queueStatus: constants.QUEUE_STATUS.PLAYING
+		};
 
+		var db = getDB.call(this);
+		db.open(function(err, db) {
+			// Fetch a collection to insert document into
+			var tweets = db.collection("tweets");
+
+			tweets.update(
+				query,
+				command,
+				{w:1}, 
+				function(err, result) {
+					db.close();
+					deferred.resolve(result);
+				});
+		});
+
+		return deferred.promise;
+	},
+	stop: function(){
+		var deferred = Q.defer();
+		var query = {
+			queueStatus:{
+				$in: constants.QUEUE_STATUS.PLAYING
+			}
+		};
+		var command = {
+			queueStatus: constants.QUEUE_STATUS.UNQUEUED
+		};
+
+		var db = getDB.call(this);
+		db.open(function(err, db) {
+			// Fetch a collection to insert document into
+			var tweets = db.collection("tweets");
+
+			tweets.update(
+				query,
+				command,
+				{w:1}, 
+				function(err, result) {
+					db.close();
+					deferred.resolve(result);
+				});
+		});
+
+		return deferred.promise;
+	},
+	getNext: function(){
+		// get the latest song that is QUEUED
+		// send that song
+		var deferred = Q.defer();
+		var query = {
+			moderationStatus: constants.MODERATION_STATUS.PUBLISHED,
+		};
+		var command = {
+			queueStatus: constants.QUEUE_STATUS.QUEUED
+		};
+
+		var db = getDB.call(this);
+		db.open(function(err, db) {
+			// Fetch a collection to insert document into
+			var tweets = db.collection("tweets");
+
+			tweets
+				.find(query)
+				.sort({created_at: 1})
+				.limit(1)
+				.update(
+					command,
+					{w:1}, 
+					function(err, result) {
+						db.close();
+						sendData(this.request, {"data":result});
+						deferred.resolve(result);
+					});
+		});
+
+		return deferred.promise;
+	},
+	parse: function(input){
+		return input;
 	},
 	save: function(){
 		var deferrals = this.map(function(model){return Q.defer();});
 		var deferredAll = Q.all(_.pluck(deferrals, "promise"));
 		var _this = this;
 
-		var db = new Db(this.remote_db, new Server(this.remote_uri, this.remote_port), {safe:false});
+		var db = getDB.call(this);
 		db.open(function(err, db) {
 			// Fetch a collection to insert document into
-			var collection = db.collection("tweets");
+			var tweets = db.collection("tweets");
 			// Insert a multiple documents
 			_this.each(function(model,i){
 				var deferral = deferrals[i];
-				collection.update(
+				tweets.update(
 					{
 						_id: model.id
 					},
@@ -110,11 +210,17 @@ var TwitterDataCollection = Backbone.Collection.extend({
 
 		return deferredAll.done(function(){
 			db.close();
-			sendData(_this.response, {"result": "updated tweets"});
+			sendData(_this.response, {"data": "updated tweets"});
 		});
 	}
 });
 
+function getDB(){
+	return new Db(this.remote_db, new Server(this.remote_uri, this.remote_port), {safe:false});
+}
+
+//takes an array of url objects from Twitter API
+//returns an array of just soundcloud urls
 function parseSoundcloudURL(array){
 	var obj = _.find(array, function(obj){
 		return obj.expanded_url.indexOf("soundcloud.com") > -1;
