@@ -1,16 +1,9 @@
 var jade = require('jade/runtime'); module.exports = {
-"another": function(locals) {
+"queue/queue-item": function(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
-
-buf.push("<div id=\"another\"><div id=\"hello\"></div></div>");;return buf.join("");
-},
-"partial": function(locals) {
-var buf = [];
-var jade_mixins = {};
-var jade_interp;
-;var locals_for_with = (locals || {});(function (id) {
-buf.push("<h2>It Worked - " + (jade.escape((jade_interp = id) == null ? '' : jade_interp)) + "</h2>");}.call(this,"id" in locals_for_with?locals_for_with.id:typeof id!=="undefined"?id:undefined));;return buf.join("");
+;var locals_for_with = (locals || {});(function (constants, copy, moderationStatus, soundcloud_url, user) {
+buf.push("<div class=\"queue-item\"><div class=\"handle\"></div><div class=\"title\">" + (jade.escape((jade_interp = copy.pages.queue['queue-item'].title) == null ? '' : jade_interp)) + "</div><div class=\"user\">" + (jade.escape((jade_interp = user.name) == null ? '' : jade_interp)) + "</div><div class=\"url\"><a" + (jade.attr("href", "" + (soundcloud_url) + "", true, false)) + " target=\"_blank\">Listen on Soundcloud</a></div><div class=\"status\"><select class=\"moderation-status\"><option" + (jade.attr("value", "" + (constants.MODERATION_STATUS.REJECTED) + "", true, false)) + (jade.attr("selected", moderationStatus == constants.MODERATION_STATUS.REJECTED, true, false)) + "> " + (jade.escape((jade_interp = copy.shared.MODERATION_STATUS.REJECTED) == null ? '' : jade_interp)) + "</option><option" + (jade.attr("value", "" + (constants.MODERATION_STATUS.UNMODERATED) + "", true, false)) + (jade.attr("selected", moderationStatus == constants.MODERATION_STATUS.UNMODERATED, true, false)) + ">" + (jade.escape((jade_interp = copy.shared.MODERATION_STATUS.UNMODERATED) == null ? '' : jade_interp)) + "</option><option" + (jade.attr("value", "" + (constants.MODERATION_STATUS.ELEVATED) + "", true, false)) + (jade.attr("selected", moderationStatus == constants.MODERATION_STATUS.ELEVATED, true, false)) + ">" + (jade.escape((jade_interp = copy.shared.MODERATION_STATUS.ELEVATED) == null ? '' : jade_interp)) + "</option><option" + (jade.attr("value", "" + (constants.MODERATION_STATUS.ACCEPTED) + "", true, false)) + (jade.attr("selected", moderationStatus == constants.MODERATION_STATUS.ACCEPTED, true, false)) + ">" + (jade.escape((jade_interp = copy.shared.MODERATION_STATUS.ACCEPTED) == null ? '' : jade_interp)) + "</option><option" + (jade.attr("value", "" + (constants.MODERATION_STATUS.PUBLISHED) + "", true, false)) + (jade.attr("selected", moderationStatus == constants.MODERATION_STATUS.PUBLISHED, true, false)) + ">" + (jade.escape((jade_interp = copy.shared.MODERATION_STATUS.PUBLISHED) == null ? '' : jade_interp)) + "</option></select></div></div>");}.call(this,"constants" in locals_for_with?locals_for_with.constants:typeof constants!=="undefined"?constants:undefined,"copy" in locals_for_with?locals_for_with.copy:typeof copy!=="undefined"?copy:undefined,"moderationStatus" in locals_for_with?locals_for_with.moderationStatus:typeof moderationStatus!=="undefined"?moderationStatus:undefined,"soundcloud_url" in locals_for_with?locals_for_with.soundcloud_url:typeof soundcloud_url!=="undefined"?soundcloud_url:undefined,"user" in locals_for_with?locals_for_with.user:typeof user!=="undefined"?user:undefined));;return buf.join("");
 },
 }

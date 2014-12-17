@@ -1,0 +1,15 @@
+.queue-item
+	.handle
+	.title
+		| #{copy.pages.queue['queue-item'].title}
+	.user
+		| #{user.name}
+	.url
+		a(href="#{soundcloud_url}", target="_blank") Listen on Soundcloud
+	.status
+		select.moderation-status
+			option(value="#{constants.MODERATION_STATUS.REJECTED}", selected=moderationStatus == constants.MODERATION_STATUS.REJECTED)  #{copy.shared.MODERATION_STATUS.REJECTED}
+			option(value="#{constants.MODERATION_STATUS.UNMODERATED}", selected=moderationStatus == constants.MODERATION_STATUS.UNMODERATED) #{copy.shared.MODERATION_STATUS.UNMODERATED}
+			option(value="#{constants.MODERATION_STATUS.ELEVATED}", selected=moderationStatus == constants.MODERATION_STATUS.ELEVATED) #{copy.shared.MODERATION_STATUS.ELEVATED}
+			option(value="#{constants.MODERATION_STATUS.ACCEPTED}", selected=moderationStatus == constants.MODERATION_STATUS.ACCEPTED) #{copy.shared.MODERATION_STATUS.ACCEPTED}
+			option(value="#{constants.MODERATION_STATUS.PUBLISHED}", selected=moderationStatus == constants.MODERATION_STATUS.PUBLISHED) #{copy.shared.MODERATION_STATUS.PUBLISHED}

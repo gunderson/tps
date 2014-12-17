@@ -20,8 +20,12 @@ Backbone.Layout.configure({
 
 function onDocumentReady(){
 	$('body').css("display", "block");
-	window.app = new App().render();
-
+	$.get("data/en.json")
+		.done(function(jsonResult){
+			window.app = new App({
+				copy: jsonResult
+			}).render();
+		});
 }
 
 $(onDocumentReady);

@@ -1,0 +1,14 @@
+{
+	"MODERATION_STATUS": {
+		"REJECTED": "Rejected",
+		"UNMODERATED": "Unmoderated",
+		"ELEVATED": "Elevated",
+		"ACCEPTED": "Accepted",
+		"PUBLISHED": "Published"
+	},
+	"QUEUE_STATUS": {
+		"UNQUEUED": "Unqueued",
+		"QUEUED": "Queued",
+		"PLAYING": "Playing"
+	}
+}

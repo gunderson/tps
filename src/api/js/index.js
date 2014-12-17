@@ -5,6 +5,7 @@ var _ = require("underscore");
 var request = require("request");
 var HeaderUtils = require("./utils/HeaderUtils");
 var TwitterDataCollection = require("./collections/TwitterDataCollection");
+var TweetModel = require("./models/TweetModel");
 var SerialPort = require("serialport");
 
 var serialPort = new SerialPort.SerialPort("/dev/tty.usbmodem1411", {
@@ -22,6 +23,13 @@ module.exports = function (app, server, _options){
 	}, _options);
 
 	router = express.Router();
+
+	router.use(function(req, res, next) {
+		res.header("Access-Control-Allow-Origin", "*");
+		res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+		res.header("Access-Control-Allow-Methods", "GET, PUT, DELETE");
+		next();
+	});
 
 	/**********************************************************
 	 *
@@ -58,20 +66,16 @@ module.exports = function (app, server, _options){
 	router.get("/pulse/trigger/:id", function(req, res, next){
 
 		serialPort.write(req.params.id, function(err, results) {
-		// console.log('err ' + err);
-		// console.log('results ' + results);
 		serialPort.once("data", function(data){
-			// console.log(data);
 			results = {results: data};
-			HeaderUtils
-				.addJSONHeader(res)
-				.addCORSHeader(res);
+			HeaderUtils.addJSONHeader(res);
+			HeaderUtils.addCORSHeader(res);
 			res.send(JSON.stringify(results));
 		  });
 		});
 	});
 
-	router.get("/twitter/cycle", function(req, res, next){
+	router.get("/tweets/cycle", function(req, res, next){
 		var twitterData = new TwitterDataCollection([]);
 		twitterData.response = res;
 		twitterData.fetchFromTwitter()
@@ -85,10 +89,21 @@ module.exports = function (app, server, _options){
 		var twitterData = new TwitterDataCollection([]);
 		twitterData.response = res;
 		twitterData.getNext()
-			.done(function(){
-				next();
-			});
-	}
+			.done(next);
+	});
+
+	router.put("/tweets/:id", function(req, res, next){
+		var tweet = new TweetModel({id: req.params.id});
+			tweet.fetch()
+				.then(function(){
+					tweet.set(req.query);
+				})
+				.then(tweet.save)
+				.then(function(){
+					sendData(res, {"result": req.params.id + " updated"});
+				})
+				.done(next);
+	});
 
 	router.get("/tweets", function(req, res, next){
 		var availableCommands = ["since"];
@@ -98,10 +113,8 @@ module.exports = function (app, server, _options){
 
 		var twitterData = new TwitterDataCollection([]);
 		twitterData.response = res;
-		twitterData.fetch(query)
-			.done(function(){
-				next();
-			});
+		twitterData.fetch({query:query})
+			.done(next);
 	});
 
 	router.get("/",function (req, res, next) {

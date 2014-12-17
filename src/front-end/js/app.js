@@ -40,10 +40,15 @@ module.exports = Backbone.Layout.extend({
 		// "#orientation-error" : new ErrorView()
     }, pages, overlays),
 
-    initialize: function () {
+    initialize: function (options) {
+        var _this = this;
+        this.copy = options.copy;
+        _.each(this.pages, function(p){
+            p.copy = _this.copy;
+        });
         // assign controller to each view
         _.each(this.views, function(v){
-    		v.controller = this.controller;
+    		v.controller = _this.controller;
     	});
 
         $(window).on('orientationchange', this.onOrientationChange);

@@ -23,7 +23,7 @@ brew install mongodb
 Start mongodb
 
 ````bash
-nohup mongodb --dbpath=/data/db --port 27017
+nohup mongod --dbpath=/data/db --port 27017 &
 ````
 
 ## Project Setup

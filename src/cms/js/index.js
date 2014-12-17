@@ -1,10 +1,15 @@
-window.$ = require('jquery');
+window.$ = window.jQuery = require('jquery');
 window._ = require('underscore');
 window.Backbone = require('backbone');
+Backbone.$ = $;
 require("backbone.layoutmanager");
-var templates = require("./templates");
+require("velocity-animate");
 
-	console.log(templates);
+
+
+
+var templates = require("./templates");
+var App = require("./app");
 
 Backbone.Layout.configure({
 	manage: true,
@@ -15,19 +20,13 @@ Backbone.Layout.configure({
 
 function onDocumentReady(){
 	$('body').css("display", "block");
-	$("h1").html("changed it up");
-
-	var v = Backbone.Layout.extend({
-		id: "main-nav",
-		template: "partial",
-		el: "header",
-		serialize: function(){
-			return {
-				id: "main-nav"
-			}
-		}
-	})
-	new v().render();
+	$.get("data/en.json")
+		.done(function(jsonResult){
+			window.app = new App({
+					copy: jsonResult
+				})
+			.render();
+	});
 
 }
 

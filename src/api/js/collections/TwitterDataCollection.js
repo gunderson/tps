@@ -47,11 +47,14 @@ var TwitterDataCollection = Backbone.Collection.extend({
 		var tweets = data.statuses;
 		var soundcloudTweets = _(tweets)
 			.each(function(tweet){
-				tweet._id = tweets.id;
+				tweet._id = tweet.id_str;
 				tweet.soundcloud_url = parseSoundcloudURL(tweet.entities.urls);
 			})
 			.filter(function(tweet){
-				return tweet.soundcloud_url;
+				var rtPosition = tweet.text.toLowerCase().indexOf("rt @");
+				rtPosition = (rtPosition > -1) ? rtPosition : tweet.text.toLowerCase().indexOf(".@");
+				rtPosition = (rtPosition > -1) ? rtPosition : tweet.text.toLowerCase().indexOf(">@");
+				return tweet.soundcloud_url && rtPosition == -1;
 			});
 		this.add(soundcloudTweets);
 		return data.statuses;
@@ -68,10 +71,13 @@ var TwitterDataCollection = Backbone.Collection.extend({
 
 		var db = getDB.call(this);
 		db.open(function(err, db) {
+			if (err){
+				return sendData(_this.response, {"error": err, "db": db});
+			}
 			// Fetch a collection to insert document into
 			var tweets = db.collection("tweets");
 			// find a multiple documents
-			tweets.find(query,
+			tweets.find(options.query,
 				function(err, result) {
 					result.toArray(function(err, docs){
 						sendData(_this.response, {"data": docs});
@@ -130,6 +136,9 @@ var TwitterDataCollection = Backbone.Collection.extend({
 
 		var db = getDB.call(this);
 		db.open(function(err, db) {
+			if (err){
+				return sendData(req, {"error": err});
+			}
 			// Fetch a collection to insert document into
 			var tweets = db.collection("tweets");
 
@@ -208,10 +217,11 @@ var TwitterDataCollection = Backbone.Collection.extend({
 			});
 		});
 
-		return deferredAll.done(function(){
+		deferredAll.done(function(){
 			db.close();
 			sendData(_this.response, {"data": "updated tweets"});
 		});
+		return deferredAll;
 	}
 });
 

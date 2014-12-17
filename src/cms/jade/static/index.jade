@@ -10,8 +10,14 @@ html
 			| 	background-color: white;
 			| }
 	body
-		include _main-nav
-		include _header
-		include _footer
-		h1 It Worked Again
+		#main
+			include ui/_site-loader
+			include ui/_main-menu
+			include ui/_header
+			include ui/_footer
+			#pages
+				include pages/_queue
+				.cover
+
+		script(src="http://connect.soundcloud.com/sdk.js")
 		script(src="index.js")

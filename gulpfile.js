@@ -186,7 +186,7 @@ settings["static-renders"].forEach(function(role){
 settings["dynamic-renders"].forEach(function(role){
 	gulp.task('templates-dynamic-' + role, function (cb) {
 		processDynamicTemplates(role);
-		gulp.start('scripts');
+		gulp.start('scripts-' + role);
 		cb();
 	});
 });
@@ -280,7 +280,8 @@ function processData(role) {
 				dest: dest,
 				bases: [lang, "data"]
 			}))
-			.pipe(gulp.dest(dest));
+			.pipe(gulp.dest(dest))
+			.pipe(gulp.dest(settings[role].dist + "/data"));
 	}
 }
 
@@ -357,11 +358,18 @@ gulp.task('watch',
 			);
 
 			watch([
-					settings[role].src + '/**/*.jade',
+					settings[role].src + '/**/*.jade'
+				],
+				function (files, cb) {
+					gulp.start(["templates-" + role, "scripts-" + role], cb);
+				}
+			);
+
+			watch([
 					settings[role].data + "/**/*.json"
 				],
 				function (files, cb) {
-					gulp.start("templates-" + role, cb);
+					gulp.start(["process-data-" + role], cb);
 				}
 			);
 
@@ -451,6 +459,7 @@ function startApiServer(cb){
 
 gulp.task('default', [
     'styles',
+    'process-data',
     'templates',
     'scripts',
     'copy-assets'
