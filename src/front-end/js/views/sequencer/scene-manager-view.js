@@ -1,6 +1,6 @@
 require("backbone");
 require("backbone.layoutmanager");
-var SceneView = require("./scene");
+var SceneView = require("./scene-view");
 
 var SceneManager = Backbone.Layout.extend({
 	keep:true,

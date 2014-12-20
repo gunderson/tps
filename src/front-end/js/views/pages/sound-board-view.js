@@ -4,7 +4,7 @@ var _ = require("underscore");
 var AbstractPage = require("./Page");
 var SoundManager = require("../../controllers/sequencer/sound-manager")();
 var instruments = require("../../music/Instruments");
-var InstrumentView = require("./sound-board/instrument");
+var InstrumentView = require("./sound-board/instrument-view");
 
 
 

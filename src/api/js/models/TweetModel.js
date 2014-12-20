@@ -1,5 +1,9 @@
+// var colors = require("colors");
+
 var Backbone = require("Backbone");
 var _ = require("underscore");
+var ResponseUtils = require("../utils/ResponseUtils");
+var SoundCloudLoader = require("../lib/soundcloudloader");
 var constants = require("../constants");
 var Q = require("q");
 var Db = require('mongodb').Db,
@@ -23,14 +27,14 @@ var TweetModel = Backbone.Model.extend({
 		var db = getDB.call(this);
 		db.open(function(err, db) {
 			if (err){
-				return sendData(_this.response, {"error": err, "db": db});
+				return ResponseUtils.sendData(_this.response, {"error": err, "db": db});
 			}
 			// Fetch a collection to insert document into
 			var tweets = db.collection("tweets");
 			// find a multiple documents
 			tweets.findOne(query,
 				function(err, result) {
-					this.set(result);
+					_this.set(result);
 					db.close();
 					deferred.resolve();
 				}
@@ -46,23 +50,40 @@ var TweetModel = Backbone.Model.extend({
 			_id: this.id
 		};
 
+		// console.log("TweetModel", this.get("order"));
+
 		var db = getDB.call(this);
 		db.open(function(err, db) {
 			// Fetch a collection to insert document into
 			var tweets = db.collection("tweets");
 			tweets.update(
+				query,
 				{
-					_id: model.id
+					$set: _this.toJSON()
 				},
-				model.toJSON(), 
 				{
+					upsert: true,
 					w:1
 				}, 
 				function(err, result) {
+					db.close();
 					deferred.resolve();
 				}
 			);
 		});
+		return deferred.promise;
+	},
+	getSoundCloudInfo: function(){
+		var deferred = Q.defer();
+		var scl = new SoundCloudLoader();
+		scl.loadStream(this.get("soundcloud_url", function(soundcloudData){
+			this.set("soundcloudData", soundcloudData);
+			this.save();
+			deferred.resolve();
+		}.bind(this), function(){
+			//err
+			deferred.reject();
+		}));
 		return deferred.promise;
 	},
 	defaults: function(){
@@ -73,7 +94,6 @@ var TweetModel = Backbone.Model.extend({
 			editedBy: ["api"], // users
 			editAction: ["create"],
 			editedAt: [Date.now()],
-			soundcloud_url: null
 		};
 	}
 });

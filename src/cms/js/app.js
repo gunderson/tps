@@ -3,11 +3,11 @@ require("backbone");
 require("backbone.layoutmanager");
 var _ = require("underscore");
 
-var Queue = require("./collections/queue");
+var Queue = require("./collections/queue-collection");
 
-var MainMenu = require("./views/ui/main-menu");
-var HomePage = require("./views/pages/home");
-var QueuePage = require("./views/pages/queue");
+var MainMenu = require("./views/ui/main-menu-view");
+var HomePage = require("./views/pages/home-view");
+var QueuePage = require("./views/pages/queue-view");
 
 
 var pages = {

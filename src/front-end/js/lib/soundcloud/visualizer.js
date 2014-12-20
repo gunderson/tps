@@ -49,11 +49,11 @@ var Visualizer = function(options) {
         //detect a peak
         i = 0x3f;
         if (prevStreamData2[i] > prevStreamData[i] && prevStreamData[i] < streamData[i]){
-            $.get("http://localhost:3030/pulse/trigger/2");
+            $.get("http://localhost:3030/pulse/trigger/3");
         }
         i = 0x1f;
         if (prevStreamData2[i] > prevStreamData[i] && prevStreamData[i] < streamData[i]){
-            $.get("http://localhost:3030/pulse/trigger/1");
+            $.get("http://localhost:3030/pulse/trigger/4");
         }
     }
 

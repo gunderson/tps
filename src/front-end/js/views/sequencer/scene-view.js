@@ -1,6 +1,6 @@
 require("backbone");
 require("backbone.layoutmanager");
-var PatternDetailView = require("./pattern-detail");
+var PatternDetailView = require("./pattern-detail-view");
 
 var SceneView = Backbone.Layout.extend({
 	el: false,

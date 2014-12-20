@@ -2,9 +2,12 @@
 	.background
 	.content
 		h1 Soundcloud Page
-		form
-			input#url-field(type="text", value="https://soundcloud.com/cresquin/no-15")
-			input#submit-button.button.button-0(type="submit")
+		h2.now-playing 
+			| Now Playing: 
+			a(href="") 
+		h3.up-next 
+			| Up Next: 
+			a(href="")  
 		button.play.button.button-0 Play
 		button.stop.button.button-0 Stop
 		canvas#visualizer(width="768", height="400")

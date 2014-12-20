@@ -3,12 +3,13 @@ require("backbone");
 require("backbone.layoutmanager");
 var _ = require("underscore");
 
-var MainMenu = require("./views/ui/main-menu");
-var HomePage = require("./views/pages/home");
-var AboutPage = require("./views/pages/about");
-var SequencerPage = require("./views/pages/sequencer");
-var SoundcloudPage = require("./views/pages/soundcloud");
-var SoundBoardPage = require("./views/pages/sound-board");
+var MainMenu = require("./views/ui/main-menu-view");
+var HomePage = require("./views/pages/home-view");
+var AboutPage = require("./views/pages/about-view");
+var SequencerPage = require("./views/pages/sequencer-view");
+var SoundcloudPage = require("./views/pages/soundcloud-view");
+var SoundcloudModel = require("./models/soundcloud-player-model");
+var SoundBoardPage = require("./views/pages/sound-board-view");
 
 var Sequencer = require("./controllers/sequencer/sequencer");
 var SequencerModel = require("./models/sequencer/sequencer");
@@ -22,7 +23,7 @@ var pages = {
     "#about" : new AboutPage({route: "/about"}),
     "#sequencer" : new SequencerPage({controller: sequencer, route: "/sequencer"}),
     "#sound-board" : new SoundBoardPage({controller: sequencer, route: "/sound-board"}),
-	"#soundcloud" : new SoundcloudPage({route: "/soundcloud"}),
+	"#soundcloud" : new SoundcloudPage({model: new SoundcloudModel(), route: "/soundcloud"}),
 };
 
 var overlays = {

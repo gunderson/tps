@@ -5,7 +5,7 @@ var SoundcloudLoader = function(player) {
     var self = this;
     var client_id = "32e4c49c70a9e7e041bf913de7ec38ae"; // to get an ID go to http://developers.soundcloud.com/
     this.sound = {};
-    this.streamUrl = function(){return "";};
+    this.streamUrl = "";
     this.errorMessage = "";
     this.player = player;
 

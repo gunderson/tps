@@ -1,6 +1,6 @@
 require("backbone");
 require("backbone.layoutmanager");
-var TrackView = require("./track");
+var TrackView = require("./track-view");
 
 var TrackManager = Backbone.Layout.extend({
 	keep:true,

@@ -1,14 +1,14 @@
 module.exports = {
-	MODERATION_STATUS: {
-		REJECTED: -1,
-		UNMODERATED: 0,
-		ELEVATED: 1,
-		ACCEPTED: 5,
-		PUBLISHED: 10
-	},
-	QUEUE_STATUS: {
-		UNQUEUED: 0,
-		QUEUED: 10,
-		PLAYING: 20,
-	}
+    MODERATION_STATUS: {
+        REJECTED: "REJECTED",
+        UNMODERATED: "UNMODERATED",
+        ELEVATED: "ELEVATED",
+        ACCEPTED: "ACCEPTED",
+        PUBLISHED: "PUBLISHED"
+    },
+    QUEUE_STATUS: {
+        UNQUEUED: "UNQUEUED",
+        QUEUED: "QUEUED",
+        PLAYING: "PLAYING",
+    }
 };

@@ -16,7 +16,7 @@ var Page = Backbone.Layout.extend({
 			this.once("afterRender", promise.resolve);
 			this.model
 				.fetch()
-				.done(this.render);
+				.done(this.render.bind(this));
 		} else if (!this.hasRendered) {
 			this.once("afterRender", promise.resolve);
 			this.render();

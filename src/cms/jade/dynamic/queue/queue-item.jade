@@ -1,15 +1,16 @@
-.queue-item
-	.handle
-	.title
-		| #{copy.pages.queue['queue-item'].title}
-	.user
-		| #{user.name}
-	.url
-		a(href="#{soundcloud_url}", target="_blank") Listen on Soundcloud
-	.status
+tr.queue-item
+	td.order #{order}
+	td.status
 		select.moderation-status
 			option(value="#{constants.MODERATION_STATUS.REJECTED}", selected=moderationStatus == constants.MODERATION_STATUS.REJECTED)  #{copy.shared.MODERATION_STATUS.REJECTED}
 			option(value="#{constants.MODERATION_STATUS.UNMODERATED}", selected=moderationStatus == constants.MODERATION_STATUS.UNMODERATED) #{copy.shared.MODERATION_STATUS.UNMODERATED}
 			option(value="#{constants.MODERATION_STATUS.ELEVATED}", selected=moderationStatus == constants.MODERATION_STATUS.ELEVATED) #{copy.shared.MODERATION_STATUS.ELEVATED}
 			option(value="#{constants.MODERATION_STATUS.ACCEPTED}", selected=moderationStatus == constants.MODERATION_STATUS.ACCEPTED) #{copy.shared.MODERATION_STATUS.ACCEPTED}
 			option(value="#{constants.MODERATION_STATUS.PUBLISHED}", selected=moderationStatus == constants.MODERATION_STATUS.PUBLISHED) #{copy.shared.MODERATION_STATUS.PUBLISHED}
+	td.user 
+		h2 #{user.name}
+		a(href="http://twitter.com/#{user.screen_name}") @#{user.screen_name}
+
+	td.song 
+		.embed
+			iframe(width="100%", height="100", scrolling="no", frameborder="no", src="https://w.soundcloud.com/player/?url="+ encodeURIComponent(soundcloud_url) +"&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true")

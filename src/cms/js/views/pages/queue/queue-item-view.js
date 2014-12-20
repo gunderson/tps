@@ -9,6 +9,11 @@ var View = Backbone.Layout.extend({
 	events: {
 		"change select.moderation-status": "onChangeStatus"
 	},
+	updateOrder: function(newOrder){
+		this.model.set("order", newOrder);
+		this.$(".order").text(newOrder);
+		return this;
+	},
 	initialize: function(options){
 		this.copy = options.copy;
 	},
@@ -17,9 +22,8 @@ var View = Backbone.Layout.extend({
 		return _.extend({}, this.model.toJSON(), {copy: this.copy, constants: constants});
 	},
 	onChangeStatus: function(e){
-		console.log("onChangeStatus")
 		this.model
-			.set({"moderationStatus": parseInt(e.target.value)})
+			.set({"moderationStatus": e.target.value})
 			.save();
 	},
 });

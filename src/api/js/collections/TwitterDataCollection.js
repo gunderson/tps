@@ -1,7 +1,7 @@
 var Backbone = require("Backbone");
 var _ = require("underscore");
 var fs = require("fs");
-var HeaderUtils = require("../utils/HeaderUtils");
+var ResponseUtils = require("../utils/ResponseUtils");
 var Twit = require('twit');
 var TweetModel = require("../models/TweetModel");
 var constants = require("../constants");
@@ -29,17 +29,17 @@ var TwitterDataCollection = Backbone.Collection.extend({
 	},
 	fetchFromTwitter: function(){
 		var deferred = Q.defer();
-		var _this = this;
 
 		T.get('search/tweets', {
-				q: '#audiovortex',
+				q: '#audiovortex -RT',
 				count: 100
 			},
 			//callback
 			function(err, data){
-				_this.parseFromTwitter(err, data);
+				// this.on("add", this.getSoundCloudInfo);
+				this.add(this.parseFromTwitter(err, data));
 				deferred.resolve();
-			}
+			}.bind(this)
 		);
 		return deferred.promise;
 	},
@@ -56,8 +56,10 @@ var TwitterDataCollection = Backbone.Collection.extend({
 				rtPosition = (rtPosition > -1) ? rtPosition : tweet.text.toLowerCase().indexOf(">@");
 				return tweet.soundcloud_url && rtPosition == -1;
 			});
-		this.add(soundcloudTweets);
 		return data.statuses;
+	},
+	getSoundCloudInfo: function(model){
+		return model.getSoundCloudInfo();
 	},
 	fetch: function(options){
 		var deferred = Q.defer();
@@ -72,7 +74,7 @@ var TwitterDataCollection = Backbone.Collection.extend({
 		var db = getDB.call(this);
 		db.open(function(err, db) {
 			if (err){
-				return sendData(_this.response, {"error": err, "db": db});
+				return ResponseUtils.sendData(_this.response, {"error": err, "db": db});
 			}
 			// Fetch a collection to insert document into
 			var tweets = db.collection("tweets");
@@ -80,7 +82,7 @@ var TwitterDataCollection = Backbone.Collection.extend({
 			tweets.find(options.query,
 				function(err, result) {
 					result.toArray(function(err, docs){
-						sendData(_this.response, {"data": docs});
+						ResponseUtils.sendData(_this.response, {"data": docs});
 						db.close();
 						deferred.resolve();
 					});
@@ -92,24 +94,29 @@ var TwitterDataCollection = Backbone.Collection.extend({
 	advance: function(){
 		var _this = this;
 		return this.stop()
-			.then(this.getNext)
+			.then(this.getNext.bind(this))
 			.then(function(song){
-				this.play(song.id);
-			});
+				this.play(song._id);
+			}.bind(this));
 	},
 	play: function(id){
 		var deferred = Q.defer();
-		var query = {
-			_id: id
-		};
-		var command = {
-			queueStatus: constants.QUEUE_STATUS.PLAYING
-		};
+		var query;
+		var command;
 
 		var db = getDB.call(this);
 		db.open(function(err, db) {
-			// Fetch a collection to insert document into
 			var tweets = db.collection("tweets");
+
+			//set correct one as playing
+			query = {
+				_id: id
+			};
+			command = {
+				$set: {
+					queueStatus: constants.QUEUE_STATUS.PLAYING
+				}
+			};
 
 			tweets.update(
 				query,
@@ -126,18 +133,18 @@ var TwitterDataCollection = Backbone.Collection.extend({
 	stop: function(){
 		var deferred = Q.defer();
 		var query = {
-			queueStatus:{
-				$in: constants.QUEUE_STATUS.PLAYING
-			}
+			queueStatus:constants.QUEUE_STATUS.PLAYING
 		};
 		var command = {
-			queueStatus: constants.QUEUE_STATUS.UNQUEUED
+			$set: {
+				queueStatus: constants.QUEUE_STATUS.UNQUEUED
+			}
 		};
 
 		var db = getDB.call(this);
 		db.open(function(err, db) {
 			if (err){
-				return sendData(req, {"error": err});
+				return ResponseUtils.sendData(req, {"error": err});
 			}
 			// Fetch a collection to insert document into
 			var tweets = db.collection("tweets");
@@ -155,14 +162,18 @@ var TwitterDataCollection = Backbone.Collection.extend({
 		return deferred.promise;
 	},
 	getNext: function(){
+		var _this = this;
 		// get the latest song that is QUEUED
 		// send that song
 		var deferred = Q.defer();
 		var query = {
-			moderationStatus: constants.MODERATION_STATUS.PUBLISHED,
-		};
-		var command = {
-			queueStatus: constants.QUEUE_STATUS.QUEUED
+			$query:{
+				moderationStatus: constants.MODERATION_STATUS.PUBLISHED,
+				queueStatus: constants.QUEUE_STATUS.QUEUED
+			},
+			$orderby:{
+				order: 1
+			}
 		};
 
 		var db = getDB.call(this);
@@ -171,17 +182,46 @@ var TwitterDataCollection = Backbone.Collection.extend({
 			var tweets = db.collection("tweets");
 
 			tweets
-				.find(query)
-				.sort({created_at: 1})
-				.limit(1)
-				.update(
-					command,
-					{w:1}, 
+				.findOne(
+					query,
 					function(err, result) {
 						db.close();
-						sendData(this.request, {"data":result});
+						ResponseUtils.sendData(_this.response, {"data":result});
 						deferred.resolve(result);
 					});
+					
+		});
+
+		return deferred.promise;
+	},
+	getCurrent: function(){
+		var _this = this;
+		// get the latest song that is QUEUED
+		// send that song
+		var deferred = Q.defer();
+		var query = {
+			$query:{
+				queueStatus: constants.QUEUE_STATUS.PLAYING
+			},
+			$orderby:{
+				order: 1
+			}
+		};
+
+		var db = getDB.call(this);
+		db.open(function(err, db) {
+			// Fetch a collection to insert document into
+			var tweets = db.collection("tweets");
+
+			tweets
+				.findOne(
+					query,
+					function(err, result) {
+						db.close();
+						ResponseUtils.sendData(_this.response, {"data":result});
+						deferred.resolve(result);
+					});
+					
 		});
 
 		return deferred.promise;
@@ -205,7 +245,9 @@ var TwitterDataCollection = Backbone.Collection.extend({
 					{
 						_id: model.id
 					},
-					model.toJSON(), 
+					{
+						$set: model.toJSON()
+					}, 
 					{
 						upsert:true,
 						w:1
@@ -219,7 +261,7 @@ var TwitterDataCollection = Backbone.Collection.extend({
 
 		deferredAll.done(function(){
 			db.close();
-			sendData(_this.response, {"data": "updated tweets"});
+			ResponseUtils.sendData(_this.response, {"data": "updated tweets"});
 		});
 		return deferredAll;
 	}
@@ -238,10 +280,6 @@ function parseSoundcloudURL(array){
 	return obj.expanded_url;
 }
 
-function sendData(response, data){
-	HeaderUtils.addJSONHeader(response);
-	HeaderUtils.addCORSHeader(response);
-	response.send(JSON.stringify(data, null, "\t") + "\n");
-}
+
 
 module.exports = TwitterDataCollection;
