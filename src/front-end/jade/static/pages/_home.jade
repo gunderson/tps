@@ -1,5 +1,8 @@
 #home.page
 	.background
 	.content
-		button.button.button-0(data-trigger="1") trigger 1
-		button.button.button-0(data-trigger="2") trigger 2
+		each val in [0,1,2,3,4]
+			button.trigger.button.button-0(data-trigger=("" + val))= "trigger " + val
+
+		button.triggerAll.button.button-0() trigger all
+		button.getSongsFromTwitter.button.button-0() Get Songs From Twitter

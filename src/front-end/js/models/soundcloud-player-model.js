@@ -14,6 +14,9 @@ var Model = Backbone.Model.extend({
 		this.start();
 		this.listenTo(this.get("current"), "change reset", this.onChangeCurrent);
 	},
+	triggerPulse: function(id){
+
+	},
 	fetch: function(){
 		// short circuit fetching
 		var def = $.Deferred();
@@ -32,11 +35,12 @@ var Model = Backbone.Model.extend({
 		);
 	},
 	advance: function(){
-		$.get("http://localhost:3030/songs/advance")
+		var getPromise = $.get("http://localhost:3030/songs/advance")
 			.done(function(){
-				_this.getNext();
-				_this.getCurrent();
+				this.getNext();
+				this.getCurrent();
 	    	}.bind(this));
+	    return getPromise;
 	},
 	getNext: function(){
 		return this.get("next").fetch();
@@ -45,7 +49,6 @@ var Model = Backbone.Model.extend({
 		return this.get("current").fetch();
 	},
 	onChangeCurrent: function(){
-		console.log(this.get("current").get("soundcloud_url"))
 		if (!this.get("current").get("soundcloud_url")){
 			this.advance();
 		}

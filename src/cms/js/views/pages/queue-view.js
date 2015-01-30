@@ -52,7 +52,7 @@ var Page = AbstractPage.extend({
 
 		var views = this.getViews(".queue-items").each(function(view, i){
 			view.updateOrder(
-				els.indexOf(view.el)
+				els.indexOf(view.el) + 1
 			);
 		});
 

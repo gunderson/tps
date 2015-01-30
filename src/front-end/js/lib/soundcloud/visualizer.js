@@ -38,21 +38,26 @@ var Visualizer = function(options) {
     function draw(){
         //cheap clear
         canvas.width = canvas.width;
-        var barWidth = canvas.width / (streamData.length >> 3);
+        var barWidth = canvas.width / (streamData.length >> 0);
         ctx.fillStyle = "#ff0000";
 
-        for (var i = 0, endi = streamData.length; i < endi; i+=8){
+        for (var i = 0, endi = streamData.length; i < endi; i+=1){
             var val = streamData[i];
             var barHeight = (canvas.height * streamData[i] / 0xff);
-            ctx.fillRect((i >> 3) * (barWidth + 1), canvas.height - barHeight, barWidth, barHeight);
+            if (i == 0x42 || i == 0x20) {
+                ctx.fillStyle = "#0000ff";
+            } else {
+                ctx.fillStyle = "#ff0000";
+            }
+            ctx.fillRect((i >> 0) * (barWidth + 1), canvas.height - barHeight, barWidth, barHeight);
         }
         //detect a peak
-        i = 0x3f;
-        if (prevStreamData2[i] > prevStreamData[i] && prevStreamData[i] < streamData[i]){
+        i = 0x42;
+        if (prevStreamData2[i] < prevStreamData[i] && prevStreamData[i] > streamData[i]){
             $.get("http://localhost:3030/pulse/trigger/3");
         }
-        i = 0x1f;
-        if (prevStreamData2[i] > prevStreamData[i] && prevStreamData[i] < streamData[i]){
+        i = 0x20;
+        if (prevStreamData2[i] < prevStreamData[i] && prevStreamData[i] > streamData[i]){
             $.get("http://localhost:3030/pulse/trigger/4");
         }
     }

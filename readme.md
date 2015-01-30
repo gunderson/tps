@@ -10,7 +10,7 @@ API
 
 ## Dependancies
 
-Node.js, mongodb and Ruby
+Node.js, MongoDB and Ruby
 
 * on OSX
 
@@ -28,7 +28,7 @@ nohup mongod --dbpath=/data/db --port 27017 &
 
 ## Project Setup
 
-Presumed installed: 
+Presumed installed:
 
 * Requires SASS gem
 
@@ -60,6 +60,14 @@ Automatically compile your JADE, SASS and JS
 
 ````bash
 $ gulp watch
+````
+
+### Add a new Page
+
+The following script scaffolds a new page, creating a view, a template and a sass file named after the new page. It also adds the a sass include to the index.sass file.
+
+````bash
+$ npm run add-page
 ````
 
 ### Javascript

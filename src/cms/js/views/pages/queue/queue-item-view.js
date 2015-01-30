@@ -1,6 +1,6 @@
 require("backbone");
 require("backbone.layoutmanager");
-var constants = require("../../../constants");
+var constants = require("constants");
 
 //abstract page class
 var View = Backbone.Layout.extend({

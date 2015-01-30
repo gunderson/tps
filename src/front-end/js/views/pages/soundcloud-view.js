@@ -11,9 +11,10 @@ var Page = AbstractPage.extend({
 	keep: true,
 	row:1,
 	col:1,
+	playing: false,
 	el: "#soundcloud",
 	events: {
-		"submit form": "onSubmitForm",
+		"click button.advance": "onClickAdvance",
 		"click button.play": "onClickPlay",
 		"click button.stop": "onClickStop"
 	},
@@ -26,13 +27,21 @@ var Page = AbstractPage.extend({
 			canvas: this.$("#visualizer")[0]
 		});
 		this.player.addEventListener('ended', this.onSongEnd.bind(this));
-		this.listenTo(this.model.get("current"), "change reset", this.updateSongTitles);
-		this.listenTo(this.model.get("next"), "change reset", this.updateSongTitles);
+		this.listenTo(this.model.get("current"), "change reset", this.onChangeCurrent);
+		this.listenTo(this.model.get("next"), "change reset", this.onChangeNext);
 	},
 
 	afterRender: function(){
 	},
-
+	onChangeCurrent: function(){
+		this.updateSongTitles();
+		if (this.playing){
+			this.onClickPlay();
+		}
+	},
+	onChangeNext: function(){
+		this.updateSongTitles();
+	},
 	updateSongTitles:function(){
 		var currentModel = this.model.get("current");
 		var nextModel = this.model.get("next");
@@ -52,10 +61,7 @@ var Page = AbstractPage.extend({
     	this.model.advance();
     },
     onClickPlay: function(){
-
-
-
-
+    	this.playing = true;
     	var deferred = $.Deferred();
     	if (this.model.get("current").get("soundcloud_url")){
     		this.loader.loadStream(this.model.get("current").get("soundcloud_url"),
@@ -81,6 +87,7 @@ var Page = AbstractPage.extend({
     	return deferred.promise;
     },
     onClickStop: function(){
+    	this.playing = false;
     	this.player.pause();
     	this.visualizer.stop();
     },

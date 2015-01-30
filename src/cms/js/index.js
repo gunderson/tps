@@ -1,6 +1,6 @@
 window.$ = window.jQuery = require('jquery');
 require("./lib/jquery-sortable-min");
-window._ = require('underscore');
+window._ = require('lodash');
 window.Backbone = require('backbone');
 Backbone.$ = $;
 require("backbone.layoutmanager");

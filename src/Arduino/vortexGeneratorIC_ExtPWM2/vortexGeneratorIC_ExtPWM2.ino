@@ -34,14 +34,14 @@ int currentPhases [12] = {
   0,0,0,0 ,0,0,0,0 ,0,0,0,0};
 
 int pin0s [12] = {
-  7,7,7,2 ,5,7,7,7 ,7,7,7,7};
+  7,7,7,3 ,5,7,7,7 ,7,7,7,7};
 int pin1s [12] = {
   7,7,7,4 ,6,7,7,7 ,7,7,7,7};
 
 int pwmChannels [12] = {
   0,1,2,3 ,4,5,6,7 ,8,9,10,11};
 int buttons [12] = {
-  8,8,8,7 ,8,8,8,8 ,8,8,8,8};
+  8,8,8,8 ,8,8,8,8 ,8,8,8,8};
 int cycleRunnings [12] = {
   0,0,0,0 ,0,0,0,0 ,0,0,0,0};
 
@@ -60,12 +60,12 @@ void setup(){
 
   int channelId = numChannels;
 
-  while (--channelId >= 0){
-    pinMode(pin0s[channelId], OUTPUT);
-    pinMode(pin1s[channelId], OUTPUT);
-
-    toggle(channelId);
-  }
+//  while (--channelId >= 0){
+//    pinMode(pin0s[channelId], OUTPUT);
+//    pinMode(pin1s[channelId], OUTPUT);
+//
+//    toggle(channelId);
+//  }
 
   pinMode(testPin, OUTPUT);
 }
@@ -78,8 +78,8 @@ void loop(){
   if (deltaTime >= microsPerCycle){
     lastTime = currentTime;
     onCycle();
-    Tlc.update();
   }
+    Tlc.update();
 }
 
 void onCycle(){
@@ -95,7 +95,7 @@ void onCycle(){
         currentCycles[incomingByte] = 0;
         voltageLevels[incomingByte] = 0;
         currentPhases[incomingByte] = 0;
-//        Serial.println(incomingByte, DEC);
+        Serial.println(incomingByte, DEC);
       }
     }
     
@@ -114,38 +114,27 @@ void onCycle(){
       case 0:
         //0 = moving to full strength bottom from neutral
         voltageLevels[channelId] += voltageCycleRate;
-        writeVoltage(channelId, voltageLevels[channelId], pwmResolution, 1, false);
-//        Serial.println(channelId);
-//        Serial.println("phase 0");
+        writeVoltage(channelId, 0, voltageLevels[channelId], pwmResolution, 1, false);
         break;
       case 1:
         //1 = moving to neutral from full strength bottom
-        voltageLevels[channelId] -= voltageCycleRate * 16;
-        writeVoltage(channelId, voltageLevels[channelId], 0, 2, false);
-//        Serial.println(channelId);
-//        Serial.println("phase 1");
+        voltageLevels[channelId] -= voltageCycleRate * 32;
+        writeVoltage(channelId, 0, voltageLevels[channelId], 0, 2, false);
         break;
       case 2:
         //2 = moving to full strength top from neutral
-        voltageLevels[channelId] += voltageCycleRate * 16;
-        writeVoltage(channelId, voltageLevels[channelId], pwmResolution, 3, false);
-//        Serial.println(channelId);
-//        Serial.println("phase 2");
+        voltageLevels[channelId] += voltageCycleRate * 32;
+        writeVoltage(channelId, 1, voltageLevels[channelId], pwmResolution, 3, false);
         break;
       case 3:
         //3 = moving to neutral from full strength top
         voltageLevels[channelId] -= voltageCycleRate;
-        writeVoltage(channelId, voltageLevels[channelId], 0, 0, true);
-//        Serial.println(channelId);
-//        Serial.println("phase 3");
+        writeVoltage(channelId, 1, voltageLevels[channelId], 0, 0, true);
         break;
       }
-      //      Serial.println(voltageLevels[channelId]);
-
     } 
     else {
       if (digitalRead(buttons[channelId]) == HIGH){
-//        Serial.println("Cycle Begin");
         cycleRunnings[channelId] = 1;
       }
     }
@@ -155,29 +144,51 @@ void onCycle(){
 
 }
 
-void writeVoltage(int channelId, float v, int limit, int nextPhase, boolean complete){
+void writeVoltage(int channelId, int activeChannel, float v, int limit, int nextPhase, boolean complete){
   v = min(max(0,v),pwmResolution);
 
-  int pwmChannel = pwmChannels[channelId];
-  int pin0 = pin0s[channelId];
-  int pin1 = pin1s[channelId];
+  int pwmChannel0 = pin0s[channelId];
+  int pwmChannel1 = pin1s[channelId];
 
-  Tlc.set(pwmChannel, (int)v);
+  if (activeChannel == 0){
+    Tlc.set(pwmChannel0, (int)v);
+    Tlc.set(pwmChannel1, 0);
+  } else {
+    Tlc.set(pwmChannel0, 0);
+    Tlc.set(pwmChannel1, (int)v);
+  }
 
   if (abs(limit-v) < 1){
     currentPhases[channelId] = nextPhase;
     if (complete == true){
       cycleRunnings[channelId] = 0;
-      currentPhases[channelId] = 0;
-      digitalWrite(pin0, LOW);
-      digitalWrite(pin1, LOW);
-    } 
-    if (v < 0.01){
-      v = 0;
-      toggle(channelId);
     }
   }
 }
+
+//void writeVoltage(int channelId, float v, int limit, int nextPhase, boolean complete){
+//  v = min(max(0,v),pwmResolution);
+//
+//  int pwmChannel = pwmChannels[channelId];
+//  int pin0 = pin0s[channelId];
+//  int pin1 = pin1s[channelId];
+//
+//  Tlc.set(pwmChannel, (int)v);
+//
+//  if (abs(limit-v) < 1){
+//    currentPhases[channelId] = nextPhase;
+//    if (complete == true){
+//      cycleRunnings[channelId] = 0;
+//      currentPhases[channelId] = 0;
+//      digitalWrite(pin0, LOW);
+//      digitalWrite(pin1, LOW);
+//    } 
+//    if (v < 0.01){
+//      v = 0;
+//      toggle(channelId);
+//    }
+//  }
+//}
 
 void toggle(int channelId){
 //  Serial.println("toggle");
