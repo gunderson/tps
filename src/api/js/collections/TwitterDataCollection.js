@@ -2,8 +2,8 @@ delete require.cache[require.resolve("../models/TweetModel")];
 var TweetModel = require("../models/TweetModel");
 delete require.cache[require.resolve("../utils/ResponseUtils")];
 var ResponseUtils = require("../utils/ResponseUtils");
-delete require.cache[require.resolve("constants")];
-var constants = require("constants");
+delete require.cache[require.resolve("../constants")];
+var constants = require("../constants");
 
 
 var Backbone = require("Backbone");

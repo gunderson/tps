@@ -1,10 +1,11 @@
 require("backbone");
 require("backbone.layoutmanager");
-var AbstractPage = require("./Page");
-var TransportBar = require("../sequencer/transportBar-view");
+var AbstractPage = require("./Page-view");
 var SoundManager = require("../../controllers/sequencer/sound-manager")();
-var SceneManager = require("../sequencer/scene-manager-view");
-var TrackManager = require("../sequencer/track-manager-view");
+var TransportBarView = require("../sequencer/transportBar-view");
+var SceneManagerView = require("../sequencer/scene-manager-view");
+var TrackManagerView = require("../sequencer/track-manager-view");
+var PatternDetailView = require("../sequencer/pattern-detail-view");
 
 var sequencerStatus;
 var controller;
@@ -12,6 +13,14 @@ var controller;
 
 
 var Page = AbstractPage.extend({
+	sceneManager: null,
+	trackManager: null,
+	transportBar: null,
+	patternDetail: null,
+	events: {
+		// can't assign scroll events in the events hash, moved to after render
+		// "scroll #track-manager": "onScroll"
+	},
 	initialize: function(options){
 		AbstractPage.prototype.initialize.call(this);
 
@@ -37,32 +46,59 @@ var Page = AbstractPage.extend({
 		});
 
 
+		this.transportBar = new TransportBarView({
+			controller: controller
+		});
+		this.sceneManager = new SceneManagerView({
+			sceneCollection: controller.model.get("scenes"),
+			trackCollection: controller.model.get("tracks")
+		});
+
+
+		this.trackManager = new TrackManagerView({
+			sceneCollection: controller.model.get("scenes"),
+			trackCollection: controller.model.get("tracks"),
+		});
+
+		this.patternDetail = new PatternDetailView();
+
 		this.setViews({
-			"#transportBar": new TransportBar({
-				controller: controller
-			}),
-			"#scene-manager": new SceneManager({
-				sceneCollection: controller.model.get("scenes"),
-				trackCollection: controller.model.get("tracks")
-			}),
-			"#track-manager": new TrackManager({
-				sceneCollection: controller.model.get("scenes"),
-				trackCollection: controller.model.get("tracks"),
-			}),
+			"#transportBar": this.transportBar,
+			"#scene-manager": this.sceneManager,
+			"#track-manager": this.trackManager,
+			"#pattern-detail": this.patternDetail
 		});
 
 		this.on("transitionInComplete", this.transitionInComplete);
+	},
+	afterRender: function(){
+		this.$(".tracks").on("scroll", this.syncScroll.bind(this));
+		this.listenTo(this.sceneManager, "afterRender", this.syncScroll);
+		this.listenTo(this.trackManager,"afterRender", this.syncScroll);
 	},
 	transitionInComplete: function(){
 		// controller.play();
 	},
 	transitionOut: function(){
-		// controlleKlanr.stop();
+		// controller.stop();
 		AbstractPage.prototype.transitionOut.apply(this, arguments);
 	},
 	row:0,
 	col:2,
-	el: "#sequencer"
+	el: "#sequencer",
+	syncScroll: function(){
+		this.$("#scene-manager .scene .patterns").scrollLeft(this.$("#track-manager .tracks").scrollLeft());
+	},
+	onScroll: function(e){
+		this.$("#scene-manager .scene .patterns").scrollLeft(e.target.scrollLeft);
+	},
+	showPatternDetail: function(){
+		this.$("#pattern-detail").show();
+	},
+	hidePatternDetail: function(){
+		this.$("#pattern-detail").hide();
+	}
+
 });
 
 module.exports = Page;

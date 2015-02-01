@@ -5,7 +5,7 @@ var MainMenu = Backbone.Layout.extend({
 
 	events:{
 		"click .handle": "onHandleClick",
-		"click a": "onMenuItemClick"
+		"click a.closer": "onMenuItemCloserClick"
 	},
 	el: "#main-menu",
 	initialize: function(){
@@ -18,7 +18,7 @@ var MainMenu = Backbone.Layout.extend({
 		this.$(".handle .contents")
 			.toggleClass("fa-close fa-bars");
 	},
-	onMenuItemClick: function(){
+	onMenuItemCloserClick: function(){
 		$("html").removeClass("menu-open");
 		this.$(".handle .contents")
 			.toggleClass("fa-close fa-bars");

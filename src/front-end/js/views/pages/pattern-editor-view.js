@@ -4,9 +4,9 @@ var AbstractPage = require("./Page-view");
 
 //abstract page class
 var Page = AbstractPage.extend({
-	row:0,
-	col:0,
-	el: "#<%=pagename%>",
+	row:1,
+	col:2,
+	el: "#pattern-editor",
 	initialize: function(){
 
 	},

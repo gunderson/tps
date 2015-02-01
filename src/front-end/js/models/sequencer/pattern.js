@@ -7,7 +7,7 @@ var PatternModel = Backbone.Model.extend({
 			sceneId: 0,
 			measureLength: 1,
 			userPatterns: []
-		}
+		};
 	},
 	addMeasure: function(){
 

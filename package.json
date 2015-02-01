@@ -10,7 +10,8 @@
   "author": "Patrick Gunderson",
   "license": "Copyright",
   "browser": {
-    "jquery": "./node_modules/jquery/dist/jquery.js"
+    "jquery": "./node_modules/jquery/dist/jquery.js",
+    "constants" : "./src/shared/constants.js"
   },
   "browserify": {
     "transform": [

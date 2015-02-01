@@ -459,8 +459,11 @@ function startApiServer(cb) {
     var appPath = settings[role].dist + "/js/index";
     //load module fresh each time
     var Module = require('module');
+    gutil.log("Starting API Server")
+    
     delete require.cache[Module._resolveFilename(appPath, module)];
     require(appPath)(apiApp, apiServer);
+
 
     return apiServer.listen(settings[role].port, "0.0.0.0", cb);
 }

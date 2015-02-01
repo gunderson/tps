@@ -1,6 +1,6 @@
 require("backbone");
 require("backbone.layoutmanager");
-var AbstractPage = require("./Page");
+var AbstractPage = require("./Page-view");
 
 var SoundCloudAudioSource = require("../../lib/soundcloud/audiosource").SoundCloudAudioSource;
 var SoundCloudLoader = require("../../lib/soundcloud/soundcloudloader");

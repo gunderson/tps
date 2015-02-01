@@ -7,7 +7,10 @@ var TrackCollection = Backbone.Collection.extend({
 	initialize: function(){
 		this.on("add", this.onAdd);
 	},
-	onAdd: function(track, collection){
+	onAdd: function(trackModel, collection){
+		trackModel.set({
+			trackId: this.indexOf(trackModel)
+		});
 	},
 });
 

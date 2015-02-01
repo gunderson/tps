@@ -3,15 +3,20 @@
 	height: 100px
 	background: #33C
 	border-bottom: 1px solid #006
-	word-wrap: nowrap
+	white-space: nowrap
 	.scene-id
 		display:inline-block
 		width: $track-width
 		height: 100%
 		background-color: #44d
+		vertical-align: top
 	.patterns
 		display: inline-block
 		height: 100%
+		width: calc(100% - #{$track-width})
+		padding-right: $track-width
+		overflow-x: hidden
+		overflow-y: hidden
 	.pattern
 		display: inline-block
 		width: $track-width

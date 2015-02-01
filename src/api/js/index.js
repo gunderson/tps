@@ -19,11 +19,11 @@ var _ = require("underscore");
 var request = require("request");
 var SerialPort = require("serialport");
 
-var serialPort = new SerialPort.SerialPort("/dev/tty.usbmodem1411", {
-	baudrate: 19200,
-	parser: SerialPort.parsers.readline("\n")
-});
-serialPort.setMaxListeners(128);
+// var serialPort = new SerialPort.SerialPort("/dev/tty.usbmodem1411", {
+// 	baudrate: 19200,
+// 	parser: SerialPort.parsers.readline("\n")
+// });
+// serialPort.setMaxListeners(128);
 
 var options = {};
 

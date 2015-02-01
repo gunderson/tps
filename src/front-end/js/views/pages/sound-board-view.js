@@ -1,7 +1,7 @@
 require("backbone");
 require("backbone.layoutmanager");
 var _ = require("underscore");
-var AbstractPage = require("./Page");
+var AbstractPage = require("./Page-view");
 var SoundManager = require("../../controllers/sequencer/sound-manager")();
 var instruments = require("../../music/Instruments");
 var InstrumentView = require("./sound-board/instrument-view");

@@ -14,12 +14,12 @@ var TrackManager = Backbone.Layout.extend({
 		this.listenTo(this.trackCollection, "reset add", this.render);
 	},
 	beforeRender: function(){
-		console.log("this.trackCollection", this.trackCollection.length)
+		//for each model in the track collection insert a new view
 		var views = [];
 		this.trackCollection.each(function(){
-			views.push(new TrackView(this));
+			views.push(new TrackView({model: this}));
 		});
-		this.insertViews({
+		this.setViews({
 			"#user-tracks": views
 		});
 	},

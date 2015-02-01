@@ -1,46 +1,65 @@
-// require("jquery.velocity");
 require("backbone");
 require("backbone.layoutmanager");
 var _ = require("underscore");
 
-var MainMenu = require("./views/ui/main-menu-view");
-var HomePage = require("./views/pages/home-view");
-var AboutPage = require("./views/pages/about-view");
-var SequencerPage = require("./views/pages/sequencer-view");
-var SoundcloudPage = require("./views/pages/soundcloud-view");
-var SoundcloudModel = require("./models/soundcloud-player-model");
-var SoundBoardPage = require("./views/pages/sound-board-view");
+//-------------------------------------------------------------
+// Top Level Models
 
-var Sequencer = require("./controllers/sequencer/sequencer");
-var SequencerModel = require("./models/sequencer/sequencer");
-var sequencer = new Sequencer({model:new SequencerModel()});
+var SoundcloudModel   = require("./models/soundcloud-player-model");
+var SequencerModel    = require("./models/sequencer/sequencer");
+
+//-------------------------------------------------------------
+// Controllers
+
+var Sequencer         = require("./controllers/sequencer/sequencer");
+
+// Instances
+
+var router            = require("./controllers/router");
+var sequencer         = new Sequencer({model:new SequencerModel()});
 sequencer.model.controller = sequencer;
 
-var sequencerStatus = sequencer.getStatus();
+//-------------------------------------------------------------
+// Top level Views
+
+var AbstractPage      = require("./views/pages/Page-view");
+var MainMenu          = require("./views/ui/main-menu-view");
+var HomePage          = require("./views/pages/home-view");
+var AboutPage         = require("./views/pages/about-view");
+var PatternEditorPage = require("./views/pages/pattern-editor-view");
+var SequencerPage     = require("./views/pages/sequencer-view");
+var SoundcloudPage    = require("./views/pages/soundcloud-view");
+var SoundBoardPage    = require("./views/pages/sound-board-view");
+
+// Instances
 
 var pages = {
-	"#home"	 : new HomePage({route: "/"}),
-    "#about" : new AboutPage({route: "/about"}),
-    "#sequencer" : new SequencerPage({controller: sequencer, route: "/sequencer"}),
-    "#sound-board" : new SoundBoardPage({controller: sequencer, route: "/sound-board"}),
-	"#soundcloud" : new SoundcloudPage({model: new SoundcloudModel(), route: "/soundcloud"}),
+    "#home"           : new HomePage({route: "/"}),
+    "#about"          : new AboutPage({route: "/about"}),
+    "#sequencer"      : new SequencerPage({controller: sequencer, route: "/sequencer"}),
+    "#pattern-editor" : new PatternEditorPage({controller: sequencer, route: "/pattern-editor"}),
+    "#sound-board"    : new SoundBoardPage({controller: sequencer, route: "/sound-board"}),
+    "#soundcloud"     : new SoundcloudPage({model: new SoundcloudModel(), route: "/soundcloud"}),
 };
 
 var overlays = {
 	//error messages
 };
 
+var ui = {
+    "#main-menu"      : new MainMenu()
+};
 
-module.exports = Backbone.Layout.extend({
+
+//-------------------------------------------------------------
+// Application
+
+module.exports = AbstractPage.extend({
 
     controller: _.extend({}, Backbone.Events),
-    router: require("./controllers/router"),
+    router: router,
     el: "#main",
-    views: _.extend({
-		"#main-menu" : new MainMenu(),
-		// "#orientation-error" : new ErrorView()
-    }, pages, overlays),
-
+    views: _.extend({}, ui, pages, overlays),
     initialize: function (options) {
         var _this = this;
         this.copy = options.copy;
@@ -74,33 +93,5 @@ module.exports = Backbone.Layout.extend({
                 this.error.transitionOut();
             }
         }
-    },
-
-    currentRoute: '',
-    onRoute: function (route, params) {
-        //console.log('onRoute', route, params);
-        params.app = this;
-        // only do this if new route is different from the last
-        if (this.currentRoute != route) {
-
-            $("html")
-                .removeClass(this.currentRoute + "-page")
-                .addClass(route + "-page");
-
-        	//determine new page
-        	var currentPage = this.page;
-        	var newPage = this.views["#" + route];
-        	if (!newPage) return;
-
-        	newPage.fetch()
-                .done(function(){
-            		currentPage && currentPage.transitionOut(newPage);
-            		newPage.transitionIn(currentPage);
-            	});
-
-        	this.page = newPage;
-        }
-        this.currentRoute = route;
     }
-
 });

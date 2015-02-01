@@ -1,7 +1,7 @@
 require("backbone");
 var _ = require("underscore");
-var SceneCollection = require("../../collections/sequencer/scenes");
-var TrackCollection = require("../../collections/sequencer/tracks");
+var SceneCollection = require("../../collections/sequencer/scene-collection");
+var TrackCollection = require("../../collections/sequencer/track-collection");
 
 var SequencerModel = Backbone.Model.extend({
 	defaults: function(){
@@ -9,8 +9,15 @@ var SequencerModel = Backbone.Model.extend({
 			bpm: 120,
 			beatsPerMeasure: 4,
 			tracks: new TrackCollection([], {controller:this.controller}),
-			scenes: new SceneCollection([{}])
+			scenes: new SceneCollection([])
 		};
+	},
+	initialize: function(){
+		this.get("scenes").trackCollection = this.get("tracks");
+		this.listenTo(this.get("scenes"), "show:pattern", this.onShowPattern);
+	},
+	onShowPattern: function(){
+		
 	}
 });
 

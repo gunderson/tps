@@ -1,11 +1,14 @@
 #track-manager
 	background-color: #333
 	height: 50%
-	overflow-x: auto
-	overflow-y: hidden
+	overflow: hidden
+	white-space: nowrap
 	.tracks
-		min-width: 100%
-		white-space: nowrap
+		display: inline-block
+		overflow-x: auto
+		overflow-y: hidden
+		width: calc(100% - #{$track-width})
+		height: 100%
 	.track
 		order: 1
 		vertical-align: top
@@ -23,6 +26,8 @@
 		order: 1
 		display: inline-block
 		height: 100%
+		white-space: nowrap
+
 	#add-new-track-button
 		order: 2
 		.content

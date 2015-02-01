@@ -1,22 +1,23 @@
 require("backbone");
 require("backbone.layoutmanager");
-var PatternDetailView = require("./pattern-detail-view");
+var PatternOverviewView = require("./pattern-overview-view");
 
 var SceneView = Backbone.Layout.extend({
 	el: false,
+	keep: true,
 	template: "sequencer/scene",
 	initialize: function(options){
-		this.trackCollection = options.trackCollection;
+		this.listenTo(this.model.get("patterns"), "add", this.onAddPattern);
 	},
-	beforeRender: function(){
-		var _this = this;
-		var patterns = this.trackCollection.map(function(track){
-			return new PatternDetailView({
-				pattern: track.get("patterns").findWhere({sceneId:_this.sceneId})
-			});
+	onAddPattern: function(patternModel){
+		var patternView = new PatternOverviewView({
+			model: patternModel
 		});
-		this.insertViews({".patterns":patterns});
-	},
+		this.insertViews({
+			".patterns": patternView
+		});
+		patternView.render();
+	}
 
 });
 
