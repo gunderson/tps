@@ -6,19 +6,26 @@ var jade_interp;
 
 buf.push("<div class=\"fader\"></div>");;return buf.join("");
 },
+"sequencer/filter": function(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+
+buf.push("<div class=\"filter\"><div class=\"remove-button\"></div><div class=\"inputs\"><div class=\"input port add\"></div><div class=\"input port multiply\"></div><div class=\"input port transform\"></div></div><div class=\"output port\"></div><div class=\"output-display\"><svg class=\"waveform\"></svg><div class=\"measure-bars\"></div></div><div class=\"waveform-display\"><!--shows waveform for length of this pattern--><svg class=\"waveform\"></svg><div class=\"measure-bars\"></div></div></div>");;return buf.join("");
+},
 "sequencer/oscillator": function(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<div class=\"oscillator\"><div class=\"window-controls\"><div class=\"remove\"></div><div class=\"minimize\"></div><div class=\"maximize\"></div></div><div class=\"inputs\"><div class=\"input port add\"></div><div class=\"input port multiply\"></div><div class=\"input port transform\"></div></div><div class=\"output port\"></div><div class=\"output-display\"><canvas class=\"waveform\"></canvas><div class=\"measure-bars\"></div></div><div class=\"waveform-display\"><!--shows waveform for length of this pattern--><canvas class=\"waveform\"></canvas><div class=\"measure-bars\"></div></div><div class=\"amplitude-input\"><input type=\"number\" min=\"-1\" max=\"1\" step=\"0.01\"/></div><div class=\"frequency-input\"><input type=\"number\" min=\"-24\" max=\"24\" step=\"0.01\"/></div><div class=\"offset-input\"><input type=\"number\" min=\"-24\" max=\"24\" step=\"0.01\"/></div></div>");;return buf.join("");
+buf.push("<div class=\"oscillator\"><div class=\"remove-button\"></div><div class=\"inputs\"><div class=\"input port add\"></div><div class=\"input port multiply\"></div><div class=\"input port transform\"></div></div><div class=\"output port\"></div><div class=\"output-display\"><svg class=\"waveform\"></svg><div class=\"measure-bars\"></div></div><div class=\"waveform-display\"><!--shows waveform for length of this pattern--><svg class=\"waveform\"></svg><div class=\"measure-bars\"></div></div></div>");;return buf.join("");
 },
 "sequencer/pattern-overview": function(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
 ;var locals_for_with = (locals || {});(function (sceneId, trackId) {
-buf.push("<div class=\"pattern-overview\"><a" + (jade.attr("href", "#/pattern-editor/" + (sceneId) + "/" + (trackId) + "", true, false)) + " class=\"content\"><canvas width=\"100%\" height=\"100%\" class=\"pattern-graph\"></canvas><div class=\"threshold-line\"></div></a></div>");}.call(this,"sceneId" in locals_for_with?locals_for_with.sceneId:typeof sceneId!=="undefined"?sceneId:undefined,"trackId" in locals_for_with?locals_for_with.trackId:typeof trackId!=="undefined"?trackId:undefined));;return buf.join("");
+buf.push("<div class=\"pattern-overview\"><a" + (jade.attr("href", "#/pattern-editor/" + (sceneId) + "/" + (trackId) + "", true, false)) + " class=\"content\"><canvas class=\"pattern-graph\"></canvas><div class=\"threshold-line\"></div></a></div>");}.call(this,"sceneId" in locals_for_with?locals_for_with.sceneId:typeof sceneId!=="undefined"?sceneId:undefined,"trackId" in locals_for_with?locals_for_with.trackId:typeof trackId!=="undefined"?trackId:undefined));;return buf.join("");
 },
 "sequencer/scene": function(locals) {
 var buf = [];

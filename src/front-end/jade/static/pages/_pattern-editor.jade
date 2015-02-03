@@ -2,7 +2,7 @@
 	.background
 	.content
 		#components
-			.controls
+			.controls.sub-menu
 				form.oscillator-controls
 					.output-display
 						svg.waveform
@@ -19,25 +19,29 @@
 						input(type="number", min="-24", max="24", step="0.01")
 				form.transform-controls
 					label
-						input(type="radiobutton", group="transforms", name="none") 
+						input(type="radio", name="transforms", value="none") 
 						| None
 					label
-						input(type="radiobutton", group="transforms", name="digital")
+						input(type="radio", name="transforms", value="digital")
 						| Digital
 					label
-						input(type="radiobutton", group="transforms", name="saw")
+						input(type="radio", name="transforms", value="saw")
 						| Saw
+					.digital-controls
+					.saw-controls
 					
 				form.filter-controls
 					label
-						input(type="radiobutton", group="transforms", name="none") 
+						input(type="radio", name="filters", value="none") 
 						| None
 					label
-						input(type="radiobutton", group="transforms", name="digital")
-						| Digital
+						input(type="radio", name="filters", value="scale")
+						| Scale
 					label
-						input(type="radiobutton", group="transforms", name="saw")
+						input(type="radio", name="filters", value="saw")
 						| Saw
+					.scale-controls
+
 			.connections
 		#sequencer-inputs
 			#pattern-input

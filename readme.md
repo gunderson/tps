@@ -12,6 +12,26 @@ API
 
 Node.js, MongoDB and Ruby
 
+Package Management is handled by NPM
+
+initialize
+
+````bash
+$ npm install && gulp
+````
+
+Add a new package
+
+````bash
+$ npm install package-name --save
+````
+
+or 
+
+````bash
+$ npm install https://github.com/username/repo-name/tarball/master --save
+````
+
 * on OSX
 
 ````bash
@@ -40,11 +60,6 @@ sudo gem install sass
 ````bash
 npm install -g gulp
 ````
-* Install
-
-````bash
-npm install && gulp
-````
 
 ## Development Process
 
@@ -70,4 +85,13 @@ The following script scaffolds a new page, creating a view, a template and a sas
 $ npm run add-page
 ````
 
-### Javascript
+### Conventions
+
+Each View consists of 3 files. Each file should have a variant of the same name and fall in the same folder structure pattern. The add-page script does this automatically.
+
+Javascript
+
+All javascript files for a view
+
+
+
