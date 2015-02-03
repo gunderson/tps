@@ -6,6 +6,13 @@ var jade_interp;
 
 buf.push("<div class=\"fader\"></div>");;return buf.join("");
 },
+"sequencer/oscillator": function(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+
+buf.push("<div class=\"oscillator\"><div class=\"window-controls\"><div class=\"remove\"></div><div class=\"minimize\"></div><div class=\"maximize\"></div></div><div class=\"inputs\"><div class=\"input port add\"></div><div class=\"input port multiply\"></div><div class=\"input port transform\"></div></div><div class=\"output port\"></div><div class=\"output-display\"><canvas class=\"waveform\"></canvas><div class=\"measure-bars\"></div></div><div class=\"waveform-display\"><!--shows waveform for length of this pattern--><canvas class=\"waveform\"></canvas><div class=\"measure-bars\"></div></div><div class=\"amplitude-input\"><input type=\"number\" min=\"-1\" max=\"1\" step=\"0.01\"/></div><div class=\"frequency-input\"><input type=\"number\" min=\"-24\" max=\"24\" step=\"0.01\"/></div><div class=\"offset-input\"><input type=\"number\" min=\"-24\" max=\"24\" step=\"0.01\"/></div></div>");;return buf.join("");
+},
 "sequencer/pattern-overview": function(locals) {
 var buf = [];
 var jade_mixins = {};

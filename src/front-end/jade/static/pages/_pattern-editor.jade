@@ -1,5 +1,59 @@
 #pattern-editor.page
 	.background
 	.content
-		canvas.pattern-graph(width="100%", height="100%")
+		#components
+			.controls
+				form.oscillator-controls
+					.output-display
+						svg.waveform
+						.measure-bars
+					.waveform-display
+						//shows waveform for length of this pattern
+						svg.waveform
+						.measure-bars
+					.amplitude-input
+						input(type="number", min="-1", max="1", step="0.01")
+					.frequency-input
+						input(type="number", min="-24", max="24", step="0.01")
+					.offset-input
+						input(type="number", min="-24", max="24", step="0.01")
+				form.transform-controls
+					label
+						input(type="radiobutton", group="transforms", name="none") 
+						| None
+					label
+						input(type="radiobutton", group="transforms", name="digital")
+						| Digital
+					label
+						input(type="radiobutton", group="transforms", name="saw")
+						| Saw
+					
+				form.filter-controls
+					label
+						input(type="radiobutton", group="transforms", name="none") 
+						| None
+					label
+						input(type="radiobutton", group="transforms", name="digital")
+						| Digital
+					label
+						input(type="radiobutton", group="transforms", name="saw")
+						| Saw
+			.connections
+		#sequencer-inputs
+			#pattern-input
+			#note-input
+		#sequencer-display
+			#pattern-graph
+				svg.graph
+			#note-graph
+				svg.graph
+			#output-sixteenths
+				each val in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+					.sixteenth(data-count="#{val}")
+						.available-notes
+
 		.threshold-line
+	.menu
+		button.button.button-0.add-oscillator-button Add Oscillator
+		button.button.button-0.add-transform-button Add Transform
+		button.button.button-0.add-filter-button Add Filter
