@@ -1,51 +1,44 @@
-#pattern-editor.page
+#pattern-editor.page.time-signature-4-4
 	.background
 	.content
 		#components
 			.controls.sub-menu
+				button.button.button-0.add-oscillator-button Add Oscillator
+				button.button.button-0.add-filter-button Add Filter
 				form.oscillator-controls
 					.output-display
 						svg.waveform
-						.measure-bars
 					.waveform-display
 						//shows waveform for length of this pattern
 						svg.waveform
-						.measure-bars
 					.amplitude-input
 						input(type="number", min="-1", max="1", step="0.01")
 					.frequency-input
 						input(type="number", min="-24", max="24", step="0.01")
 					.offset-input
 						input(type="number", min="-24", max="24", step="0.01")
-				form.transform-controls
-					label
-						input(type="radio", name="transforms", value="none") 
-						| None
-					label
-						input(type="radio", name="transforms", value="digital")
-						| Digital
-					label
-						input(type="radio", name="transforms", value="saw")
-						| Saw
-					.digital-controls
-					.saw-controls
-					
 				form.filter-controls
-					label
-						input(type="radio", name="filters", value="none") 
-						| None
-					label
-						input(type="radio", name="filters", value="scale")
-						| Scale
-					label
-						input(type="radio", name="filters", value="saw")
-						| Saw
+					.type
+						label
+							input(type="radio", name="type", value="none") 
+							| None
+						label
+							input(type="radio", name="type", value="scale")
+							| Scale
+						label
+							input(type="radio", name="type", value="digital")
+							| Digital
+						label
+							input(type="radio", name="type", value="saw")
+							| Saw
 					.scale-controls
+						| scale controls
+					.digital-controls
+						| digital controls
+					.saw-controls
+						| saw controls
 
 			.connections
-		#sequencer-inputs
-			#pattern-input
-			#note-input
 		#sequencer-display
 			#pattern-graph
 				svg.graph
@@ -56,8 +49,3 @@
 					.sixteenth(data-count="#{val}")
 						.available-notes
 
-		.threshold-line
-	.menu
-		button.button.button-0.add-oscillator-button Add Oscillator
-		button.button.button-0.add-transform-button Add Transform
-		button.button.button-0.add-filter-button Add Filter

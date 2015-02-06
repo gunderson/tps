@@ -1,10 +1,17 @@
-.oscillator
+.oscillator.component
 	.remove-button
+	.title
+		| Oscillator
 	.inputs
-		.input.port.add
-		.input.port.multiply
-		.input.port.transform
-	.output.port
+		.add-input.input
+			.port
+			| Add
+		.multiply-input.input
+			.port
+			| Multiply
+	.output
+		.port
+		| Output
 	.output-display
 		svg.waveform
 		.measure-bars

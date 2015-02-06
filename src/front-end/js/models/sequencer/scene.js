@@ -10,7 +10,7 @@ var SceneModel = Backbone.Model.extend({
 		};
 	},
 	initialize: function(){
-		this.listenTo(this.get("patterns"), "show:pattern", this.onShowPattern);
+		this.listenTo(this.get("patterns"), "edit-pattern", this.onEditPattern);
 	},
 	addPattern: function(trackId){
 		this.get("patterns").add({
@@ -18,9 +18,15 @@ var SceneModel = Backbone.Model.extend({
 			sceneId: this.get("sceneId")
 		});
 	},
-	onShowPattern: function(obj, data){
+	onAddPattern: function(){
+
+	},
+	onRemovePattern: function(){
+
+	},
+	onEditPattern: function(obj, data){
 		// forward the event
-		this.trigger("show:pattern", data);
+		this.trigger("edit-pattern", obj);
 	},
 	onDeleteTrack: function(){
 

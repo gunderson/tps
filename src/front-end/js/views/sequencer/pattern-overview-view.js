@@ -14,7 +14,7 @@ var PatternOverviewView = Backbone.Layout.extend({
 		this.drawPattern();
 	},
 	onClickPattern: function(e){
-		this.model.trigger("show:pattern", {model: model});
+		this.model.trigger("edit-pattern", this.model);
 	},
 	drawPattern: function(){
 		var $canvas = this.$("canvas");

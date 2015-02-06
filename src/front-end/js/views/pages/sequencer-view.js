@@ -5,7 +5,6 @@ var SoundManager = require("../../controllers/sequencer/sound-manager")();
 var TransportBarView = require("../sequencer/transportBar-view");
 var SceneManagerView = require("../sequencer/scene-manager-view");
 var TrackManagerView = require("../sequencer/track-manager-view");
-var PatternDetailView = require("../sequencer/pattern-detail-view");
 
 var sequencerStatus;
 var controller;
@@ -60,13 +59,10 @@ var Page = AbstractPage.extend({
 			trackCollection: controller.model.get("tracks"),
 		});
 
-		this.patternDetail = new PatternDetailView();
-
 		this.setViews({
 			"#transportBar": this.transportBar,
 			"#scene-manager": this.sceneManager,
-			"#track-manager": this.trackManager,
-			"#pattern-detail": this.patternDetail
+			"#track-manager": this.trackManager
 		});
 
 		this.on("transitionInComplete", this.transitionInComplete);

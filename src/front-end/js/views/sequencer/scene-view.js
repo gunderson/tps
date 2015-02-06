@@ -17,6 +17,9 @@ var SceneView = Backbone.Layout.extend({
 			".patterns": patternView
 		});
 		patternView.render();
+	}, 
+	onEditPattern: function(){
+
 	}
 
 });

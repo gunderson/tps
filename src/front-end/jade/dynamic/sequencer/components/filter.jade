@@ -1,10 +1,17 @@
-.filter
+.filter.component
 	.remove-button
+	.title
+		| Filter
 	.inputs
-		.input.port.add
-		.input.port.multiply
-		.input.port.transform
-	.output.port
+		.line-input.input
+			.port
+			| Line
+		.level-input.input
+			.port
+			| Level
+	.output
+		.port
+		| Output
 	.output-display
 		svg.waveform
 		.measure-bars

@@ -14,10 +14,11 @@ var SequencerModel = Backbone.Model.extend({
 	},
 	initialize: function(){
 		this.get("scenes").trackCollection = this.get("tracks");
-		this.listenTo(this.get("scenes"), "show:pattern", this.onShowPattern);
+		this.listenTo(this.get("scenes"), "edit-pattern", this.onEditPatternEvent);
 	},
-	onShowPattern: function(){
-		
+	onEditPatternEvent: function(patternModel){
+		//forward the event
+		this.trigger("edit-pattern", patternModel);
 	}
 });
 
