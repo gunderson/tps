@@ -10,18 +10,23 @@ var Page = Backbone.Layout.extend({
 	row: 0,
 	currentRoute: "",
 	page: null,
-	views: [],
+	views: {},
 	fetch: function(){
+
 		var promise = new $.Deferred();
 		
 		if (this.model && this.model.url){
-			this.once("afterRender", promise.resolve);
+			// this.once("afterRender", promise.resolve);
 			this.model
 				.fetch()
-				.done(this.render.bind(this));
+				.done(function(){
+						this.render()
+							.then(promise.resolve);
+					}.bind(this)
+				);
 		} else if (!this.hasRendered) {
-			this.once("afterRender", promise.resolve);
-			this.render();
+			this.render()
+				.then(promise.resolve);
 		} else {
 			_.defer(function(){
 				promise.resolve();

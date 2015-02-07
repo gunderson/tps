@@ -11,6 +11,7 @@ var View = Backbone.Layout.extend({
 		"mouseup .output>.port"		: "onOutputMouseUp",
 		"click"                     : "onClick"
 	},
+	views: {},
 	initialize: function(options){
 	},
 	onClick: function(){

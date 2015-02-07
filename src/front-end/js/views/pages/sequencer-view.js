@@ -12,6 +12,10 @@ var controller;
 
 
 var Page = AbstractPage.extend({
+	row:0,
+	col:2,
+	keep:true,
+	el: "#sequencer",
 	sceneManager: null,
 	trackManager: null,
 	transportBar: null,
@@ -52,8 +56,6 @@ var Page = AbstractPage.extend({
 			sceneCollection: controller.model.get("scenes"),
 			trackCollection: controller.model.get("tracks")
 		});
-
-
 		this.trackManager = new TrackManagerView({
 			sceneCollection: controller.model.get("scenes"),
 			trackCollection: controller.model.get("tracks"),
@@ -61,16 +63,20 @@ var Page = AbstractPage.extend({
 
 		this.setViews({
 			"#transportBar": this.transportBar,
-			"#scene-manager": this.sceneManager,
-			"#track-manager": this.trackManager
+			"#track-manager": this.trackManager,
+			"#scene-manager": this.sceneManager
 		});
 
 		this.on("transitionInComplete", this.transitionInComplete);
 	},
+	beforeRender: function(){
+		console.log("Sequencer-view::beforeRender", this.route)
+	},
 	afterRender: function(){
+		console.log("Sequencer-view::afterRender");
 		this.$(".tracks").on("scroll", this.syncScroll.bind(this));
-		this.listenTo(this.sceneManager, "afterRender", this.syncScroll);
-		this.listenTo(this.trackManager,"afterRender", this.syncScroll);
+		// this.listenTo(this.sceneManager, "afterRender", this.syncScroll);
+		// this.listenTo(this.trackManager,"afterRender", this.syncScroll);
 	},
 	transitionInComplete: function(){
 		// controller.play();
@@ -79,9 +85,6 @@ var Page = AbstractPage.extend({
 		// controller.stop();
 		AbstractPage.prototype.transitionOut.apply(this, arguments);
 	},
-	row:0,
-	col:2,
-	el: "#sequencer",
 	syncScroll: function(){
 		this.$("#scene-manager .scene .patterns").scrollLeft(this.$("#track-manager .tracks").scrollLeft());
 	},

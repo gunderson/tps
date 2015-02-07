@@ -2,6 +2,7 @@ require("backbone");
 require("backbone.layoutmanager");
 
 var TransportBar = Backbone.Layout.extend({
+	keep:true,
 	el: "#transportBar",
 	events: {
 		"click .play-button": "onClickPlay",
@@ -17,6 +18,9 @@ var TransportBar = Backbone.Layout.extend({
 		this.controller = options.controller;
 		this.listenTo(this.controller, "play", this.onControllerPlay);
 		this.listenTo(this.controller, "stop", this.onControllerStop);
+	},
+	beforeRender: function(){
+		console.log("TransportBar::beforeRender");
 	},
 	//respond to controller
 	onControllerPlay: function(){

@@ -3,7 +3,7 @@ require("backbone.layoutmanager");
 var SceneView = require("./scene-view");
 
 var SceneManager = Backbone.Layout.extend({
-	keep:true,
+	keep:false,
 	el:"#scene-manager",
 	events: {
 		"click #add-new-scene-button": "onClickAddNewSceneButton"
@@ -13,6 +13,12 @@ var SceneManager = Backbone.Layout.extend({
 		this.sceneCollection = options.sceneCollection;
 		this.listenTo(this.sceneCollection, "reset add", this.onAddScene);
 		this.listenTo(this.trackCollection, "reset add", this.onAddTrack);
+	},
+	beforeRender: function(){
+		console.log("Scene-manager-view::beforeRender", this);
+		this.sceneCollection.each(function(sceneModel){
+			this.onAddScene(sceneModel);
+		}.bind(this));
 	},
 	addScene: function(){
 		this.sceneCollection.add({});
@@ -25,10 +31,11 @@ var SceneManager = Backbone.Layout.extend({
 		this.sceneCollection.each(function(sceneModel){
 			sceneModel.addPattern(trackModel.get("trackId"));
 		});
-
-		// this.render();
 	},
-	onAddScene: function(sceneModel){
+	onAddScene: function(sceneModel, skipRender){
+
+		console.log("Scene-manager-view::onAddScene")
+
 		var sceneView = new SceneView({
 			model: sceneModel
 		});

@@ -15,7 +15,7 @@ Backbone.Layout.configure({
 	manage: true,
 	fetchTemplate: function (path) {
 		return templates[path];
-	}
+	},
 });
 
 function onDocumentReady(){
@@ -24,7 +24,7 @@ function onDocumentReady(){
 		.done(function(jsonResult){
 			window.app = new App({
 				copy: jsonResult
-			}).render();
+			});
 		});
 }
 

@@ -36,10 +36,10 @@ var SoundBoardPage    = require("./views/pages/sound-board-view");
 var pages = {
     "#home"           : new HomePage({route: "/"}),
     "#about"          : new AboutPage({route: "/about"}),
-    "#sequencer"      : new SequencerPage({controller: sequencer, route: "/sequencer"}),
     "#pattern-editor" : new PatternEditorPage({controller: sequencer, route: "/pattern-editor"}),
-    "#sound-board"    : new SoundBoardPage({controller: sequencer, route: "/sound-board"}),
     "#soundcloud"     : new SoundcloudPage({model: new SoundcloudModel(), route: "/soundcloud"}),
+    "#sound-board"    : new SoundBoardPage({controller: sequencer, route: "/sound-board"}),
+    "#sequencer"      : new SequencerPage({controller: sequencer, route: "/sequencer"}),
 };
 
 var overlays = {

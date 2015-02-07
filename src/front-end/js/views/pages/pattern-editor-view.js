@@ -17,7 +17,7 @@ var Page = AbstractPage.extend({
 	initialize: function(options){
 		var masterView = new MasterView();
 		this.insertViews({
-			"#components": masterView
+			"#components": [masterView]
 		});
 
 		this.listenTo(this.controller.model, "edit-pattern", this.onEditPatternEvent);
@@ -25,11 +25,11 @@ var Page = AbstractPage.extend({
 
 	// RENDERING
 
-	/*
+	
 	beforeRender: function(){
-
+		console.log("pattern-editor::beforeRender", this.getViews().value())
 	},
-
+	/*
 	afterRender: function(){
 	},
 	*/

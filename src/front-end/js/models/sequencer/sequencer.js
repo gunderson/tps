@@ -8,8 +8,8 @@ var SequencerModel = Backbone.Model.extend({
 		return {
 			bpm: 120,
 			beatsPerMeasure: 4,
-			tracks: new TrackCollection([], {controller:this.controller}),
-			scenes: new SceneCollection([])
+			tracks: new TrackCollection([{}], {controller:this.controller}),
+			scenes: new SceneCollection([{}])
 		};
 	},
 	initialize: function(){

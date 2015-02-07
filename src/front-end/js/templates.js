@@ -55,4 +55,18 @@ var jade_interp;
 
 buf.push("<div class=\"oscillator component\"><div class=\"remove-button\"></div><div class=\"title\">Oscillator</div><div class=\"inputs\"><div class=\"add-input input\"><div class=\"port\"></div>Add</div><div class=\"multiply-input input\"><div class=\"port\"></div>Multiply</div></div><div class=\"output\"><div class=\"port\"></div>Output</div><div class=\"output-display\"><svg class=\"waveform\"></svg><div class=\"measure-bars\"></div></div><div class=\"waveform-display\"><!--shows waveform for length of this pattern--><svg class=\"waveform\"></svg><div class=\"measure-bars\"></div></div></div>");;return buf.join("");
 },
+"sequencer/components/splitter": function(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+
+buf.push("<div class=\"splitter component\"><div class=\"remove-button\"></div><div class=\"title\">Splitter</div><div class=\"inputs\"><div class=\"line-input input\"><div class=\"port\"></div>Line</div></div><div class=\"outputs\"><div class=\"output-a\"><div class=\"port\"></div>Output A</div><div class=\"output-b\"><div class=\"port\"></div>Output B</div></div><div class=\"output-display\"><svg class=\"waveform\"></svg><div class=\"measure-bars\"></div></div><div class=\"waveform-display\"><!--shows waveform for length of this pattern--><svg class=\"waveform\"></svg><div class=\"measure-bars\"></div></div></div>");;return buf.join("");
+},
+"sequencer/components/user-pattern": function(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+
+buf.push("<div class=\"user-pattern component\"></div>");;return buf.join("");
+},
 }
