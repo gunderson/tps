@@ -2,9 +2,9 @@ require("backbone");
 require("backbone.layoutmanager");
 var AbstractPage = require("./Page-view");
 var SoundManager = require("../../controllers/sequencer/sound-manager")();
-var TransportBarView = require("../sequencer/transportBar-view");
-var SceneManagerView = require("../sequencer/scene-manager-view");
-var TrackManagerView = require("../sequencer/track-manager-view");
+var TransportBarView = require("./sequencer/transportBar-view");
+var SceneManagerView = require("./sequencer/scene-manager-view");
+var TrackManagerView = require("./sequencer/track-manager-view");
 
 var sequencerStatus;
 var controller;

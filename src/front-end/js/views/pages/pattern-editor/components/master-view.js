@@ -5,7 +5,7 @@ var ComponentView = require("./component-view");
 var View = ComponentView.extend({
 	// el: false,
 	// keep: false,
-	template: "sequencer/components/master",
+	template: "pattern-editor/components/master",
 	initialize: function(options){
 		console.log("master");
 	},

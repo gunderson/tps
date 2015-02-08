@@ -34,39 +34,39 @@ var jade_interp;
 ;var locals_for_with = (locals || {});(function (instrument) {
 buf.push("<div" + (jade.cls(['instrument',"" + (instrument.name) + ""], [null,true])) + "><h1>" + (jade.escape((jade_interp = instrument.name) == null ? '' : jade_interp)) + "  " + (jade.escape((jade_interp = instrument.type) == null ? '' : jade_interp)) + "</h1><input type=\"range\" step=\"1\"" + (jade.attr("min", "" + (instrument.range.first) + "", true, false)) + (jade.attr("max", "" + (instrument.range.last) + "", true, false)) + " value=\"30\" class=\"noteValue\"/><div class=\"noteValueDisplay\">30</div><button class=\"trigger\">Trigger</button><button class=\"load\">Load</button></div>");}.call(this,"instrument" in locals_for_with?locals_for_with.instrument:typeof instrument!=="undefined"?instrument:undefined));;return buf.join("");
 },
-"sequencer/components/filter": function(locals) {
+"pattern-editor/components/filter": function(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
 buf.push("<div class=\"filter component\"><div class=\"remove-button\"></div><div class=\"title\">Filter</div><div class=\"inputs\"><div class=\"line-input input\"><div class=\"port\"></div>Line</div><div class=\"level-input input\"><div class=\"port\"></div>Level</div></div><div class=\"output\"><div class=\"port\"></div>Output</div><div class=\"output-display\"><svg class=\"waveform\"></svg><div class=\"measure-bars\"></div></div><div class=\"waveform-display\"><!--shows waveform for length of this pattern--><svg class=\"waveform\"></svg><div class=\"measure-bars\"></div></div></div>");;return buf.join("");
 },
-"sequencer/components/master": function(locals) {
+"pattern-editor/components/master": function(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
 buf.push("<div id=\"master\" class=\"component\"><div class=\"title\">Master Inputs</div><div id=\"sequencer-inputs\"><div id=\"rhythm-input\" class=\"input\"><div class=\"port\"></div>Pattern</div><div id=\"pitch-input\" class=\"input\"><div class=\"port\"></div>Pitch</div></div></div>");;return buf.join("");
 },
-"sequencer/components/oscillator": function(locals) {
+"pattern-editor/components/oscillator": function(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
 buf.push("<div class=\"oscillator component\"><div class=\"remove-button\"></div><div class=\"title\">Oscillator</div><div class=\"inputs\"><div class=\"add-input input\"><div class=\"port\"></div>Add</div><div class=\"multiply-input input\"><div class=\"port\"></div>Multiply</div></div><div class=\"output\"><div class=\"port\"></div>Output</div><div class=\"output-display\"><svg class=\"waveform\"></svg><div class=\"measure-bars\"></div></div><div class=\"waveform-display\"><!--shows waveform for length of this pattern--><svg class=\"waveform\"></svg><div class=\"measure-bars\"></div></div></div>");;return buf.join("");
 },
-"sequencer/components/splitter": function(locals) {
+"pattern-editor/components/splitter": function(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<div class=\"splitter component\"><div class=\"remove-button\"></div><div class=\"title\">Splitter</div><div class=\"inputs\"><div class=\"line-input input\"><div class=\"port\"></div>Line</div></div><div class=\"outputs\"><div class=\"output-a\"><div class=\"port\"></div>Output A</div><div class=\"output-b\"><div class=\"port\"></div>Output B</div></div><div class=\"output-display\"><svg class=\"waveform\"></svg><div class=\"measure-bars\"></div></div><div class=\"waveform-display\"><!--shows waveform for length of this pattern--><svg class=\"waveform\"></svg><div class=\"measure-bars\"></div></div></div>");;return buf.join("");
+buf.push("<div class=\"splitter component\"><div class=\"remove-button\"></div><div class=\"title\">Splitter</div><div class=\"inputs\"><div class=\"line-input input\"><div class=\"port\"></div>Line</div></div><div class=\"outputs\"><div class=\"output output-a\"><div class=\"port\"></div>Output A</div><div class=\"output output-b\"><div class=\"port\"></div>Output B</div></div><div class=\"output-display\"><svg class=\"waveform\"></svg><div class=\"measure-bars\"></div></div><div class=\"waveform-display\"><!--shows waveform for length of this pattern--><svg class=\"waveform\"></svg><div class=\"measure-bars\"></div></div></div>");;return buf.join("");
 },
-"sequencer/components/user-pattern": function(locals) {
+"pattern-editor/components/user-pattern": function(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<div class=\"user-pattern component\"></div>");;return buf.join("");
+buf.push("<div class=\"user-pattern component\"><div class=\"remove-button\"></div><div class=\"title\">User Pattern</div><div class=\"inputs\"><div class=\"line-input input\"><div class=\"port\"></div>Line</div></div><div class=\"outputs\"><div class=\"output output-a\"><div class=\"port\"></div>Output A</div></div><div class=\"output-display\"><svg class=\"waveform\"></svg><div class=\"measure-bars\"></div></div><div class=\"waveform-display\"><!--shows waveform for length of this pattern--><svg class=\"waveform\"></svg><div class=\"measure-bars\"></div></div></div>");;return buf.join("");
 },
 }

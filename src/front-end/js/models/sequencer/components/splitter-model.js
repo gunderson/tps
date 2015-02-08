@@ -1,13 +1,10 @@
 require("backbone");
-var _ = require("underscore");
 var ComponentModel = require("./component-model");
-
-// filters take an array of values and 
 
 var Model = ComponentModel.extend({
 	defaults: function (){
 		return {
-			componentType: "filter",
+			componentType: "splitter",
 			type: "none",
 			inputLineId: _.uniqueId("i_"),
 			inputLineConnection: null,
@@ -31,25 +28,6 @@ var Model = ComponentModel.extend({
 	getValues: function(){
 		var lineValues, levelValues;
 	},
-
-	// transforms
-	none: function(val, i){
-		return val;
-	},
-	scale: function(val, i){
-		var scale = this.get("inputLevels")[i];
-		if (!scale && scale !== 0){
-			scale = 1;
-		}
-		return val * scale;
-	},
-	offset: function(){
-
-	},
-	digital: function(val, i){
-		if (val < 0.5) return 0;
-		if (val >= 0.5) return 1;
-	}
 });
 
 module.exports = Model;

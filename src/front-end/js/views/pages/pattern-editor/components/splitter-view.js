@@ -5,9 +5,9 @@ var ComponentView = require("./component-view")
 var View = ComponentView.extend({
 	el: false,
 	keep: true,
-	template: "sequencer/components/oscillator",
+	template: "pattern-editor/components/splitter",
 	initialize: function(options){
-		console.log("oscillator")
+		console.log("splitter")
 	}
 });
 

@@ -1,9 +1,12 @@
 require("backbone");
 require("backbone.layoutmanager");
-var AbstractPage = require("./Page-view");
-var MasterView = require("../sequencer/components/master-view");
-var FilterView = require("../sequencer/components/filter-view");
-var OscillatorView = require("../sequencer/components/oscillator-view");
+var AbstractPage	= require("./Page-view");
+var MasterView		= require("./pattern-editor/components/master-view");
+var FilterView		= require("./pattern-editor/components/filter-view");
+var OscillatorView	= require("./pattern-editor/components/oscillator-view");
+var UserPatternView	= require("./pattern-editor/components/user-pattern-view");
+var SplitterView	= require("./pattern-editor/components/splitter-view");
+var PatternModel	= require("../../models/sequencer/pattern");
 
 //abstract page class
 var Page = AbstractPage.extend({
@@ -11,8 +14,10 @@ var Page = AbstractPage.extend({
 	col:2,
 	el: "#pattern-editor",
 	events: {
-		"click .add-filter-button": "onClickAddFilter",
-		"click .add-oscillator-button": "onClickAddOscillator",
+		"click .add-filter-button"			: "onClickAddFilter",
+		"click .add-oscillator-button"		: "onClickAddOscillator",
+		"click .add-user-pattern-button"	: "onClickAddUserPattern",
+		"click .add-splitter-button"		: "onClickAddSplitter",
 	},
 	initialize: function(options){
 		var masterView = new MasterView();
@@ -20,16 +25,18 @@ var Page = AbstractPage.extend({
 			"#components": [masterView]
 		});
 
+		//a default patternModel
+		this.patternModel = new PatternModel();
+		this.listenTo(this.patternModel.get("components"), "add", this.onAddComponent);
+
 		this.listenTo(this.controller.model, "edit-pattern", this.onEditPatternEvent);
 	},
 
 	// RENDERING
-
-	
+	/*
 	beforeRender: function(){
 		console.log("pattern-editor::beforeRender", this.getViews().value())
 	},
-	/*
 	afterRender: function(){
 	},
 	*/
@@ -39,37 +46,49 @@ var Page = AbstractPage.extend({
 
 
 	onEditPatternEvent: function(patternModel){
+		this.stopListening(this.patternModel);
 		this.patternModel = patternModel;
+		this.listenTo(patternModel.get("components"), "add", this.onAddComponent);
 	},
-	onAddFilter: function(model){
-		var view = new FilterView({
-			model: model
-		});
-		this.insertViews({
-			"#components": view
-		});
-		view.render();
-		//add model to patternModel
+	onAddComponent: function(componentModel){
+		function insertView(ViewClass, model){
 
-	},
-	onAddOscillator: function(model){
-		var view = new OscillatorView({
-			model: model
-		});
-		this.insertViews({
-			"#components": view
-		});
-		view.render();
+			var view = new ViewClass({
+				model: model
+			});
+			this.insertViews({
+				"#components": view
+			});
+			view.render();
+		}
+
+		switch(componentModel.get("componentType")){
+			case "filter":
+				insertView.call(this, FilterView, componentModel);
+				break;
+			case "oscillator":
+				insertView.call(this, OscillatorView, componentModel);
+				break;
+			case "user-pattern":
+				insertView.call(this, UserPatternView, componentModel);
+				break;
+			case "splitter":
+				insertView.call(this, SplitterView, componentModel);
+				break;
+		}
 	},
 
 	onClickAddFilter: function(){
-		// tell the controller to add a filter
 		var model = this.patternModel.addFilter();
-		this.onAddFilter(model);
 	},
 	onClickAddOscillator: function(){
 		var model = this.patternModel.addOscillator();
-		this.onAddOscillator(model);
+	},
+	onClickAddUserPattern: function(){
+		var model = this.patternModel.addUserPattern();
+	},
+	onClickAddSplitter: function(){
+		var model = this.patternModel.addSplitter();
 	},
 
 	// TRANSITIONS
