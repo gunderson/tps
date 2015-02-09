@@ -6,11 +6,6 @@ var Router = Backbone.Router.extend({
 		"": "home",
 		"home": "home",
 		"about": "about",
-		"sequencer": "sequencer",
-		"pattern-editor/:sceneId/:trackId": "pattern-editor",
-		"sound-board": "sound-board",
-		"soundcloud": "soundcloud",
-		"pattern-editor": "pattern-editor"
 	}
 });
 
