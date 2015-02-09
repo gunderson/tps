@@ -1,14 +1,7 @@
-delete require.cache[require.resolve("./utils/ResponseUtils")];
 var ResponseUtils = require("./utils/ResponseUtils");
 
-delete require.cache[require.resolve("./utils/HeaderUtils")];
 var HeaderUtils = require("./utils/HeaderUtils");
 
-delete require.cache[require.resolve("./collections/TwitterDataCollection")];
-var TwitterDataCollection = require("./collections/TwitterDataCollection");
-
-delete require.cache[require.resolve("./models/TweetModel")];
-var TweetModel = require("./models/TweetModel");
 
 
 var fs = require("fs");
@@ -17,13 +10,6 @@ var express = require("express");
 var bodyParser = require('body-parser');
 var _ = require("underscore");
 var request = require("request");
-var SerialPort = require("serialport");
-
-// var serialPort = new SerialPort.SerialPort("/dev/tty.usbmodem1411", {
-// 	baudrate: 19200,
-// 	parser: SerialPort.parsers.readline("\n")
-// });
-// serialPort.setMaxListeners(128);
 
 var options = {};
 
@@ -80,102 +66,8 @@ module.exports = function(app, server, _options) {
 
 	router.get("/pulse/trigger/:id", function(req, res, next) {
 
-		serialPort.write(req.params.id, function(err, results) {
-			serialPort.once("data", function(data) {
-				results = {
-					results: data
-				};
-				HeaderUtils.addJSONHeader(res);
-				HeaderUtils.addCORSHeader(res);
-				res.send(JSON.stringify(results));
-			});
-		});
 	});
 
-	router.get("/songs/cycle", function(req, res, next) {
-		var twitterData = new TwitterDataCollection([]);
-		twitterData.response = res;
-		twitterData.fetch()
-			.then(twitterData.fetchFromTwitter.bind(twitterData))
-			.done(function() {
-				twitterData.save()
-					.done(next);
-			});
-	});
-
-	router.get("/songs/next", function(req, res, next) {
-		var twitterData = new TwitterDataCollection([]);
-		twitterData.response = res;
-		twitterData.getNext()
-			.done(next);
-	});
-
-	router.get("/songs/current", function(req, res, next) {
-		var twitterData = new TwitterDataCollection([]);
-		twitterData.response = res;
-		twitterData.getCurrent()
-			.done(next);
-	});
-
-	router.get("/songs/advance", function(req, res, next) {
-		var twitterData = new TwitterDataCollection([]);
-		twitterData.response = res;
-		twitterData.advance()
-			.done(next);
-	});
-
-	router.get("/songs/play/:id", function(req, res, next) {
-		var twitterData = new TwitterDataCollection([]);
-		twitterData.response = res;
-		twitterData.stop()
-			.then(function() {
-				play(req.params.id);
-			})
-			.done(next);
-	});
-
-	router.put("/songs/:id", function(req, res, next) {
-		var tweet = new TweetModel({
-			id: req.params.id
-		});
-
-		tweet.fetch()
-			.then(function() {
-				tweet.set(req.body);
-			})
-			.then(function() {
-				tweet.save
-			})
-			.then(function() {
-				ResponseUtils.sendData(res, {
-					"result": req.params.id + " updated"
-				});
-			})
-			.done(next);
-	});
-
-	router.get("/songs", function(req, res, next) {
-		var availableCommands = ["since"];
-		var query = _.pick(req.query, availableCommands);
-
-		var twitterData = new TwitterDataCollection([]);
-		twitterData.response = res;
-		twitterData.fetch({
-				query: query
-			})
-			.done(function() {
-				ResponseUtils.sendData(res, {
-					"data": twitterData.toJSON()
-				});
-			});
-	});
-
-	router.put("/songs", function(req, res, next) {
-		var twitterData = new TwitterDataCollection(req.body);
-		twitterData.response = res;
-		twitterData.save()
-			.done(next);
-	});
 
 	router.get("/", function(req, res, next) {
 		var pathToFile = path.resolve(__dirname, "../data/data.json");

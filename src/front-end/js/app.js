@@ -5,19 +5,14 @@ var _ = require("underscore");
 //-------------------------------------------------------------
 // Top Level Models
 
-var SoundcloudModel   = require("./models/soundcloud-player-model");
-var SequencerModel    = require("./models/sequencer/sequencer");
 
 //-------------------------------------------------------------
 // Controllers
 
-var Sequencer         = require("./controllers/sequencer/sequencer");
 
 // Instances
 
 var router            = require("./controllers/router");
-var sequencer         = new Sequencer({model:new SequencerModel()});
-sequencer.model.controller = sequencer;
 
 //-------------------------------------------------------------
 // Top level Views
@@ -26,20 +21,13 @@ var AbstractPage      = require("./views/pages/Page-view");
 var MainMenu          = require("./views/ui/main-menu-view");
 var HomePage          = require("./views/pages/home-view");
 var AboutPage         = require("./views/pages/about-view");
-var PatternEditorPage = require("./views/pages/pattern-editor-view");
-var SequencerPage     = require("./views/pages/sequencer-view");
-var SoundcloudPage    = require("./views/pages/soundcloud-view");
-var SoundBoardPage    = require("./views/pages/sound-board-view");
 
 // Instances
 
 var pages = {
     "#home"           : new HomePage({route: "/"}),
     "#about"          : new AboutPage({route: "/about"}),
-    "#pattern-editor" : new PatternEditorPage({controller: sequencer, route: "/pattern-editor"}),
-    "#soundcloud"     : new SoundcloudPage({model: new SoundcloudModel(), route: "/soundcloud"}),
-    "#sound-board"    : new SoundBoardPage({controller: sequencer, route: "/sound-board"}),
-    "#sequencer"      : new SequencerPage({controller: sequencer, route: "/sequencer"}),
+    
 };
 
 var overlays = {
