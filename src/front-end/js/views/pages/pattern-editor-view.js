@@ -1,6 +1,7 @@
 require("backbone");
 require("backbone.layoutmanager");
 var AbstractPage	= require("./Page-view");
+var ConnectionsView = require("./pattern-editor/connections-view");
 var MasterView		= require("./pattern-editor/components/master-view");
 var FilterView		= require("./pattern-editor/components/filter-view");
 var OscillatorView	= require("./pattern-editor/components/oscillator-view");
@@ -13,6 +14,9 @@ var Page = AbstractPage.extend({
 	row:1,
 	col:2,
 	el: "#pattern-editor",
+	views: {
+		"#connections": new ConnectionsView(),
+	},
 	events: {
 		"click .add-filter-button"			: "onClickAddFilter",
 		"click .add-oscillator-button"		: "onClickAddOscillator",
@@ -20,15 +24,20 @@ var Page = AbstractPage.extend({
 		"click .add-splitter-button"		: "onClickAddSplitter",
 	},
 	initialize: function(options){
-		var masterView = new MasterView();
+
+		// a default patternModel
+		this.patternModel = new PatternModel();
+
+		// set views
+		this.masterView = new MasterView({
+			model: this.patternModel.get("components").findWhere({"type": "master"})
+		});
 		this.insertViews({
-			"#components": [masterView]
+			"#components": [this.masterView]
 		});
 
-		//a default patternModel
-		this.patternModel = new PatternModel();
+		// set listeners
 		this.listenTo(this.patternModel.get("components"), "add", this.onAddComponent);
-
 		this.listenTo(this.controller.model, "edit-pattern", this.onEditPatternEvent);
 	},
 
@@ -46,9 +55,11 @@ var Page = AbstractPage.extend({
 
 
 	onEditPatternEvent: function(patternModel){
-		this.stopListening(this.patternModel);
+		this.stopListening(this.patternModel.get("components"));
 		this.patternModel = patternModel;
 		this.listenTo(patternModel.get("components"), "add", this.onAddComponent);
+		this.masterView.model = this.patternModel.get("components").findWhere({"type": "master"});
+		// this.masterView.render();
 	},
 	onAddComponent: function(componentModel){
 		function insertView(ViewClass, model){
@@ -62,7 +73,7 @@ var Page = AbstractPage.extend({
 			view.render();
 		}
 
-		switch(componentModel.get("componentType")){
+		switch(componentModel.get("type")){
 			case "filter":
 				insertView.call(this, FilterView, componentModel);
 				break;

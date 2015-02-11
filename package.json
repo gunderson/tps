@@ -11,7 +11,7 @@
   "license": "Copyright",
   "browser": {
     "jquery": "./node_modules/jquery/dist/jquery.js",
-    "constants" : "./src/shared/constants.js"
+    "constants": "./src/shared/constants.js"
   },
   "browserify": {
     "transform": [
@@ -52,15 +52,18 @@
     "body-parser": "^1.10.0",
     "colors": "^1.0.3",
     "git": "^0.1.5",
+    "install": "^0.1.8",
     "jade": "^1.7.0",
     "jquery": "^2.1.1",
     "lodash": "^3.0.0",
     "mongodb": "^1.4.23",
     "mongoose": "^3.8.20",
     "node-twitter-api": "^1.5.0",
+    "npm": "^2.5.0",
     "q": "^1.1.2",
     "request": "^2.48.0",
     "serialport": "^1.4.6",
+    "snapsvg": "git://github.com/sethvincent/Snap.svg#a34b8af69b",
     "soundcloud-node": "0.0.10",
     "twit": "^1.1.18",
     "underscore": "^1.7.0",

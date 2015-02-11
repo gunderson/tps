@@ -16,6 +16,9 @@ var PatternModel = Backbone.Model.extend({
 			components: new Backbone.Collection([new MasterModel()])
 		};
 	},
+	initialize: function(){
+		this.get("components").at(0).setupCollection();
+	},
 	// override fetch() since this doesn't need to get page info from server
 	fetch: function(){
 		// create a promise to send back since calling fetch() expects a promise to be returned
@@ -26,30 +29,27 @@ var PatternModel = Backbone.Model.extend({
 		});
 		return promise;
 	},
-	initialize: function(){
-
-	},
 	onDeleteTrack: function(){
 
 	},
 	addFilter: function(){
-		var model = new FilterModel();
-		this.get("components").add(model);
+		var model = this.get("components").add(new FilterModel());
+		model.setupCollection();
 		return model;
 	},
 	addOscillator: function(){
-		var model = new OscillatorModel();
-		this.get("components").add(model);
+		var model = this.get("components").add(new OscillatorModel());
+		model.setupCollection();
 		return model;
 	},
 	addUserPattern: function(){
-		var model = new UserPatternModel();
-		this.get("components").add(model);
+		var model = this.get("components").add(new UserPatternModel());
+		model.setupCollection();
 		return model;
 	},
 	addSplitter: function(){
-		var model = new SplitterModel();
-		this.get("components").add(model);
+		var model = this.get("components").add(new SplitterModel());
+		model.setupCollection();
 		return model;
 	}
 });

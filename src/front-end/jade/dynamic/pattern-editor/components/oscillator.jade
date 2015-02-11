@@ -3,13 +3,13 @@
 	.title
 		| Oscillator
 	.inputs
-		.add-input.input
+		.add-input.input(data-connection-id="#{addInputId}")
 			.port
 			| Add
-		.multiply-input.input
+		.multiply-input.input(data-connection-id="#{multiplyInputId}")
 			.port
 			| Multiply
-	.output
+	.output(data-connection-id="#{outputId}")
 		.port
 		| Output
 	.output-display

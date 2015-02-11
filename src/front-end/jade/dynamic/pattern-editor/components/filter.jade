@@ -3,13 +3,13 @@
 	.title
 		| Filter
 	.inputs
-		.line-input.input
+		.line-input.input(data-connection-id="#{lineInputId}")
 			.port
 			| Line
-		.level-input.input
+		.level-input.input(data-connection-id="#{levelInputId}")
 			.port
 			| Level
-	.output
+	.output(data-connection-id="#{outputId}")
 		.port
 		| Output
 	.output-display

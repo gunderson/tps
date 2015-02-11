@@ -3,30 +3,38 @@ var ComponentModel = require("./component-model");
 
 var Model = ComponentModel.extend({
 	defaults: function (){
-		return {
-			componentType: "splitter",
-			type: "none",
-			inputLineId: _.uniqueId("i_"),
-			inputLineConnection: null,
-			inputLevelId: _.uniqueId("i_"),
-			inputLevelConnection: null,
-			outputId: _.uniqueId("o_"),
-			outputConnection: null,
-			inputLineValues: [],
-			inputLevelValues: [],
-			outputValues: [],
-			x: 0,
-			y: 0
-		};
+		return _.extend({}, _.result(ComponentModel.prototype, "defaults"),
+		{
+			type: "splitter",
+			ports: [
+				{
+					control: "input",
+					type: "input",
+					id: _.uniqueId("i_"),
+					partner: null
+				},
+				{	
+					control: "a",
+					type: "output",
+					id: _.uniqueId("o_"),
+					partner: null
+				},
+				{
+					control: "b",
+					type: "output",
+					id: _.uniqueId("o_"),
+					partner: null
+				}
+			]
+		});
 	},
 	initialize: function(options){
 		this.set(_.pick(options, ["patternId"]));
 	},
-	filter: function(values){
-		return _.map(values, this[this.get("type")]);
-	},
 	getValues: function(){
-		var lineValues, levelValues;
+		if (!dirty){
+			return 
+		}
 	},
 });
 

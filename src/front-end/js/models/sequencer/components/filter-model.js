@@ -6,30 +6,42 @@ var ComponentModel = require("./component-model");
 
 var Model = ComponentModel.extend({
 	defaults: function (){
-		return {
-			componentType: "filter",
-			type: "none",
-			inputLineId: _.uniqueId("i_"),
-			inputLineConnection: null,
-			inputLevelId: _.uniqueId("i_"),
-			inputLevelConnection: null,
-			outputId: _.uniqueId("o_"),
-			outputConnection: null,
-			inputLineValues: [],
-			inputLevelValues: [],
-			outputValues: [],
-			x: 0,
-			y: 0
-		};
+		return _.extend({}, _.result(ComponentModel.prototype, "defaults"),
+		{
+			ports: [
+				{
+					control: "line",
+					type: "input",
+					id: _.uniqueId("i_"),
+					partner: null
+				},
+				{
+					control: "level",
+					type: "input",
+					id: _.uniqueId("i_"),
+					partner: null
+				},
+				{	
+					id: _.uniqueId("o_"),
+					type: "output",
+					partner: null,
+				}
+			],
+			type: "filter",
+			mode: "passthrough"
+		});
 	},
 	initialize: function(options){
 		this.set(_.pick(options, ["patternId"]));
 	},
 	filter: function(values){
-		return _.map(values, this[this.get("type")]);
+		return _.map(values, this[this.get("mode")]);
 	},
 	getValues: function(){
 		var lineValues, levelValues;
+	},
+	passthrough: function(i){
+		return i;
 	},
 
 	// transforms

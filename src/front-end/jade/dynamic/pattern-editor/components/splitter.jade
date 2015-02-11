@@ -3,14 +3,14 @@
 	.title
 		| Splitter
 	.inputs
-		.line-input.input
+		.line-input.input(data-connection-id="#{inputId}")
 			.port
 			| Line
 	.outputs
-		.output.output-a
+		.output.output-a(data-connection-id="#{outputAId}")
 			.port
 			| Output A
-		.output.output-b
+		.output.output-b(data-connection-id="#{outputBId}")
 			.port
 			| Output B
 	.output-display

@@ -11,6 +11,13 @@ var View = ComponentView.extend({
 	},
 	beforeRender: function(){
 		console.log("render master");
+	},
+	serialize: function(){
+		var ports = this.model.get("ports");
+		return {
+			rhythmInputId: _.findWhere(ports, {type: "input", control: "rhythm"}).id,
+			pitchInputId: _.findWhere(ports, {type: "input", control: "pitch"}).id
+		}
 	}
 });
 

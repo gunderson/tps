@@ -2,9 +2,9 @@
 	.title
 		| Master Inputs
 	#sequencer-inputs
-		#rhythm-input.input
+		#rhythm-input.input(data-connection-id="#{rhythmInputId}")
 			.port
-			| Pattern
-		#pitch-input.input
+			| Rhythm
+		#pitch-input.input(data-connection-id="#{pitchInputId}")
 			.port
 			| Pitch

@@ -8,6 +8,14 @@ var View = ComponentView.extend({
 	template: "pattern-editor/components/oscillator",
 	initialize: function(options){
 		console.log("oscillator")
+	},
+	serialize: function(){
+		var ports = this.model.get("ports");
+		return {
+			addInputId: _.findWhere(ports, {type: "input", control: "add"}).id,
+			multiplylInputId: _.findWhere(ports, {type: "input", control: "multiply"}).id,
+			outputId: _.findWhere(ports, {type: "output"}).id
+		}
 	}
 });
 

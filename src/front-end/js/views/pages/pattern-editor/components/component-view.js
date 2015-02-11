@@ -4,9 +4,10 @@ require("backbone.layoutmanager");
 var View = Backbone.Layout.extend({
 	el: false,
 	keep: true,
+	connectionRequest: null,
 	events: {
 		"mousedown .input>.port"	: "onInputMouseDown",
-		"mouseup .input>.port"		: "onOInputMouseUp",
+		"mouseup .input>.port"		: "onInputMouseUp",
 		"mousedown .output>.port"	: "onOutputMouseDown",
 		"mouseup .output>.port"		: "onOutputMouseUp",
 		"click"                     : "onClick",
@@ -74,7 +75,9 @@ var View = Backbone.Layout.extend({
 	onDragEnd: function(e){
 		e.preventDefault();
 		e.stopImmediatePropagation();
+		var position = this.$el.position();
 		$("body").off("mousemove mouseup mouseleave");
+		this.model.cancelConnectionRequest();
 	},
 	select: function(){
 
@@ -83,38 +86,35 @@ var View = Backbone.Layout.extend({
 
 	},
 	onInputMouseDown: function(e){
+		var $target = $(e.currentTarget).parent();
 		e.preventDefault();
 		e.stopPropagation();
-		console.log("port down");
-		//if connection exists
-			//clear other connection
+		this.model.triggerConnectionRequest($target.data("connection-id"));
 		//start dragging connection
+		this.trigger("connection-request", {$target: $target});
 	},
 	onOutputMouseDown: function(e){
+		var $target = $(e.currentTarget).parent();
 		e.preventDefault();
 		e.stopPropagation();
-		console.log("port down");
-		//if connection exists
-			//clear other connection
+		this.model.triggerConnectionRequest($target.data("connection-id"));
 		//start dragging connection
+		this.trigger("connection-request", {$target: $target});
 	},
 	onMouseLeave: function(){
 		this.cancelConnection();
 	},
 	cancelConnection: function(){
-
+		this.model.cancelConnectionRequest();
+		this.trigger("cancel-connection-request");
 	},
 	onInputMouseUp: function(e){
-		//if source is an output
-		//and source parent is not this
-		//create connection
+		var $target = $(e.currentTarget).parent();
+		this.model.triggerConnectionResponseInput($target.data("connection-id"));
 	},
 	onOutputMouseUp: function(e){
-		//if source is an input
-		//and source parent is not this
-		//if connection exists
-			//clear other connection
-		//create connection
+		var $target = $(e.currentTarget).parent();
+		this.model.triggerConnectionResponseOutput($target.data("connection-id"));
 	},
 	onStageUp: function(){
 		this.cancelConnection();

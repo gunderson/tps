@@ -3,30 +3,40 @@ var ComponentModel = require("./component-model");
 
 var Model = ComponentModel.extend({
 	defaults: function(){
-		return {
-			componentType: "oscillator",
-			type: "cos",
-			inputAddId: _.uniqueId("i_"),
-			inputAddConnection: null,
-			inputScaleId: _.uniqueId("i_"),
-			inputScaleConnection: null,
-			outputId: _.uniqueId("o_"),
-			outputConnection: null,
-			inputAddValues: [],
-			inputScaleLevels: [],
-			outputValues: [],
+		return _.extend({}, _.result(ComponentModel.prototype, "defaults"),
+		{
+			type: "oscillator",
+			mode: "cos",
+
+			ports: [
+				{
+					control: "add",
+					type: "input",
+					id: _.uniqueId("i_"),
+					partner: null
+				},
+				{
+					control: "multiply",
+					type: "input",
+					id: _.uniqueId("i_"),
+					partner: null
+				},
+				{	
+					id: _.uniqueId("o_"),
+					type: "output",
+					partner: null,
+				}
+			],
 			amplitude: 1,
 			period: 4, //period is in cycles/beat
 			offset: 0, //offset is in beats
-			x: 0,
-			y: 0
-		};
+		});
 	},
 	initialize: function(options){
 		this.set(_.pick(options, ["patternId"]));
 	},
 	filter: function(values){
-		return _.map(values, this[this.get("type")]);
+		return _.map(values, this[this.get("mode")]);
 	},
 
 	getValues: function(numBeats, pulsesPerBeat){
