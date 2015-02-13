@@ -15,7 +15,6 @@ var Page = AbstractPage.extend({
 	col:2,
 	el: "#pattern-editor",
 	views: {
-		"#connections": new ConnectionsView(),
 	},
 	events: {
 		"click .add-filter-button"			: "onClickAddFilter",
@@ -32,11 +31,15 @@ var Page = AbstractPage.extend({
 		this.masterView = new MasterView({
 			model: this.patternModel.get("components").findWhere({"type": "master"})
 		});
+		this.connectionsView = new ConnectionsView();
+
 		this.insertViews({
+			"#connections": [this.connectionsView],
 			"#components": [this.masterView]
 		});
 
 		// set listeners
+		this.connectionsView.ListenTo(this.patternModel.get("components"), "draw-partial", this.connections.drawPartial);
 		this.listenTo(this.patternModel.get("components"), "add", this.onAddComponent);
 		this.listenTo(this.controller.model, "edit-pattern", this.onEditPatternEvent);
 	},
@@ -49,7 +52,13 @@ var Page = AbstractPage.extend({
 	afterRender: function(){
 	},
 	*/
-
+	onResize: function(){
+		var $connections = this.$("#connections");
+		this.$("#connections").attr({
+			width: $connections.width(),
+			height: $connections.height()
+		})
+	},
 
 	// EVENT HANDLERS
 
@@ -109,6 +118,7 @@ var Page = AbstractPage.extend({
 			this.__manager__.parent.router.navigate("/sequencer", {trigger: true});
 			return;
 		}*/
+		requestAnimationFrame(this.onResize.bind(this));
 		AbstractPage.prototype.transitionIn.apply(this, arguments);
 	},
 	transitionInComplete: function(){

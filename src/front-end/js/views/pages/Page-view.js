@@ -11,6 +11,8 @@ var Page = Backbone.Layout.extend({
 	currentRoute: "",
 	page: null,
 	views: {},
+	initialize: function(){
+	},
 	fetch: function(){
 
 		var promise = new $.Deferred();

@@ -5,6 +5,7 @@ var MasterModel = require("./components/master-model");
 var OscillatorModel = require("./components/oscillator-model");
 var UserPatternModel = require("./components/user-pattern-model");
 var SplitterModel = require("./components/splitter-model");
+var ConnectionsCollection = require("../../collections/sequencer/connections-collection");
 
 var PatternModel = Backbone.Model.extend({
 	defaults: function(){
@@ -13,7 +14,8 @@ var PatternModel = Backbone.Model.extend({
 			sceneId: 0,
 			trackId: 0,
 			measureLength: 1,
-			components: new Backbone.Collection([new MasterModel()])
+			components: new Backbone.Collection([new MasterModel()]),
+			connections: new ConnectionsCollection()
 		};
 	},
 	initialize: function(){

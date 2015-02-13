@@ -101,6 +101,9 @@ var View = Backbone.Layout.extend({
 		//start dragging connection
 		this.trigger("connection-request", {$target: $target});
 	},
+	onConnectionMouseMove: function(e){
+		this.trigger("draw-partial", {port: port, pageX: e.pageX, pageY: e.pageY})
+	},
 	onMouseLeave: function(){
 		this.cancelConnection();
 	},
