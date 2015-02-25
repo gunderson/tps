@@ -24,62 +24,100 @@ var Page = AbstractPage.extend({
 	},
 	initialize: function(options){
 
-		// a default patternModel
-		this.patternModel = new PatternModel();
+		this.connectionsCollection = options.connectionsCollection;
+		this.controller = options.controller;
 
 		// set views
 		this.masterView = new MasterView({
-			model: this.patternModel.get("components").findWhere({"type": "master"})
 		});
-		this.connectionsView = new ConnectionsView();
 
+		this.connectionsView = new ConnectionsView({collection: this.connectionsCollection});
+
+
+		// set listeners
+		this.listenTo(this.controller.model, "edit-pattern", this.onEditPatternEvent);
+	},
+	fetch: function(params){
+		var promise = new $.Deferred();
+		
+		if (this.patternModel){
+			this.removePatternModelListeners();
+		}
+
+		this.patternModel = this.controller.model
+			.get("scenes").findWhere({ sceneId: parseInt(params[0]) })
+			.get("patterns").findWhere({ trackId: parseInt(params[1]) });
+		this.setPatternModelListeners();
+
+		this.masterView.model = this.patternModel.get("components").findWhere({"type": "master"});
+
+		this.render();
+
+		_.defer(function(){
+			promise.resolve();
+		});
+
+		return promise;
+	},
+	setPatternModelListeners: function(){
+		var components = this.patternModel.get("components");
+		this.listenTo(components, "connection-request", 		this.beginConnection);
+		this.listenTo(components, "cancel-connection-request", 	this.cancelConnection);
+		this.listenTo(components, "connection-response", 		this.completeConnection);
+		this.listenTo(components, "remove", 					this.onRemoveComponent);
+		this.listenTo(components, "add", 						this.onAddComponent);
+
+	},
+	removePatternModelListeners: function(){
+		if (this.patternModel) this.stopListening(this.patternModel.get("components"));
+	},
+
+
+	// RENDERING
+	beforeRender: function(){
+		
 		this.insertViews({
-			"#connections": [this.connectionsView],
+			"": this.connectionsView,
 			"#components": [this.masterView]
 		});
 
-		// set listeners
-		this.connectionsView.ListenTo(this.patternModel.get("components"), "draw-partial", this.connections.drawPartial);
-		this.listenTo(this.patternModel.get("components"), "add", this.onAddComponent);
-		this.listenTo(this.controller.model, "edit-pattern", this.onEditPatternEvent);
-	},
-
-	// RENDERING
-	/*
-	beforeRender: function(){
-		console.log("pattern-editor::beforeRender", this.getViews().value())
+		this.patternModel.get("components").each(
+			function(componentModel){
+				this.onAddComponent(componentModel, true);
+			}.bind(this)
+		);
 	},
 	afterRender: function(){
+		console.log(this);
+
 	},
-	*/
 	onResize: function(){
 		var $connections = this.$("#connections");
 		this.$("#connections").attr({
 			width: $connections.width(),
 			height: $connections.height()
-		})
+		});
 	},
 
 	// EVENT HANDLERS
 
 
 	onEditPatternEvent: function(patternModel){
-		this.stopListening(this.patternModel.get("components"));
+		this.removePatternModelListeners();
 		this.patternModel = patternModel;
-		this.listenTo(patternModel.get("components"), "add", this.onAddComponent);
-		this.masterView.model = this.patternModel.get("components").findWhere({"type": "master"});
-		// this.masterView.render();
+		this.setPatternModelListeners();
 	},
-	onAddComponent: function(componentModel){
+	onAddComponent: function(componentModel, deferRender){
 		function insertView(ViewClass, model){
-
 			var view = new ViewClass({
 				model: model
 			});
 			this.insertViews({
 				"#components": view
 			});
-			view.render();
+
+
+			if (deferRender !== true) view.render();
 		}
 
 		switch(componentModel.get("type")){
@@ -96,6 +134,19 @@ var Page = AbstractPage.extend({
 				insertView.call(this, SplitterView, componentModel);
 				break;
 		}
+	},
+
+	beginConnection: function(data){
+		// data = { $target: $(element) }
+		this.connectionsView.beginConnection(data);
+	},
+
+	completeConnection: function(data){
+
+	},
+
+	clearConnection: function(data){
+
 	},
 
 	onClickAddFilter: function(){

@@ -5,39 +5,40 @@ var _ = require("underscore");
 //-------------------------------------------------------------
 // Top Level Models
 
-var SoundcloudModel   = require("./models/soundcloud-player-model");
-var SequencerModel    = require("./models/sequencer/sequencer");
+var SoundcloudModel        = require("./models/soundcloud-player-model");
+var SequencerModel         = require("./models/sequencer/sequencer");
 
 //-------------------------------------------------------------
 // Controllers
 
-var Sequencer         = require("./controllers/sequencer/sequencer");
+var Sequencer              = require("./controllers/sequencer/sequencer");
 
 // Instances
 
-var router            = require("./controllers/router");
-var sequencer         = new Sequencer({model:new SequencerModel()});
+var connectionsCollection  = new (require("./collections/sequencer/connections-collection"))();
+var router                 = require("./controllers/router");
+var sequencer              = new Sequencer({model:new SequencerModel()});
 sequencer.model.controller = sequencer;
 
 //-------------------------------------------------------------
 // Top level Views
 
-var AbstractPage      = require("./views/pages/Page-view");
-var MainMenu          = require("./views/ui/main-menu-view");
-var HomePage          = require("./views/pages/home-view");
-var AboutPage         = require("./views/pages/about-view");
-var PatternEditorPage = require("./views/pages/pattern-editor-view");
-var SequencerPage     = require("./views/pages/sequencer-view");
-var SoundcloudPage    = require("./views/pages/soundcloud-view");
-var SoundBoardPage    = require("./views/pages/sound-board-view");
+var AbstractPage           = require("./views/pages/Page-view");
+var MainMenu               = require("./views/ui/main-menu-view");
+var HomePage               = require("./views/pages/home-view");
+var AboutPage              = require("./views/pages/about-view");
+var PatternEditorPage      = require("./views/pages/pattern-editor-view");
+var SequencerPage          = require("./views/pages/sequencer-view");
+var SoundcloudPage         = require("./views/pages/soundcloud-view");
+var SoundBoardPage         = require("./views/pages/sound-board-view");
 
 // Instances
 
 var pages = {
     "#home"           : new HomePage({route: "/"}),
     "#about"          : new AboutPage({route: "/about"}),
-    "#pattern-editor" : new PatternEditorPage({controller: sequencer, route: "/pattern-editor"}),
     "#soundcloud"     : new SoundcloudPage({model: new SoundcloudModel(), route: "/soundcloud"}),
+    "#pattern-editor" : new PatternEditorPage({controller: sequencer, route: "/pattern-editor", connectionsCollection: connectionsCollection}),
     "#sound-board"    : new SoundBoardPage({controller: sequencer, route: "/sound-board"}),
     "#sequencer"      : new SequencerPage({controller: sequencer, route: "/sequencer"}),
 };
@@ -68,7 +69,7 @@ module.exports = AbstractPage.extend({
         });
         // assign controller to each view
         _.each(this.views, function(v){
-    		v.controller = _this.controller;
+    		v.appController = _this.controller;
     	});
 
         $(window).on('orientationchange', this.onOrientationChange);

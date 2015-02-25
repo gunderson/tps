@@ -13,7 +13,7 @@ var Page = Backbone.Layout.extend({
 	views: {},
 	initialize: function(){
 	},
-	fetch: function(){
+	fetch: function(params){
 
 		var promise = new $.Deferred();
 		
@@ -58,7 +58,7 @@ var Page = Backbone.Layout.extend({
 
             //if the route is invalid, do nothing
         	if (!newPage) return;
-        	newPage.fetch()
+        	newPage.fetch(params)
                 .done(function(){
             		if (currentPage) { currentPage.transitionOut(newPage); }
             		newPage.transitionIn(currentPage);

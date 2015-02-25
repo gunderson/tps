@@ -4,7 +4,7 @@ var ComponentView = require("./component-view");
 
 var View = ComponentView.extend({
 	// el: false,
-	// keep: false,
+	// keep: true,
 	template: "pattern-editor/components/master",
 	initialize: function(options){
 		console.log("master");

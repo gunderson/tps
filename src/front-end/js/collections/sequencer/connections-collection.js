@@ -6,7 +6,9 @@ var ConnectionsCollection = Backbone.Collection.extend({
 	model: Backbone.Model.extend({
 		defaults: {
 			input: null,
-			output: null
+			output: null,
+			svgPath: "",
+			patternId: null
 		},
 		initialize: function(options){
 			this.set(options);

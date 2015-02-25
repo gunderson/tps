@@ -17,6 +17,12 @@ var View = Backbone.Layout.extend({
 	initialize: function(options){
 		//bind dom event handlers
 	},
+	afterRender: function(){
+		this.$el.css({
+			translateX: this.model.get("x"),
+			translateY: this.model.get("y"),
+		});
+	},
 	onClick: function(){
 		if (this.cancelClick) return;
 		//trigger menu to show correct options for type
@@ -100,9 +106,6 @@ var View = Backbone.Layout.extend({
 		this.model.triggerConnectionRequest($target.data("connection-id"));
 		//start dragging connection
 		this.trigger("connection-request", {$target: $target});
-	},
-	onConnectionMouseMove: function(e){
-		this.trigger("draw-partial", {port: port, pageX: e.pageX, pageY: e.pageY})
 	},
 	onMouseLeave: function(){
 		this.cancelConnection();

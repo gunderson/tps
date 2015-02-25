@@ -8,13 +8,13 @@ int button = 7;
 int ana0 = 11;
 int testPin = 13;
 
-int pwmResolution = 4095;
+int pwmResolution = 256;
 
 int cycleRunning = 0;
 
 int lastTime = 0;
-int hz = 2400; // cycles per second
-int periodLength = 300; // number of cycles per period
+int hz = 600; // cycles per second
+int periodLength = 600; // number of cycles per period
 float cyclesPerPeriod = (float)periodLength / 2; // number of cycles between max and min voltage levels
 float voltageCycleRate = pwmResolution / cyclesPerPeriod; // rate of change per cycle
 
@@ -41,7 +41,7 @@ int pin1s [12] = {
 int pwmChannels [12] = {
   0,1,2,3 ,4,5,6,7 ,8,9,10,11};
 int buttons [12] = {
-  8,8,8,8 ,8,8,8,8 ,8,8,8,8};
+  6,6,6,8 ,8,6,6,6 ,6,6,6,6};
 int cycleRunnings [12] = {
   0,0,0,0 ,0,0,0,0 ,0,0,0,0};
 
@@ -113,17 +113,17 @@ void onCycle(){
       switch(currentPhases[channelId]){
       case 0:
         //0 = moving to full strength bottom from neutral
-        voltageLevels[channelId] += voltageCycleRate;
+        voltageLevels[channelId] += 1;//voltageCycleRate;
         writeVoltage(channelId, 0, voltageLevels[channelId], pwmResolution, 1, false);
         break;
       case 1:
         //1 = moving to neutral from full strength bottom
-        voltageLevels[channelId] -= voltageCycleRate * 32;
+        voltageLevels[channelId] -= voltageCycleRate * 64;
         writeVoltage(channelId, 0, voltageLevels[channelId], 0, 2, false);
         break;
       case 2:
         //2 = moving to full strength top from neutral
-        voltageLevels[channelId] += voltageCycleRate * 32;
+        voltageLevels[channelId] += voltageCycleRate * 64;
         writeVoltage(channelId, 1, voltageLevels[channelId], pwmResolution, 3, false);
         break;
       case 3:
