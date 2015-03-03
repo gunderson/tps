@@ -6,12 +6,10 @@ var View = Backbone.Layout.extend({
 	keep: true,
 	connectionRequest: null,
 	events: {
-		"mousedown .input>.port"	: "onInputMouseDown",
-		"mouseup .input>.port"		: "onInputMouseUp",
-		"mousedown .output>.port"	: "onOutputMouseDown",
-		"mouseup .output>.port"		: "onOutputMouseUp",
-		"click"                     : "onClick",
-		"mousedown"                 : "onDragStart",
+		"mousedown .port"	: "onPortMouseDown",
+		"mouseup .port"		: "onPortMouseUp",
+		"click"				: "onClick",
+		"mousedown"			: "onDragStart",
 	},
 	views: {},
 	initialize: function(options){
@@ -70,6 +68,11 @@ var View = Backbone.Layout.extend({
 			this.cancelClick = true;
 		}
 
+		this.model.set({
+			x: newX - this.mouseDownX,
+			y: newY - this.mouseDownY
+		});
+
 		this.$el.velocity({
 			//TODO: switch to using mouse telemetrics class to handle this.
 			translateX: newX - this.mouseDownX,
@@ -91,7 +94,7 @@ var View = Backbone.Layout.extend({
 	deselect: function(){
 
 	},
-	onInputMouseDown: function(e){
+	onPortMouseDown: function(e){
 		var $target = $(e.currentTarget).parent();
 		e.preventDefault();
 		e.stopPropagation();
@@ -99,13 +102,10 @@ var View = Backbone.Layout.extend({
 		//start dragging connection
 		this.trigger("connection-request", {$target: $target});
 	},
-	onOutputMouseDown: function(e){
-		var $target = $(e.currentTarget).parent();
-		e.preventDefault();
-		e.stopPropagation();
-		this.model.triggerConnectionRequest($target.data("connection-id"));
-		//start dragging connection
-		this.trigger("connection-request", {$target: $target});
+	onPortMouseUp: function(e){
+		var $currentTarget = $(e.currentTarget);
+		var $target = $currentTarget.parent();
+		this.model.triggerConnectionResponse($target.data("connection-id"));
 	},
 	onMouseLeave: function(){
 		this.cancelConnection();
@@ -113,14 +113,6 @@ var View = Backbone.Layout.extend({
 	cancelConnection: function(){
 		this.model.cancelConnectionRequest();
 		this.trigger("cancel-connection-request");
-	},
-	onInputMouseUp: function(e){
-		var $target = $(e.currentTarget).parent();
-		this.model.triggerConnectionResponseInput($target.data("connection-id"));
-	},
-	onOutputMouseUp: function(e){
-		var $target = $(e.currentTarget).parent();
-		this.model.triggerConnectionResponseOutput($target.data("connection-id"));
 	},
 	onStageUp: function(){
 		this.cancelConnection();

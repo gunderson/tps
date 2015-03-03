@@ -8,25 +8,28 @@ var Model = ComponentModel.extend({
 	defaults: function (){
 		return _.extend({}, _.result(ComponentModel.prototype, "defaults"),
 		{
-			ports: [
+			ports: new Backbone.Collection([
 				{
 					control: "line",
 					type: "input",
 					id: _.uniqueId("i_"),
-					partner: null
+					partner: null,
+					model: this
 				},
 				{
 					control: "level",
 					type: "input",
 					id: _.uniqueId("i_"),
-					partner: null
+					partner: null,
+					model: this
 				},
 				{	
 					id: _.uniqueId("o_"),
 					type: "output",
 					partner: null,
+					model: this
 				}
-			],
+			]),
 			type: "filter",
 			mode: "passthrough"
 		});

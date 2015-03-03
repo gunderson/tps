@@ -15,9 +15,9 @@ var View = ComponentView.extend({
 	serialize: function(){
 		var ports = this.model.get("ports");
 		return {
-			rhythmInputId: _.findWhere(ports, {type: "input", control: "rhythm"}).id,
-			pitchInputId: _.findWhere(ports, {type: "input", control: "pitch"}).id
-		}
+			rhythmInputId: ports.findWhere({type: "input", control: "rhythm"}).id,
+			pitchInputId: ports.findWhere({type: "input", control: "pitch"}).id
+		};
 	}
 });
 

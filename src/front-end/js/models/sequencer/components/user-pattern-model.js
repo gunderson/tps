@@ -6,19 +6,21 @@ var Model = ComponentModel.extend({
 		return _.extend({}, _.result(ComponentModel.prototype, "defaults"),
 		{
 			type: "user-pattern",
-			ports: [
+			ports: new Backbone.Collection([
 				{
 					control: "threshold",
 					type: "input",
 					id: _.uniqueId("i_"),
-					partner: null
+					partner: null,
+					model: this
 				},
 				{	
 					id: _.uniqueId("o_"),
 					type: "output",
 					partner: null,
+					model: this
 				}
-			]
+			])
 		});
 	},
 	initialize: function(options){

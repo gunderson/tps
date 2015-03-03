@@ -49,6 +49,10 @@ var Page = AbstractPage.extend({
 			.get("patterns").findWhere({ trackId: parseInt(params[1]) });
 		this.setPatternModelListeners();
 
+		this.connectionsCollection = this.patternModel.get("connections");
+		this.connectionsView.setConnectionCollection(this.patternModel.get("connections"));
+		this.connectionsView.setComponentCollection(this.patternModel.get("components"));
+
 		this.masterView.model = this.patternModel.get("components").findWhere({"type": "master"});
 
 		this.render();
@@ -101,7 +105,6 @@ var Page = AbstractPage.extend({
 
 	// EVENT HANDLERS
 
-
 	onEditPatternEvent: function(patternModel){
 		this.removePatternModelListeners();
 		this.patternModel = patternModel;
@@ -141,8 +144,12 @@ var Page = AbstractPage.extend({
 		this.connectionsView.beginConnection(data);
 	},
 
-	completeConnection: function(data){
+	cancelConnection: function(){
+		this.connectionsView.cancelConnection();
+	},
 
+	completeConnection: function(){
+		this.connectionsView.cancelConnection();
 	},
 
 	clearConnection: function(data){

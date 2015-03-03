@@ -4,12 +4,11 @@ var Model = Backbone.Model.extend({
 	dirty: false,
 	connectionRequest: null,
 	defaults: {
-		values: null,
+		values: [],
 		x:0,
 		y:0
 	},
-	initialize: function(){
-		this.set("values", []);
+	initialize: function(options){
 	},
 	setupCollection: function(){
 		if (this.collection){
@@ -18,40 +17,34 @@ var Model = Backbone.Model.extend({
 		}
 	},
 	// triggers
-	triggerConnectionRequest: function(sourceId){
-		this.destroyConnection(sourceId, true);
+	triggerConnectionRequest: function(portId){
+		var port = this.get("ports").get(portId);
+		this.collection.destroyPort(port);
 		this.trigger("connection-request", {
 			model: this,
-			sourceId: sourceId
+			port: this.get("ports").get(portId)
 		});
 	},
-	triggerConnectionResponseInput: function(inputId){
+	triggerConnectionResponse: function(portId){
+		var port = this.get("ports").get(portId);
 		//if source is an output
-		if (this.connectionRequest && this.connectionRequest.sourceId.charAt(0) === "o"){
+		if (this.connectionRequest){
 			//send connection resopnse
-			this.setupConnection(inputId, this.connectionRequest.model)
+			this.setupConnection(port, this.connectionRequest.port);
 		}
 		// tell other components to cancel connection mode
-		this.cancelConnectionRequest();
+		this.cancelConnectionRequest(port);
 	},
-	triggerConnectionResponseOutput: function(outputId){
-		//if source is an output
-		if (this.connectionRequest && this.connectionRequest.sourceId.charAt(0) === "i"){
-			//send connection resopnse
-			this.setupConnection(outputId, this.connectionRequest.model)
-		}
-		// tell other components to cancel connection mode
-		this.cancelConnectionRequest();
-	},
-	cancelConnectionRequest: function(){
-		this.trigger("connection-response");
+	cancelConnectionRequest: function(portId){
+		this.trigger("connection-response", portId);
 	},
 
 	//handlers
 	onConnectionRequest: function(data){
 
 		// ignore your own connection requests to prevent connecting to yourself
-		if (_.findWhere(this.get("ports"), {id:data.sourceId})) {
+		if (this.get("ports").contains(data.port)) {
+			this.collection.destroyPort(data.port);
 			return;
 		}
 
@@ -63,23 +56,17 @@ var Model = Backbone.Model.extend({
 		this.connectionRequest = null;
 	},
 
-	setupConnection: function(connectionId, partner){
-		var connection = _.findWhere(this.get("ports"), {id: connectionId});
-		_.extend(connection, {
-			partner: partner
+	setupConnection: function(localPort, partnerPort){
+		if (localPort.get("type") === partnerPort.get("type")) return;
+		localPort.set({
+			partnerPort: partnerPort
 		});
-		_.extend(partner, {
-			partner: connection
+		partnerPort.set({
+			partnerPort: localPort
 		});
-	},
-	destroyConnection: function(partnerId, destroyPartnerConnection){
-		_.each(this.get("ports"), function(connection){
-			if (connection.partner && connection.partner.get("id") === partnerId){
-				if (destroyPartnerConnection){
-					connection.partner.destroyConnection(connection.get("id"), false);
-				}
-				connection.partner = null;
-			}
+		this.get("connectionsCollection").add({
+			input: (localPort.get("type") === "input") ? localPort : partnerPort,
+			output: (localPort.get("type") === "output") ? localPort : partnerPort
 		});
 	}
 });

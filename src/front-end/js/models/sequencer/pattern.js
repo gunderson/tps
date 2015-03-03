@@ -6,20 +6,23 @@ var OscillatorModel = require("./components/oscillator-model");
 var UserPatternModel = require("./components/user-pattern-model");
 var SplitterModel = require("./components/splitter-model");
 var ConnectionsCollection = require("../../collections/sequencer/connections-collection");
+var ComponentsCollection = require("../../collections/sequencer/components-collection");
 
 var PatternModel = Backbone.Model.extend({
 	defaults: function(){
+		var connectionsCollection = new ConnectionsCollection();
 		return {
 			url: "",
 			sceneId: 0,
 			trackId: 0,
 			measureLength: 1,
-			components: new Backbone.Collection([new MasterModel()]),
-			connections: new ConnectionsCollection()
+			components: new ComponentsCollection([new MasterModel({connectionsCollection:connectionsCollection})]),
+			connections: connectionsCollection
 		};
 	},
 	initialize: function(){
 		this.get("components").at(0).setupCollection();
+		this.listenTo(this.get("components"), "remove", this.destroyConnection);
 	},
 	// override fetch() since this doesn't need to get page info from server
 	fetch: function(){
@@ -34,23 +37,40 @@ var PatternModel = Backbone.Model.extend({
 	onDeleteTrack: function(){
 
 	},
+	destroyConnection: function(connection){
+		console.log("collection data", arguments);
+		connection.get("input").model.set("partnerPort", null);
+		connection.get("output").model.set("partnerPort", null);
+	},
 	addFilter: function(){
-		var model = this.get("components").add(new FilterModel());
+		var model = this.get("components").add(new FilterModel({
+				connectionsCollection: this.get("connections")
+			})
+		);
 		model.setupCollection();
 		return model;
 	},
 	addOscillator: function(){
-		var model = this.get("components").add(new OscillatorModel());
+		var model = this.get("components").add(new OscillatorModel({
+				connectionsCollection: this.get("connections")
+			})
+		);
 		model.setupCollection();
 		return model;
 	},
 	addUserPattern: function(){
-		var model = this.get("components").add(new UserPatternModel());
+		var model = this.get("components").add(new UserPatternModel({
+				connectionsCollection: this.get("connections")
+			})
+		);
 		model.setupCollection();
 		return model;
 	},
 	addSplitter: function(){
-		var model = this.get("components").add(new SplitterModel());
+		var model = this.get("components").add(new SplitterModel({
+				connectionsCollection: this.get("connections")
+			})
+		);
 		model.setupCollection();
 		return model;
 	}

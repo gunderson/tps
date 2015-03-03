@@ -8,25 +8,28 @@ var Model = ComponentModel.extend({
 			type: "oscillator",
 			mode: "cos",
 
-			ports: [
+			ports: new Backbone.Collection([
 				{
 					control: "add",
 					type: "input",
 					id: _.uniqueId("i_"),
-					partner: null
+					partner: null,
+					model: this
 				},
 				{
 					control: "multiply",
 					type: "input",
 					id: _.uniqueId("i_"),
-					partner: null
+					partner: null,
+					model: this
 				},
 				{	
 					id: _.uniqueId("o_"),
 					type: "output",
 					partner: null,
+					model: this
 				}
-			],
+			]),
 			amplitude: 1,
 			period: 4, //period is in cycles/beat
 			offset: 0, //offset is in beats
