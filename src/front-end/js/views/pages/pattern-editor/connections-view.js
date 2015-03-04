@@ -50,7 +50,7 @@ var View = Backbone.Layout.extend({
 		}.bind(this));
 	},
 	onRemoveConnection: function(obj, event){
-		console.log("onRemoveConnection", arguments)
+		console.log("onRemoveConnection", arguments);
 		var connection = obj;
 		this.paper.remove(connection.path);
 	},

@@ -67,6 +67,7 @@ var Page = AbstractPage.extend({
 		var components = this.patternModel.get("components");
 		this.listenTo(components, "connection-request", 		this.beginConnection);
 		this.listenTo(components, "cancel-connection-request", 	this.cancelConnection);
+		this.listenTo(components, "activate-component", 		this.onActivateComponent);
 		this.listenTo(components, "connection-response", 		this.completeConnection);
 		this.listenTo(components, "remove", 					this.onRemoveComponent);
 		this.listenTo(components, "add", 						this.onAddComponent);
@@ -92,7 +93,6 @@ var Page = AbstractPage.extend({
 		);
 	},
 	afterRender: function(){
-		console.log(this);
 
 	},
 	onResize: function(){
@@ -104,7 +104,13 @@ var Page = AbstractPage.extend({
 	},
 
 	// EVENT HANDLERS
-
+	onActivateComponent: function($controls){
+		console.log("------------ onActivateComponent")
+		var $controlHolder = this.$("#component-control-holder");
+		var $currentControls = $controlHolder.find(".component-controls");
+		if ($currentControls) $currentControls.detach();
+		$controlHolder.append($controls);
+	},
 	onEditPatternEvent: function(patternModel){
 		this.removePatternModelListeners();
 		this.patternModel = patternModel;

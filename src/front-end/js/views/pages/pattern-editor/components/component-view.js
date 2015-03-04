@@ -6,10 +6,11 @@ var View = Backbone.Layout.extend({
 	keep: true,
 	connectionRequest: null,
 	events: {
-		"mousedown .port"	: "onPortMouseDown",
-		"mouseup .port"		: "onPortMouseUp",
-		"click"				: "onClick",
-		"mousedown"			: "onDragStart",
+		"mousedown .port"				: "onPortMouseDown",
+		"mouseup .port"					: "onPortMouseUp",
+		"click"							: "onClick",
+		"mousedown"						: "onDragStart",
+		"change .component-controls"	: "onChangeComponentControls" 
 	},
 	views: {},
 	initialize: function(options){
@@ -20,24 +21,21 @@ var View = Backbone.Layout.extend({
 			translateX: this.model.get("x"),
 			translateY: this.model.get("y"),
 		});
+		this.$controls = this.$(".component-controls");
+		this.$controls.detach();
+	},
+	cleanup: function(){
+		if (this.$controls) {
+			this.$controls.empty().remove();
+		}
 	},
 	// event handlers
 	onClick: function(){
 		if (this.cancelClick) return;
 		//trigger menu to show correct options for type
-		var $patternEditor = $('#pattern-editor');
-		var componentType = this.model.get("componentType");
-		var subType = this.model.get("type");
-		var className = "component-selected-" + componentType + " component-selected-" + subType;
-		var currentClasses = $patternEditor[0].className.split(/\s+/);
-		var componentClasses = _.filter(currentClasses, function(c){
-			return c.indexOf("component-selected") > -1;
-		});
+		this.model.trigger("activate-component", this.$controls);
 		// deactivate everything
 		// then activate this
-		$patternEditor
-			.removeClass(componentClasses.join(" "))
-			.addClass(className);
 		this.$el.parent().find(".component").removeClass("active");
 		this.$el.addClass("active");
 
