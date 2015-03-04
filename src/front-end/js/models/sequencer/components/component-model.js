@@ -15,19 +15,41 @@ var Model = Backbone.Model.extend({
 			port.set("parent", portParent);
 		});
 	},
-	getValues: function(numValues, interval){
+	getValues: function(numValues, tickwidth){
 		var transform = this.transform;
-		var values = this.get("ports")
-			.where({type: "input"})
-			.map(function(input){
+		var inputs = this.get("ports")
+			.where({type: "input"});
+
+		_.each(inputs, function(input){
 				var output = input.get("partner");
+				var inputValues;
+
 				if (output){
-					return output.get("parent").getValues(numValues, interval);
+					inputValues = output.get("parent").getValues(numValues, tickwidth);
+					input.set("values", inputValues);
+					return inputValues;
 				} else {
-					return _.filledArray(numValues, 1);
+					//not connected, return [1,1,1...1]
+					inputValues = _.filledArray(numValues, 1);
+					input.set("values", inputValues);
+					return inputValues;
 				}
 			});
 		//transform values
+		return this.transformValues(inputs);
+	},
+	transformValues: function(inputs){
+		var values = _.map(inputs,function(input){
+			return input.get("values");
+		});
+		values = _.map(
+			//combine each value at the same index of each array into new arrays
+			_.zip.apply(this, values),
+			//multiply all the inputs together
+			function(a){
+				return _.reduce(a, function(memo, num){ return memo * num; }, 0);
+			}
+		);
 		return values;
 	},
 	setupCollection: function(){
@@ -55,7 +77,7 @@ var Model = Backbone.Model.extend({
 		this.cancelConnectionRequest(port);
 	},
 	cancelConnectionRequest: function(portId){
-		this.trigger("connection-response", portId);
+		this.trigger("connection-response", {model:this, port: this.get("ports").get(portId)});
 	},
 
 	//handlers

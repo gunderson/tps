@@ -24,6 +24,7 @@ var PatternModel = Backbone.Model.extend({
 		this.get("components").at(0).setupCollection();
 		this.listenTo(this.get("components"), "remove", this.destroyConnections);
 		this.listenTo(this.get("components"), "connection-request", this.onConnectionRequest);
+		this.listenTo(this.get("components"), "connection-response", this.onConnectionResponse);
 	},
 	// override fetch() since this doesn't need to get page info from server
 	fetch: function(){
@@ -40,6 +41,17 @@ var PatternModel = Backbone.Model.extend({
 	},
 	onConnectionRequest: function(connectionRequest){
 		this.destroyPort(connectionRequest.port);
+	},
+
+	onConnectionResponse: function(connectionResponse){
+		var ticksperbeat = 64;
+		var beatspermeasure = 4;
+		var measuresperphrase = 4;
+		var tickwidth = (Math.PI * 2) / ticksperbeat;
+		var values = this.get("components")
+			.findWhere({type:"master"})
+			.getValues(ticksperbeat * beatspermeasure * measuresperphrase, tickwidth);
+		console.log(values);
 	},
 	destroyConnections: function( component ){
 		var destroyPort = this.destroyPort;
