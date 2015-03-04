@@ -12,19 +12,18 @@ var Model = ComponentModel.extend({
 					type: "input",
 					id: _.uniqueId("i_"),
 					partner: null,
-					model: this
 				},
 				{	
 					id: _.uniqueId("o_"),
 					type: "output",
 					partner: null,
-					model: this
 				}
 			])
 		});
 	},
 	initialize: function(options){
 		this.set(_.pick(options, ["patternId"]));
+		ComponentModel.prototype.initialize.call(this);
 	},
 	filter: function(values){
 		return _.map(values, this[this.get("type")]);

@@ -9,9 +9,11 @@
 		.multiply-input.input(data-connection-id="#{multiplyInputId}")
 			.port
 			| Multiply
-	.output(data-connection-id="#{outputId}")
-		.port
-		| Output
+
+	.outputs
+		.output(data-connection-id="#{outputId}")
+			.port
+			| Output
 	.output-display
 		svg.waveform
 		.measure-bars

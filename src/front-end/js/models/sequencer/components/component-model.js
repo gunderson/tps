@@ -1,3 +1,4 @@
+require("../../../lib/underscore.filledArray");
 require("backbone");
 
 var Model = Backbone.Model.extend({
@@ -9,6 +10,25 @@ var Model = Backbone.Model.extend({
 		y:0
 	},
 	initialize: function(options){
+		var portParent = this;
+		this.get("ports").each(function(port){
+			port.set("parent", portParent);
+		});
+	},
+	getValues: function(numValues, interval){
+		var transform = this.transform;
+		var values = this.get("ports")
+			.where({type: "input"})
+			.map(function(input){
+				var output = input.get("partner");
+				if (output){
+					return output.get("parent").getValues(numValues, interval);
+				} else {
+					return _.filledArray(numValues, 1);
+				}
+			});
+		//transform values
+		return values;
 	},
 	setupCollection: function(){
 		if (this.collection){
@@ -19,10 +39,9 @@ var Model = Backbone.Model.extend({
 	// triggers
 	triggerConnectionRequest: function(portId){
 		var port = this.get("ports").get(portId);
-		this.collection.destroyPort(port);
 		this.trigger("connection-request", {
 			model: this,
-			port: this.get("ports").get(portId)
+			port: port
 		});
 	},
 	triggerConnectionResponse: function(portId){
@@ -41,10 +60,8 @@ var Model = Backbone.Model.extend({
 
 	//handlers
 	onConnectionRequest: function(data){
-
 		// ignore your own connection requests to prevent connecting to yourself
 		if (this.get("ports").contains(data.port)) {
-			this.collection.destroyPort(data.port);
 			return;
 		}
 

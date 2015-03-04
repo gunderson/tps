@@ -12,7 +12,7 @@ var View = ComponentView.extend({
 	serialize: function(){
 		var ports = this.model.get("ports");
 		return {
-			intputId: ports.findWhere({type: "input"}).id,
+			inputId: ports.findWhere({type: "input"}).id,
 			outputAId: ports.findWhere({type: "output", control: "a"}).id,
 			outputBId: ports.findWhere({type: "output", control: "b"}).id
 		};

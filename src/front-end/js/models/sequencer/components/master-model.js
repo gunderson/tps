@@ -10,15 +10,13 @@ var Model = ComponentModel.extend({
 					control: "rhythm",
 					type: "input",
 					id: _.uniqueId("i_"),
-					partner: null,
-					model: this
+					partner: null
 				},
 				{
 					control: "pitch",
 					type: "input",
 					id: _.uniqueId("i_"),
-					partner: null,
-					model: this
+					partner: null
 				}
 			]),
 			type: "master"

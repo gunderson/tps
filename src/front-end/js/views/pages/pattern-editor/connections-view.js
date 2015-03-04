@@ -16,50 +16,85 @@ var View = Backbone.Layout.extend({
 	setComponentCollection: function(componentCollection){
 		if (this.componentCollection) this.stopListening(this.componentCollection);
 		this.componentCollection = componentCollection;
-		this.listenTo(this.componentCollection, "add remove reset", this.render);
+		this.listenTo(this.componentCollection, "add reset", this.render);
+		this.listenTo(this.componentCollection, "remove", this.onRemoveConnection);
+		this.listenTo(this.componentCollection, "change", this.updateConnections);
 	},
 	beforeRender: function(){
+	},
+	updateConnections: function(obj, event){
+		var componentModel = obj;
+		componentModel.get("ports").each(this.updatePort.bind(this));
+	},
+	updatePort: function(port){
+		var connectionsCollection = this.collection;
+		var connection = connectionsCollection.find(function(conn){
+			if (port.get("type") === "input" && conn.get("input") === port){
+				return conn;
+			} else if (port.get("type") === "output" && conn.get("output") === port){
+				return conn;
+			} else {
+				return false;
+			}
+		});
+		if (connection){
+			this.drawConnection(connection);
+		}
 	},
 	afterRender: function(){
 		// make connections	
 		this.paper = Snap(this.el);
-		Snap.selectAll("path").remove();
-		console.log("render", this.collection.length);
 		//for each connection
 		this.collection.each(function(connection){
 			this.drawConnection(connection);
 		}.bind(this));
 	},
+	onRemoveConnection: function(obj, event){
+		console.log("onRemoveConnection", arguments)
+		var connection = obj;
+		this.paper.remove(connection.path);
+	},
 	drawConnection: function(connection){
 		var $input = $('.input[data-connection-id="' + connection.get("input").id + '"]');
+		var $inputPort = $input.find(".port");
 		var inputOffset = $input.offset();
 		var $output = $('.output[data-connection-id="' + connection.get("output").id + '"]');
+		var $outputPort = $input.find(".port");
 		var outputOffset = $output.offset();
 		var dx = inputOffset.left - outputOffset.left;
 		var dy = inputOffset.top - outputOffset.top;
 		var dist = Math.sqrt((dx*dx)+(dy*dy));
 		var elOffset = this.$el.offset();
 
-		var inputX = inputOffset.left - elOffset.left;
-		var inputY = inputOffset.top - elOffset.top;
-		var outputX = outputOffset.left - elOffset.left;
-		var outputY = outputOffset.top - elOffset.top;
+		var inputX = ($inputPort.width() >> 1) + inputOffset.left - elOffset.left;
+		var inputY = ($inputPort.height() >> 1) + inputOffset.top - elOffset.top;
+		var outputX = ($outputPort.width() >> 1) + outputOffset.left - elOffset.left;
+		var outputY = ($outputPort.height() >> 1) + outputOffset.top - elOffset.top;
 
 		var d = [
 			"M", inputX, inputY,
-			"C", inputX - (dist >> 1), inputY, ",", outputX - (dist >> 1), outputY, ",", outputX, outputY
+			"C", inputX - (dist >> 1), inputY, ",", outputX + (dist >> 1), outputY, ",", outputX, outputY
 
 		].join(" ");
 
-		var path = this.paper.path().attr({
-			d: d,
-			inputId: connection.get("input").id,
-			outputId: connection.get("output").id,
-			class: "connection",
-			stroke: "#fa0",
-			strokeWidth: "5px",
-			fill: "transparent"
-		});
+		var path = connection.get("path");
+		//if path exists use path
+		if (path){
+			path.attr({
+				d: d
+			});
+		} else {
+			//else create a new path
+			path = this.paper.path().attr({
+				d: d,
+				inputId: connection.get("input").id,
+				outputId: connection.get("output").id,
+				class: "connection",
+				stroke: "#fa0",
+				strokeWidth: "5px",
+				fill: "transparent"
+			});
+		}
 		connection.set("path", path);
 
 	},
@@ -67,7 +102,7 @@ var View = Backbone.Layout.extend({
 		this.componentCollection = componentCollection;
 	},
 	beginConnection: function(data){
-		console.log("BEGIN CONNECTION")
+		console.log("BEGIN CONNECTION");
 		this.currentPortId = data.port.id;
 		this.port = data.port;
 		this.portModel = data.model;
@@ -106,21 +141,23 @@ var View = Backbone.Layout.extend({
 
 		var portId = this.currentPortId;
 
-		var $port = $(".input[data-connection-id='"+this.port.id+"'], .output[data-connection-id='"+this.port.id+"']");
+		var $io = $(".input[data-connection-id='"+this.port.id+"'], .output[data-connection-id='"+this.port.id+"']");
+		var $port = $io.find(".port"); 
 
-
-		var portX = $port.offset().left - el_offset.left ;
-		var portY = $port.offset().top - el_offset.top;
+		var portX = ($port.width() >> 1) + $io.offset().left - el_offset.left ;
+		var portY = ($port.height() >> 1) + $io.offset().top - el_offset.top;
 
 		var dx = localX - portX;
 		var dy = localY - portY;
 
 		var dist = Math.sqrt((dx*dx)+(dy*dy));
 
+		var dir = (this.port.get("type") === "input") ? -1: 1;
+
 
 		path = [
 			"M", portX, portY,
-			"C", portX - (dist >> 1), portY, ",", localX - (dx >> 1), localY - (dy >> 1), ",", localX, localY
+			"C", portX + dir * (dist >> 1), portY, ",", localX - (dx >> 1), localY - (dy >> 1), ",", localX, localY
 
 		].join(" ");
 

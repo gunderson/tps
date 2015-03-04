@@ -21,6 +21,7 @@ var View = Backbone.Layout.extend({
 			translateY: this.model.get("y"),
 		});
 	},
+	// event handlers
 	onClick: function(){
 		if (this.cancelClick) return;
 		//trigger menu to show correct options for type

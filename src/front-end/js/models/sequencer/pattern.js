@@ -22,7 +22,8 @@ var PatternModel = Backbone.Model.extend({
 	},
 	initialize: function(){
 		this.get("components").at(0).setupCollection();
-		this.listenTo(this.get("components"), "remove", this.destroyConnection);
+		this.listenTo(this.get("components"), "remove", this.destroyConnections);
+		this.listenTo(this.get("components"), "connection-request", this.onConnectionRequest);
 	},
 	// override fetch() since this doesn't need to get page info from server
 	fetch: function(){
@@ -35,12 +36,30 @@ var PatternModel = Backbone.Model.extend({
 		return promise;
 	},
 	onDeleteTrack: function(){
-
+		//delete all components
 	},
-	destroyConnection: function(connection){
+	onConnectionRequest: function(connectionRequest){
+		this.destroyPort(connectionRequest.port);
+	},
+	destroyConnections: function( component ){
+		var destroyPort = this.destroyPort;
+		_.each(component.get( "ports" ), function( port ){
+			destroyPort( port );
+		});
+	},
+	destroyPort: function( port ){
+		var connection = this.get("connections").findByPort( port );
+		if ( connection ) this.destroyConnection( connection );
+	},
+	destroyConnection: function( connection ){
 		console.log("collection data", arguments);
-		connection.get("input").model.set("partnerPort", null);
-		connection.get("output").model.set("partnerPort", null);
+		var resetSettings = {
+			"partner": null
+		};
+		connection.get("path").remove();
+		connection.get( "input"  ).get("parent").set( resetSettings );
+		connection.get( "output" ).get("parent").set( resetSettings );
+		this.get( "connections" ).remove( connection );
 	},
 	addFilter: function(){
 		var model = this.get("components").add(new FilterModel({
