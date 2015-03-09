@@ -16,9 +16,9 @@ var Model = Backbone.Model.extend({
 			port.parent = portParent;
 		});
 	},
-	getValues: function(){
-		console.log("getValues",this.get("values"))
-		// if (this.get("values")) return this.get("values");
+	getValues: function(regen){
+		console.log("getValues")
+		// if (this.get("values") && !regen) return this.get("values");
 
 		var pattern				= this.get("pattern");
 		var ticksPerBeat		= pattern.get("ticksPerBeat");

@@ -26,6 +26,11 @@ var View = ComponentView.extend({
 	onChange: function(){
 		this.renderWaveforms();
 	},
+	renderWaveforms: function(){
+		this.renderWaveform(this.$controls.find(".output-display .waveform"), this.model.get("values") || [0]);
+		this.renderWaveform(this.$controls.find(".oscillation-display .waveform"), this.model.getOscillation() || [0]);
+		return this;
+	},
 	
 	// control event handlers
 	onChangeAmplitudeInput: function(e){

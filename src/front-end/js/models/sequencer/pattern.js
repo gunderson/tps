@@ -69,6 +69,7 @@ var PatternModel = Backbone.Model.extend({
 	},
 
 	getValues: function(){
+		console.log("=======  pattern.getValues");
 		var values = this.get("components")
 			.findWhere({type:"master"})
 			.getValues();

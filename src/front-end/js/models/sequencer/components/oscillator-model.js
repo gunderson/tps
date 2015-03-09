@@ -40,11 +40,11 @@ var Model = ComponentModel.extend({
 
 		this.on("change:amplitude change:frequency change:offset ", function(){
 			this.getOscillation(true);
-			this.getValues();
+			this.getValues(true);
 		}, this);
 		this.listenTo(this.get("ports"), "change", function(){
 			this.getOscillation(true);
-			this.getValues();
+			this.getValues(true);
 		});
 	},
 
