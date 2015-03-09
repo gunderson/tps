@@ -2,6 +2,8 @@
 	.remove-button
 	.title
 		| Splitter
+
+	// PORTS
 	.inputs
 		.line-input.input(data-connection-id="#{inputId}")
 			.port
@@ -13,11 +15,9 @@
 		.output.output-b(data-connection-id="#{outputBId}")
 			.port
 			| Output B
-	.output-display
-		svg.waveform
-		.measure-bars
-	.waveform-display
-		//shows waveform for length of this pattern
-		svg.waveform
-		.measure-bars
-	include ./controls/_splitter-controls
+	// CONTROLS
+	form.component-controls.splitter-controls
+		.displays
+			.output-display
+				h3 Output Waveform
+				svg.waveform

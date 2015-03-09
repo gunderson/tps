@@ -1,6 +1,8 @@
 #master.component
 	.title
 		| Master Inputs
+
+	// PORTS
 	#sequencer-inputs.inputs
 		#rhythm-input.input(data-connection-id="#{rhythmInputId}")
 			.port
@@ -8,3 +10,33 @@
 		#pitch-input.input(data-connection-id="#{pitchInputId}")
 			.port
 			| Pitch
+
+	// CONTROLS
+	form.component-controls.master-controls
+		.type
+			label
+				input(type="radio", name="type", value="none") 
+				| None
+			label
+				input(type="radio", name="type", value="scale")
+				| Scale
+			label
+				input(type="radio", name="type", value="digital")
+				| Digital
+			label
+				input(type="radio", name="type", value="saw")
+				| Saw
+		.scale-controls
+			| scale controls
+		.digital-controls
+			| digital controls
+		.saw-controls
+			| saw controls
+
+		.displays
+			.rhythm-display
+				h3 Output Waveform
+				svg.waveform
+			.pitch-display
+				h3 Output Waveform
+				svg.waveform

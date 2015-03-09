@@ -1,4 +1,4 @@
-require("../../../lib/underscore.filledArray");
+require("underscore.filledArray");
 require("backbone");
 
 var Model = Backbone.Model.extend({
@@ -7,38 +7,45 @@ var Model = Backbone.Model.extend({
 	defaults: {
 		values: [],
 		x:0,
-		y:0
+		y:0,
+		defaultValue: 1
 	},
 	initialize: function(options){
 		var portParent = this;
 		this.get("ports").each(function(port){
-			port.set("parent", portParent);
+			port.parent = portParent;
 		});
 	},
-	getValues: function(numValues, tickwidth){
-		var transform = this.transform;
-		var inputs = this.get("ports")
-			.where({type: "input"});
+	getValues: function(){
+		var pattern				= this.get("pattern");
+		var ticksPerBeat		= pattern.get("ticksPerBeat");
+		var beatsPerMeasure		= pattern.get("beatsPerMeasure");
+		var measuresPerPhrase	= pattern.get("measuresPerPhrase");
+		var tickWidth			= pattern.get("tickWidth");
+		var numValues			= ticksPerBeat * beatsPerMeasure * measuresPerPhrase;
+		var inputs				= this.get("ports").where({type: "input"});
 
 		_.each(inputs, function(input){
-				var output = input.get("partner");
-				var inputValues;
-
-				if (output){
-					inputValues = output.get("parent").getValues(numValues, tickwidth);
-					input.set("values", inputValues);
-					return inputValues;
-				} else {
-					//not connected, return [1,1,1...1]
-					inputValues = _.filledArray(numValues, 1);
-					input.set("values", inputValues);
-					return inputValues;
-				}
-			});
+			var output = input.get("partnerPort");
+			var inputValues;
+			if (output){
+				inputValues = output.parent.getValues();
+				input.set("values", inputValues);
+				return inputValues;
+			} else {
+				//not connected, return [defaultValue,defaultValue...defaultValue]
+				var defaultValue = input.get("defaultValue");
+				inputValues = _.filledArray(numValues, defaultValue);
+				input.set("values", inputValues);
+				return inputValues;
+			}
+		});
 		//transform values
-		return this.transformValues(inputs);
+		var values = this.transformValues(inputs, numValues, tickWidth);
+		this.set("values", values);
+		return values;
 	},
-	transformValues: function(inputs){
+	transformValues: function(inputs, numValues, tickwidth){
 		var values = _.map(inputs,function(input){
 			return input.get("values");
 		});
@@ -47,7 +54,7 @@ var Model = Backbone.Model.extend({
 			_.zip.apply(this, values),
 			//multiply all the inputs together
 			function(a){
-				return _.reduce(a, function(memo, num){ return memo * num; }, 0);
+				return _.reduce(a, function(memo, num){ return memo * num; }, 1);
 			}
 		);
 		return values;
@@ -66,8 +73,13 @@ var Model = Backbone.Model.extend({
 			port: port
 		});
 	},
+	destroy: function(){
+		this.stopListening();
+		this.collection.remove(this);
+	},
 	triggerConnectionResponse: function(portId){
 		var port = this.get("ports").get(portId);
+		console.log(port, portId)
 		//if source is an output
 		if (this.connectionRequest){
 			//send connection resopnse

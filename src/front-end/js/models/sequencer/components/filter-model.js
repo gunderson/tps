@@ -14,12 +14,14 @@ var Model = ComponentModel.extend({
 					type: "input",
 					id: _.uniqueId("i_"),
 					partner: null,
+					defaultValue: 0
 				},
 				{
 					control: "level",
 					type: "input",
 					id: _.uniqueId("i_"),
 					partner: null,
+					defaultValue: 0
 				},
 				{	
 					id: _.uniqueId("o_"),
@@ -35,19 +37,18 @@ var Model = ComponentModel.extend({
 		this.set(_.pick(options, ["patternId"]));
 		ComponentModel.prototype.initialize.call(this);
 	},
-	filter: function(values){
+	transformValues: function(inputs, numValues, tickwidth){
+		//filter only has one input
+		var values = inputs[0].get("values");
 		return _.map(values, this[this.get("mode")]);
-	},
-	getValues: function(){
-		var lineValues, levelValues;
-	},
-	passthrough: function(i){
-		return i;
 	},
 
 	// transforms
 	none: function(val, i){
 		return val;
+	},
+	passthrough: function(i){
+		return i;
 	},
 	scale: function(val, i){
 		var scale = this.get("inputLevels")[i];

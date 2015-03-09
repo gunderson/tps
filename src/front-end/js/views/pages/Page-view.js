@@ -38,7 +38,7 @@ var Page = Backbone.Layout.extend({
 		return promise;
 	},
 	onRoute: function (route, params) {
-        console.log('onRoute', route, params);
+        // console.log('onRoute', route, params);
 
         var currentPage = this.page;
         var newPage = null;

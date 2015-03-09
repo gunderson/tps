@@ -1,5 +1,6 @@
 require("backbone");
 require("backbone.layoutmanager");
+var Snap = require("snapsvg");
 
 var View = Backbone.Layout.extend({
 	el: false,
@@ -10,7 +11,7 @@ var View = Backbone.Layout.extend({
 		"mouseup .port"					: "onPortMouseUp",
 		"click"							: "onClick",
 		"mousedown"						: "onDragStart",
-		"change .component-controls"	: "onChangeComponentControls" 
+		"click .remove-button"          : "onClickRemove"
 	},
 	views: {},
 	initialize: function(options){
@@ -23,13 +24,22 @@ var View = Backbone.Layout.extend({
 		});
 		this.$controls = this.$(".component-controls");
 		this.$controls.detach();
+
+		this.setControlListeners();
 	},
 	cleanup: function(){
+		this.clearControlListeners();
 		if (this.$controls) {
 			this.$controls.empty().remove();
 		}
 	},
+	setControlListeners: function(){},
+	clearControlListeners: function(){},
 	// event handlers
+	onClickRemove: function(e){
+		e.stopImmediatePropagation();
+		this.model.destroy();
+	},
 	onClick: function(){
 		if (this.cancelClick) return;
 		//trigger menu to show correct options for type
@@ -38,6 +48,8 @@ var View = Backbone.Layout.extend({
 		// then activate this
 		this.$el.parent().find(".component").removeClass("active");
 		this.$el.addClass("active");
+
+		this.renderWaveforms();
 
 	},
 	onDragStart: function(e){
@@ -112,9 +124,37 @@ var View = Backbone.Layout.extend({
 	cancelConnection: function(){
 		this.model.cancelConnectionRequest();
 		this.trigger("cancel-connection-request");
+		return this;
 	},
 	onStageUp: function(){
 		this.cancelConnection();
+		return this;
+	},
+	renderWaveforms: function(){
+		this.renderWaveform(this.$controls.find(".output-display .waveform"), this.model.getValues());
+		return this;
+	},
+	renderWaveform: function($el, data){
+		var paper = Snap($el[0]);
+		paper.clear();
+
+		var wavescale = $el.height() >> 1;
+		var tickWidth = $el.width() / data.length;
+		var commands = ["M", 0, (data[0] * 50) + 50];
+
+		for (var i = 1, endi = data.length; i < endi; i++){
+			commands.push("L", i * tickWidth, (data[i] * 50) + 50);
+		}
+
+		var p = paper.path({
+			d: commands.join(" "),
+			stroke: "#0ff",
+			strokeWidth: "1px",
+			fill: "transparent"
+		});
+
+
+
 	}
 });
 

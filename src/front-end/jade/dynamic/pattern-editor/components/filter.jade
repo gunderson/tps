@@ -2,6 +2,8 @@
 	.remove-button
 	.title
 		| Filter
+
+	// PORTS
 	.inputs
 		.line-input.input(data-connection-id="#{lineInputId}")
 			.port
@@ -13,11 +15,30 @@
 		.output(data-connection-id="#{outputId}")
 			.port
 			| Output
-	.output-display
-		svg.waveform
-		.measure-bars
-	.waveform-display
-		//shows waveform for length of this pattern
-		svg.waveform
-		.measure-bars
-	include ./controls/_filter-controls
+
+	// Controls
+	form.component-controls.filter-controls
+		.type
+			label
+				input(type="radio", name="type", value="none") 
+				| None
+			label
+				input(type="radio", name="type", value="scale")
+				| Scale
+			label
+				input(type="radio", name="type", value="digital")
+				| Digital
+			label
+				input(type="radio", name="type", value="saw")
+				| Saw
+		.scale-controls
+			| scale controls
+		.digital-controls
+			| digital controls
+		.saw-controls
+			| saw controls
+
+		.displays
+			.output-display
+				h3 Output Waveform
+				svg.waveform

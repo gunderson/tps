@@ -14,12 +14,14 @@ var Model = ComponentModel.extend({
 					type: "input",
 					id: _.uniqueId("i_"),
 					partner: null,
+					defaultValue: 0
 				},
 				{
 					control: "multiply",
 					type: "input",
 					id: _.uniqueId("i_"),
 					partner: null,
+					defaultValue: 1
 				},
 				{	
 					id: _.uniqueId("o_"),
@@ -28,8 +30,8 @@ var Model = ComponentModel.extend({
 				}
 			]),
 			amplitude: 1,
-			period: 4, //period is in cycles/beat
-			offset: 0, //offset is in beats
+			frequency: 4, //frequency is in beats
+			offset: -0.5, //offset is in beats
 		});
 	},
 	initialize: function(options){
@@ -40,26 +42,49 @@ var Model = ComponentModel.extend({
 		return _.map(values, this[this.get("mode")]);
 	},
 
-	getValues: function(numBeats, pulsesPerBeat){
-		var output = [];
-		var tau = Math.PI * 2;
-		var pulsesPer16th = pulsesPerBeat * 0.25;
-		var amplitude = this.get("amplitude");
-
+	transformValues: function(inputs){
+		var tau					= Math.PI * 2;
+		var pattern				= this.get("pattern");
+		var defaultValue		= this.get("defaultValue");
+		var ticksPerBeat		= pattern.get("ticksPerBeat");
+		var beatsPerMeasure		= pattern.get("beatsPerMeasure");
+		var measuresPerPhrase	= pattern.get("measuresPerPhrase");
+		var tickWidth			= pattern.get("tickWidth");
+		var numValues			= ticksPerBeat * beatsPerMeasure * measuresPerPhrase;
+		
+		var amplitude			= this.get("amplitude");
+		
 		// offset is in beats
-		// convert beats to pulses
-		var offset = this.get("offset") * pulsesPerBeat;
+		// convert to cycle width
+		var offset				= tau * this.get("offset");
+		
+		// frequency is in beats
+		// convert cycles/beat to cycles/tick
+		var frequency			= tau / (this.get("frequency") * ticksPerBeat) || 0;
 
-		// period is in beats
-		// convert beats to pulses
-		var period = this.get("period") * pulsesPerBeat;
-
-		var totalIterations = numBeats * pulsesPerBeat;
 		var val = 0, i = -1;
-		while (++iterations < totalIterations){
-			val = amplitude * Math.cos(offset + period * tau * (iterations / pulsesPerBeat));
+		var iterations = -1;
+		var output = [];
+		while (++iterations < numValues){
+			/*console.log({
+				amplitude: amplitude,
+				offset: offset,
+				frequency: frequency,
+				val: (offset) + (frequency * iterations)
+			});*/
+
+			val = -1 * amplitude * Math.cos((offset) + (frequency * iterations));
 			output.push(val);
 		}
+		
+		//add output by input#add
+		//scale outputs by input#multiply
+		var multiplyInputValues = this.get("ports").findWhere({control: "multiply"}).get("values");
+		var addInputValues = this.get("ports").findWhere({control: "add"}).get("values");
+		output = _.map(output, function(v,i){
+			return (v + addInputValues[i]) * multiplyInputValues[i];
+		});
+
 		return output;
 	},
 

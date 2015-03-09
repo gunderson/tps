@@ -49,9 +49,7 @@ var View = Backbone.Layout.extend({
 			this.drawConnection(connection);
 		}.bind(this));
 	},
-	onRemoveConnection: function(obj, event){
-		console.log("onRemoveConnection", arguments);
-		var connection = obj;
+	onRemoveConnection: function(connection, collection, event){
 		this.paper.remove(connection.path);
 	},
 	drawConnection: function(connection){

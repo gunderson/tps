@@ -2,6 +2,8 @@
 	.remove-button
 	.title
 		| User Pattern
+
+	// PORTS
 	.inputs
 		.threshold-input.input(data-connection-id="#{thresholdInputId}")
 			.port
@@ -10,11 +12,10 @@
 		.output.output-a(data-connection-id="#{outputId}")
 			.port
 			| Output A
-	.output-display
-		svg.waveform
-		.measure-bars
-	.waveform-display
-		//shows waveform for length of this pattern
-		svg.waveform
-		.measure-bars
-	include ./controls/_user-pattern-controls
+
+	// CONTROLS
+	form.component-controls.user-pattern-controls
+		.displays
+			.output-display
+				h3 Output Waveform
+				svg.waveform

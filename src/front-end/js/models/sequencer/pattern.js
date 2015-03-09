@@ -11,14 +11,24 @@ var ComponentsCollection = require("../../collections/sequencer/components-colle
 var PatternModel = Backbone.Model.extend({
 	defaults: function(){
 		var connectionsCollection = new ConnectionsCollection();
-		return {
+		var settings = {
 			url: "",
 			sceneId: 0,
 			trackId: 0,
 			measureLength: 1,
-			components: new ComponentsCollection([new MasterModel({connectionsCollection:connectionsCollection})]),
-			connections: connectionsCollection
+			components: new ComponentsCollection([
+				new MasterModel({
+					connectionsCollection:connectionsCollection,
+					pattern: this
+				})
+			]),
+			connections: connectionsCollection,
+			beatsPerMeasure: 4,
+			measuresPerPhrase: 4,
+			ticksPerBeat: 64
 		};
+		settings.tickWidth = (Math.PI * 2) / settings.ticksPerBeat;
+		return settings;
 	},
 	initialize: function(){
 		this.get("components").at(0).setupCollection();
@@ -44,23 +54,20 @@ var PatternModel = Backbone.Model.extend({
 	},
 
 	onConnectionResponse: function(connectionResponse){
-		var ticksperbeat = 64;
-		var beatspermeasure = 4;
-		var measuresperphrase = 4;
-		var tickwidth = (Math.PI * 2) / ticksperbeat;
 		var values = this.get("components")
 			.findWhere({type:"master"})
-			.getValues(ticksperbeat * beatspermeasure * measuresperphrase, tickwidth);
-		console.log(values);
+			.getValues();
 	},
 	destroyConnections: function( component ){
-		var destroyPort = this.destroyPort;
-		_.each(component.get( "ports" ), function( port ){
+		var destroyPort = this.destroyPort.bind(this);
+		component.get( "ports" ).each(function( port ){
 			destroyPort( port );
 		});
 	},
 	destroyPort: function( port ){
-		var connection = this.get("connections").findByPort( port );
+		var connection = this
+			.get("connections")
+			.findByPort( port );
 		if ( connection ) this.destroyConnection( connection );
 	},
 	destroyConnection: function( connection ){
@@ -69,12 +76,13 @@ var PatternModel = Backbone.Model.extend({
 			"partner": null
 		};
 		connection.get("path").remove();
-		connection.get( "input"  ).get("parent").set( resetSettings );
-		connection.get( "output" ).get("parent").set( resetSettings );
+		connection.get( "input"  ).parent.set( resetSettings );
+		connection.get( "output" ).parent.set( resetSettings );
 		this.get( "connections" ).remove( connection );
 	},
 	addFilter: function(){
 		var model = this.get("components").add(new FilterModel({
+				pattern: this,
 				connectionsCollection: this.get("connections")
 			})
 		);
@@ -83,6 +91,7 @@ var PatternModel = Backbone.Model.extend({
 	},
 	addOscillator: function(){
 		var model = this.get("components").add(new OscillatorModel({
+				pattern: this,
 				connectionsCollection: this.get("connections")
 			})
 		);
@@ -91,6 +100,7 @@ var PatternModel = Backbone.Model.extend({
 	},
 	addUserPattern: function(){
 		var model = this.get("components").add(new UserPatternModel({
+				pattern: this,
 				connectionsCollection: this.get("connections")
 			})
 		);
@@ -99,6 +109,7 @@ var PatternModel = Backbone.Model.extend({
 	},
 	addSplitter: function(){
 		var model = this.get("components").add(new SplitterModel({
+				pattern: this,
 				connectionsCollection: this.get("connections")
 			})
 		);

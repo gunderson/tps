@@ -11,11 +11,11 @@ var View = ComponentView.extend({
 	},
 	serialize: function(){
 		var ports = this.model.get("ports");
-		return {
+		return _.extend(this.model.toJSON, {
 			lineInputId: ports.findWhere({type: "input", control: "line"}).id,
 			levelInputId: ports.findWhere({type: "input", control: "level"}).id,
 			outputId: ports.findWhere({type: "output"}).id,
-		};
+		});
 	}
 });
 

@@ -70,10 +70,10 @@ var Page = AbstractPage.extend({
 		this.on("transitionInComplete", this.transitionInComplete);
 	},
 	beforeRender: function(){
-		console.log("Sequencer-view::beforeRender", this.route)
+		// console.log("Sequencer-view::beforeRender", this.route)
 	},
 	afterRender: function(){
-		console.log("Sequencer-view::afterRender");
+		// console.log("Sequencer-view::afterRender");
 		this.$(".tracks").on("scroll", this.syncScroll.bind(this));
 		// this.listenTo(this.sceneManager, "afterRender", this.syncScroll);
 		// this.listenTo(this.trackManager,"afterRender", this.syncScroll);

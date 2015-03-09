@@ -1,0 +1,22 @@
+form.component-controls.master-settings
+	label
+		input(type="number", name="measures", value="1") 
+		| Measures
+	label
+		input(type="number", name="change-frequency", value="0")
+		| Change Frequency
+	label
+		input(type="number", name="key", value="0")
+		| Key
+	label
+		input(type="radio", name="key-mod", value="")
+		| Major
+	label
+		input(type="radio", name="key-mod", value="m")
+		| Minor
+
+
+	.displays
+		.output-display
+			h3 Output Waveform
+			svg.waveform

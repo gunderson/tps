@@ -105,7 +105,7 @@ var Page = AbstractPage.extend({
 
 	// EVENT HANDLERS
 	onActivateComponent: function($controls){
-		console.log("------------ onActivateComponent")
+		// console.log("------------ onActivateComponent")
 		var $controlHolder = this.$("#component-control-holder");
 		var $currentControls = $controlHolder.find(".component-controls");
 		if ($currentControls) $currentControls.detach();
@@ -143,6 +143,10 @@ var Page = AbstractPage.extend({
 				insertView.call(this, SplitterView, componentModel);
 				break;
 		}
+	},
+	onRemoveComponent: function(componentModel){
+		var view = this.getViews("#components").findWhere({model: componentModel}).value();
+		view.remove();
 	},
 
 	beginConnection: function(data){

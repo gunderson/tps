@@ -12,6 +12,7 @@ var Model = ComponentModel.extend({
 					type: "input",
 					id: _.uniqueId("i_"),
 					partner: null,
+					defaultValue: 0
 				},
 				{	
 					id: _.uniqueId("o_"),

@@ -12,18 +12,20 @@ var Model = ComponentModel.extend({
 					type: "input",
 					id: _.uniqueId("i_"),
 					partner: null,
+					defaultValue: 0
 				},
 				{	
 					control: "a",
 					type: "output",
 					id: _.uniqueId("o_"),
 					partner: null,
+					defaultValue: 0
 				},
 				{
 					control: "b",
 					type: "output",
 					id: _.uniqueId("o_"),
-					partner: null,
+					partner: null
 				}
 			])
 		});
@@ -32,11 +34,10 @@ var Model = ComponentModel.extend({
 		this.set(_.pick(options, ["patternId"]));
 		ComponentModel.prototype.initialize.call(this);
 	},
-	getValues: function(){
-		if (!dirty){
-			return 
-		}
-	},
+	transformValues: function(inputs, numValues, tickwidth){
+		console.log(inputs[0].get("values"))
+		return inputs[0].get("values");
+	}
 });
 
 module.exports = Model;

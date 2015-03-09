@@ -20,7 +20,7 @@ var TransportBar = Backbone.Layout.extend({
 		this.listenTo(this.controller, "stop", this.onControllerStop);
 	},
 	beforeRender: function(){
-		console.log("TransportBar::beforeRender");
+		// console.log("TransportBar::beforeRender");
 	},
 	//respond to controller
 	onControllerPlay: function(){

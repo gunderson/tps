@@ -11,7 +11,8 @@
   "license": "Copyright",
   "browser": {
     "jquery": "./node_modules/jquery/dist/jquery.js",
-    "constants": "./src/shared/constants.js"
+    "constants": "./src/shared/constants.js",
+    "underscore.filledArray": "./src/lib/underscore.filledArray.js"
   },
   "browserify": {
     "transform": [
@@ -19,7 +20,8 @@
     ]
   },
   "browserify-shim": {
-    "jquery": "$"
+    "jquery": "$",
+    "paper": "paper"
   },
   "devDependencies": {
     "aliasify": "^1.5.1",

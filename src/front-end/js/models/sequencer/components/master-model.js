@@ -10,18 +10,31 @@ var Model = ComponentModel.extend({
 					control: "rhythm",
 					type: "input",
 					id: _.uniqueId("i_"),
-					partner: null
+					partner: null,
+					defaultValue: 0
 				},
 				{
 					control: "pitch",
 					type: "input",
 					id: _.uniqueId("i_"),
-					partner: null
+					partner: null,
+					defaultValue: 0
 				}
 			]),
 			type: "master"
 		});
-	}
+	},
+
+	transformValues: function(inputs, numValues, tickwidth){
+		var values = _.map(inputs,function(input){
+			return input.get("values");
+		});
+		values = {
+			rhythm: this.get("ports").findWhere({control: "rhythm"}).get("values"),
+			pitch: this.get("ports").findWhere({control: "pitch"}).get("values")
+		};
+		return values;
+	},
 });
 
 module.exports = Model;

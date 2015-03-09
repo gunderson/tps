@@ -10,7 +10,12 @@ var View = ComponentView.extend({
 		console.log("master");
 	},
 	beforeRender: function(){
-		console.log("render master");
+	},
+	renderWaveforms: function(){
+		var values = this.model.getValues()
+		this.renderWaveform(this.$controls.find(".rhythm-display .waveform"), values.rhythm);
+		this.renderWaveform(this.$controls.find(".pitch-display .waveform"), values.pitch);
+		return this;
 	},
 	serialize: function(){
 		var ports = this.model.get("ports");

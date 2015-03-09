@@ -15,7 +15,7 @@ var SceneManager = Backbone.Layout.extend({
 		this.listenTo(this.trackCollection, "reset add", this.onAddTrack);
 	},
 	beforeRender: function(){
-		console.log("Scene-manager-view::beforeRender", this);
+		// console.log("Scene-manager-view::beforeRender", this);
 		this.sceneCollection.each(function(sceneModel){
 			this.onAddScene(sceneModel);
 		}.bind(this));
@@ -34,7 +34,7 @@ var SceneManager = Backbone.Layout.extend({
 	},
 	onAddScene: function(sceneModel, skipRender){
 
-		console.log("Scene-manager-view::onAddScene")
+		// console.log("Scene-manager-view::onAddScene")
 
 		var sceneView = new SceneView({
 			model: sceneModel
