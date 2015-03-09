@@ -1,12 +1,13 @@
 require("backbone");
-var _ = require("underscore");
-var FilterModel = require("./components/filter-model");
-var MasterModel = require("./components/master-model");
-var OscillatorModel = require("./components/oscillator-model");
-var UserPatternModel = require("./components/user-pattern-model");
-var SplitterModel = require("./components/splitter-model");
-var ConnectionsCollection = require("../../collections/sequencer/connections-collection");
-var ComponentsCollection = require("../../collections/sequencer/components-collection");
+var _						= require("underscore");
+var FilterModel				= require("./components/filter-model");
+var MasterModel				= require("./components/master-model");
+var OscillatorModel			= require("./components/oscillator-model");
+var UserPatternModel		= require("./components/user-pattern-model");
+var SplitterModel			= require("./components/splitter-model");
+var ConnectionsCollection	= require("../../collections/sequencer/connections-collection");
+var ComponentsCollection	= require("../../collections/sequencer/components-collection");
+var Snap					= require("snapsvg");
 
 var PatternModel = Backbone.Model.extend({
 	defaults: function(){
@@ -34,7 +35,7 @@ var PatternModel = Backbone.Model.extend({
 		this.get("components").at(0).setupCollection();
 		this.listenTo(this.get("components"), "remove", this.destroyConnections);
 		this.listenTo(this.get("components"), "connection-request", this.onConnectionRequest);
-		this.listenTo(this.get("components"), "connection-response", this.onConnectionResponse);
+		this.listenTo(this.get("components"), "change:values remove connection-response", this.getValues);
 	},
 	// override fetch() since this doesn't need to get page info from server
 	fetch: function(){
@@ -52,8 +53,22 @@ var PatternModel = Backbone.Model.extend({
 	onConnectionRequest: function(connectionRequest){
 		this.destroyPort(connectionRequest.port);
 	},
+	getMeasureLinePath: function(){
+		if (this.measureLinePath){
+			return this.measureLinePath;
+		}
+		var numLines = this.get("beatsPerMeasure") * this.get("measuresPerPhrase");
+		var commands = [];
+		var x;
+		for (var i = 0; i < numLines-1; i++){
+			x = (i * 100 / numLines) + "%";
+			commands.push("M", x, 0, "L", x, "100%");
+		}
+		this.measureLinePath = commands.join(" ");
+		return this.measureLinePath;
+	},
 
-	onConnectionResponse: function(connectionResponse){
+	getValues: function(){
 		var values = this.get("components")
 			.findWhere({type:"master"})
 			.getValues();
@@ -72,12 +87,9 @@ var PatternModel = Backbone.Model.extend({
 	},
 	destroyConnection: function( connection ){
 		console.log("collection data", arguments);
-		var resetSettings = {
-			"partner": null
-		};
 		connection.get("path").remove();
-		connection.get( "input"  ).parent.set( resetSettings );
-		connection.get( "output" ).parent.set( resetSettings );
+		connection.get( "input" ).parent.destroyConnection(connection.get( "input" ));
+		connection.get( "output" ).parent.destroyConnection(connection.get( "output" ));
 		this.get( "connections" ).remove( connection );
 	},
 	addFilter: function(){

@@ -5,7 +5,7 @@ var Model = Backbone.Model.extend({
 	dirty: false,
 	connectionRequest: null,
 	defaults: {
-		values: [],
+		values: null,
 		x:0,
 		y:0,
 		defaultValue: 1
@@ -17,6 +17,9 @@ var Model = Backbone.Model.extend({
 		});
 	},
 	getValues: function(){
+		console.log("getValues",this.get("values"))
+		// if (this.get("values")) return this.get("values");
+
 		var pattern				= this.get("pattern");
 		var ticksPerBeat		= pattern.get("ticksPerBeat");
 		var beatsPerMeasure		= pattern.get("beatsPerMeasure");
@@ -43,6 +46,7 @@ var Model = Backbone.Model.extend({
 		//transform values
 		var values = this.transformValues(inputs, numValues, tickWidth);
 		this.set("values", values);
+		this.trigger("regenerate");
 		return values;
 	},
 	transformValues: function(inputs, numValues, tickwidth){
@@ -79,7 +83,6 @@ var Model = Backbone.Model.extend({
 	},
 	triggerConnectionResponse: function(portId){
 		var port = this.get("ports").get(portId);
-		console.log(port, portId)
 		//if source is an output
 		if (this.connectionRequest){
 			//send connection resopnse
@@ -107,8 +110,13 @@ var Model = Backbone.Model.extend({
 		this.connectionRequest = null;
 	},
 
+	destroyConnection: function(port){
+		port.set("partner", null);
+		this.set("values", null);
+	},
 	setupConnection: function(localPort, partnerPort){
 		if (localPort.get("type") === partnerPort.get("type")) return;
+		this.set("values", null);
 		localPort.set({
 			partnerPort: partnerPort
 		});

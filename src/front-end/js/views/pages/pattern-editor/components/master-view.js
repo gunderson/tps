@@ -12,9 +12,9 @@ var View = ComponentView.extend({
 	beforeRender: function(){
 	},
 	renderWaveforms: function(){
-		var values = this.model.getValues()
-		this.renderWaveform(this.$controls.find(".rhythm-display .waveform"), values.rhythm);
-		this.renderWaveform(this.$controls.find(".pitch-display .waveform"), values.pitch);
+		var values = this.model.get("values");
+		this.renderWaveform($("#sequencer-display .rhythm-display .waveform"), values.rhythm);
+		this.renderWaveform($("#sequencer-display .pitch-display .waveform"), values.pitch);
 		return this;
 	},
 	serialize: function(){

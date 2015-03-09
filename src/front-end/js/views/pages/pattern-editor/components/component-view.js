@@ -26,6 +26,7 @@ var View = Backbone.Layout.extend({
 		this.$controls.detach();
 
 		this.setControlListeners();
+		this.listenTo(this.model, "regenerate", this.renderWaveforms, this);
 	},
 	cleanup: function(){
 		this.clearControlListeners();
@@ -131,7 +132,7 @@ var View = Backbone.Layout.extend({
 		return this;
 	},
 	renderWaveforms: function(){
-		this.renderWaveform(this.$controls.find(".output-display .waveform"), this.model.getValues());
+		this.renderWaveform(this.$controls.find(".output-display .waveform"), this.model.get("values") || [0]);
 		return this;
 	},
 	renderWaveform: function($el, data){

@@ -37,12 +37,20 @@ var Model = ComponentModel.extend({
 	initialize: function(options){
 		this.set(_.pick(options, ["patternId"]));
 		ComponentModel.prototype.initialize.call(this);
-	},
-	filter: function(values){
-		return _.map(values, this[this.get("mode")]);
+
+		this.on("change:amplitude change:frequency change:offset ", function(){
+			this.getOscillation(true);
+			this.getValues();
+		}, this);
+		this.listenTo(this.get("ports"), "change", function(){
+			this.getOscillation(true);
+			this.getValues();
+		});
 	},
 
-	transformValues: function(inputs){
+	getOscillation: function(regen){
+		if (this.oscillation && !regen) return this.oscillation;
+
 		var tau					= Math.PI * 2;
 		var pattern				= this.get("pattern");
 		var defaultValue		= this.get("defaultValue");
@@ -66,17 +74,16 @@ var Model = ComponentModel.extend({
 		var iterations = -1;
 		var output = [];
 		while (++iterations < numValues){
-			/*console.log({
-				amplitude: amplitude,
-				offset: offset,
-				frequency: frequency,
-				val: (offset) + (frequency * iterations)
-			});*/
-
 			val = -1 * amplitude * Math.cos((offset) + (frequency * iterations));
 			output.push(val);
 		}
-		
+
+		this.oscillation = output;
+		return output;
+
+	},
+	transformValues: function(inputs){
+		var output = this.getOscillation();
 		//add output by input#add
 		//scale outputs by input#multiply
 		var multiplyInputValues = this.get("ports").findWhere({control: "multiply"}).get("values");
