@@ -18,6 +18,7 @@ var SceneModel = Backbone.Model.extend({
 			sceneId: this.get("sceneId")
 		});
 	},
+	
 	onAddPattern: function(){
 
 	},

@@ -1,4 +1,11 @@
 var jade = require('jade/runtime'); module.exports = {
+"pattern-editor/output-sixteenths": function(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+
+;return buf.join("");
+},
 "sequencer/fader": function(locals) {
 var buf = [];
 var jade_mixins = {};
@@ -39,7 +46,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 ;var locals_for_with = (locals || {});(function (lineInputId, levelInputId, outputId) {
-buf.push("<div class=\"filter component\"><div class=\"remove-button\"></div><div class=\"title\">Filter</div><!-- PORTS--><div class=\"inputs\"><div" + (jade.attr("data-connection-id", "" + (lineInputId) + "", true, false)) + " class=\"line-input input\"><div class=\"port\"></div>Line</div><div" + (jade.attr("data-connection-id", "" + (levelInputId) + "", true, false)) + " class=\"level-input input\"><div class=\"port\"></div>Level</div></div><div class=\"outputs\"><div" + (jade.attr("data-connection-id", "" + (outputId) + "", true, false)) + " class=\"output\"><div class=\"port\"></div>Output</div></div><!-- Controls--><form class=\"component-controls filter-controls\"><div class=\"type\"><label><input type=\"radio\" name=\"type\" value=\"none\"/>None</label><label><input type=\"radio\" name=\"type\" value=\"scale\"/>Scale</label><label><input type=\"radio\" name=\"type\" value=\"digital\"/>Digital</label><label><input type=\"radio\" name=\"type\" value=\"saw\"/>Saw</label></div><div class=\"scale-controls\">scale controls</div><div class=\"digital-controls\">digital controls</div><div class=\"saw-controls\">saw controls</div><div class=\"displays\"><div class=\"output-display\"><h3>Output Waveform</h3><svg class=\"waveform\"></svg></div></div></form></div>");}.call(this,"lineInputId" in locals_for_with?locals_for_with.lineInputId:typeof lineInputId!=="undefined"?lineInputId:undefined,"levelInputId" in locals_for_with?locals_for_with.levelInputId:typeof levelInputId!=="undefined"?levelInputId:undefined,"outputId" in locals_for_with?locals_for_with.outputId:typeof outputId!=="undefined"?outputId:undefined));;return buf.join("");
+buf.push("<div class=\"filter component\"><div class=\"remove-button\"></div><div class=\"title\">Filter</div><!-- PORTS--><div class=\"inputs\"><div" + (jade.attr("data-connection-id", "" + (lineInputId) + "", true, false)) + " class=\"line-input input\"><div class=\"port\"></div>Line</div><div" + (jade.attr("data-connection-id", "" + (levelInputId) + "", true, false)) + " class=\"level-input input\"><div class=\"port\"></div>Level</div></div><div class=\"outputs\"><div" + (jade.attr("data-connection-id", "" + (outputId) + "", true, false)) + " class=\"output\"><div class=\"port\"></div>Output</div></div><!-- Controls--><form class=\"component-controls filter-controls\"><div class=\"type\"><label><input type=\"radio\" name=\"filter-type\" value=\"passthrough\" selected=\"true\"/>Passthrough</label><label><input type=\"radio\" name=\"filter-type\" value=\"scale\"/>Scale</label><label><input type=\"radio\" name=\"filter-type\" value=\"add\"/>Add </label><label><input type=\"radio\" name=\"filter-type\" value=\"quant\"/>Quant</label></div><div class=\"scale-controls\">scale controls<label><input type=\"number\" name=\"static-value\" value=\"1\"/>Static Value</label></div><div class=\"static-controls\">Add Value Controls<label><input type=\"number\" name=\"static-value\" value=\"0\"/>Add Value</label></div><div class=\"quant-controls\">Quant controls<label><input type=\"number\" name=\"static-value\" value=\"1\"/>Quant to the nearest</label></div><div class=\"displays\"><div class=\"output-display\"><h3>Output Waveform</h3><svg class=\"waveform\"></svg></div></div></form></div>");}.call(this,"lineInputId" in locals_for_with?locals_for_with.lineInputId:typeof lineInputId!=="undefined"?lineInputId:undefined,"levelInputId" in locals_for_with?locals_for_with.levelInputId:typeof levelInputId!=="undefined"?levelInputId:undefined,"outputId" in locals_for_with?locals_for_with.outputId:typeof outputId!=="undefined"?outputId:undefined));;return buf.join("");
 },
 "pattern-editor/components/master": function(locals) {
 var buf = [];

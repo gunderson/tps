@@ -1,0 +1,14 @@
+//- - var measureId = 1
+//- while (measureId <= measuresPerPhase)
+//- 	- var beatId  = 1
+//- 	while (beatId <= beatsPerMeasure)
+//- 		.beat.beat-#{beatId}
+//- 		- var beatIndex = 1
+//- 		while (beatIndex <= 4)
+//- 			.sixteenth(data-count="#{(beatId * beatIndex)}", data-beat-index="#{beatIndex}")
+//- 				.available-notes
+//- 					each noteName in notes
+//- 						if (noteName !== root)
+//- 							.note(data-note-name="#{noteName}")
+//- 						else
+//- 							.note.root(data-note-name="#{noteName}")

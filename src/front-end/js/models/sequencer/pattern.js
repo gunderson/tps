@@ -26,7 +26,14 @@ var PatternModel = Backbone.Model.extend({
 			connections: connectionsCollection,
 			beatsPerMeasure: 4,
 			measuresPerPhrase: 4,
-			ticksPerBeat: 64
+			ticksPerBeat: 16,
+
+			notes:[],
+			key: "dm",
+			scaleDomainOffset: 0, //offsets the first note available
+			scaleResolution: 5, // number of notes per octave available to this pattern
+			octaves: 3, // how many octaves are available
+			octaveBias: 0 //offsets the octaves available
 		};
 		settings.tickWidth = (Math.PI * 2) / settings.ticksPerBeat;
 		return settings;

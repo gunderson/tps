@@ -20,23 +20,33 @@
 	form.component-controls.filter-controls
 		.type
 			label
-				input(type="radio", name="type", value="none") 
-				| None
+				input(type="radio", name="filter-type", value="passthrough", selected="true") 
+				| Passthrough
 			label
-				input(type="radio", name="type", value="scale")
+				input(type="radio", name="filter-type", value="scale")
 				| Scale
 			label
-				input(type="radio", name="type", value="digital")
-				| Digital
+				input(type="radio", name="filter-type", value="add")
+				| Add 
 			label
-				input(type="radio", name="type", value="saw")
-				| Saw
+				input(type="radio", name="filter-type", value="quant")
+				| Quant
+
 		.scale-controls
 			| scale controls
-		.digital-controls
-			| digital controls
-		.saw-controls
-			| saw controls
+			label
+				input(type="number", name="static-value", value="1") 
+				| Static Value
+		.static-controls
+			| Add Value Controls
+			label
+				input(type="number", name="static-value", value="0") 
+				| Add Value
+		.quant-controls
+			| Quant controls
+			label
+				input(type="number", name="static-value", value="1") 
+				| Quant to the nearest
 
 		.displays
 			.output-display
