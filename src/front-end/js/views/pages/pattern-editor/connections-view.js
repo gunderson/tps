@@ -3,7 +3,7 @@ require("backbone.layoutmanager");
 var Snap = require("snapsvg");
 
 var View = Backbone.Layout.extend({
-	el: "#connections",
+	// el: "#connections",
 	// keep: true,
 	initialize: function(){
 		this.listenTo(this.collection, "add remove reset", this.render);

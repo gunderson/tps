@@ -136,6 +136,7 @@ var View = Backbone.Layout.extend({
 		return this;
 	},
 	renderWaveform: function($el, data){
+
 		var paper = Snap($el[0]);
 		paper.clear();
 
@@ -146,6 +147,7 @@ var View = Backbone.Layout.extend({
 		for (var i = 1, endi = data.length; i < endi; i++){
 			commands.push("L", i * tickWidth, (data[i] * 50) + 50);
 		}
+
 
 		var p = paper.path({
 			d: commands.join(" "),

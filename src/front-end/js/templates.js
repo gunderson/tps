@@ -1,10 +1,70 @@
 var jade = require('jade/runtime'); module.exports = {
-"pattern-editor/output-sixteenths": function(locals) {
+"pattern-editor/output-notes": function(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
+;var locals_for_with = (locals || {});(function (numMeasures, beatsPerMeasure, availableNotes, key) {
+var measureId = 0
+while ((++measureId <= numMeasures))
+{
+buf.push("<div class=\"measure\">");
+var beatId = 0
+while ((++beatId <= beatsPerMeasure))
+{
+buf.push("<div" + (jade.cls(['beat',"beat-" + (beatId) + ""], [null,true])) + ">");
+var beatIndex = 0
+while ((++beatIndex <= 4))
+{
+buf.push("<div" + (jade.attr("data-count", "" + ((beatId * beatIndex)) + "", true, false)) + (jade.attr("data-beat-index", "" + (beatIndex) + "", true, false)) + " class=\"sixteenth\"><div class=\"available-notes\">");
+// iterate availableNotes.reverse()
+;(function(){
+  var $$obj = availableNotes.reverse();
+  if ('number' == typeof $$obj.length) {
 
-;return buf.join("");
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var noteName = $$obj[$index];
+
+if ( (noteName.charAt(0) !== key.charAt(0)))
+{
+buf.push("<div" + (jade.cls(['note',"" + (noteName) + ""], [null,true])) + "></div>");
+}
+else
+{
+buf.push("<div" + (jade.cls(['note','root',"" + (noteName) + ""], [null,null,true])) + "></div>");
+}
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var noteName = $$obj[$index];
+
+if ( (noteName.charAt(0) !== key.charAt(0)))
+{
+buf.push("<div" + (jade.cls(['note',"" + (noteName) + ""], [null,true])) + "></div>");
+}
+else
+{
+buf.push("<div" + (jade.cls(['note','root',"" + (noteName) + ""], [null,null,true])) + "></div>");
+}
+    }
+
+  }
+}).call(this);
+
+buf.push("</div></div>");
+}
+buf.push("</div>");
+}
+buf.push("</div>");
+}}.call(this,"numMeasures" in locals_for_with?locals_for_with.numMeasures:typeof numMeasures!=="undefined"?numMeasures:undefined,"beatsPerMeasure" in locals_for_with?locals_for_with.beatsPerMeasure:typeof beatsPerMeasure!=="undefined"?beatsPerMeasure:undefined,"availableNotes" in locals_for_with?locals_for_with.availableNotes:typeof availableNotes!=="undefined"?availableNotes:undefined,"key" in locals_for_with?locals_for_with.key:typeof key!=="undefined"?key:undefined));;return buf.join("");
+},
+"sound-board/instrument": function(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+;var locals_for_with = (locals || {});(function (instrument) {
+buf.push("<div" + (jade.cls(['instrument',"" + (instrument.name) + ""], [null,true])) + "><h1>" + (jade.escape((jade_interp = instrument.name) == null ? '' : jade_interp)) + "  " + (jade.escape((jade_interp = instrument.type) == null ? '' : jade_interp)) + "</h1><input type=\"range\" step=\"1\"" + (jade.attr("min", "" + (instrument.range.first) + "", true, false)) + (jade.attr("max", "" + (instrument.range.last) + "", true, false)) + " value=\"30\" class=\"noteValue\"/><div class=\"noteValueDisplay\">30</div><button class=\"trigger\">Trigger</button><button class=\"load\">Load</button></div>");}.call(this,"instrument" in locals_for_with?locals_for_with.instrument:typeof instrument!=="undefined"?instrument:undefined));;return buf.join("");
 },
 "sequencer/fader": function(locals) {
 var buf = [];
@@ -34,13 +94,6 @@ var jade_interp;
 
 buf.push("<div class=\"track\"><div class=\"content\"></div></div>");;return buf.join("");
 },
-"sound-board/instrument": function(locals) {
-var buf = [];
-var jade_mixins = {};
-var jade_interp;
-;var locals_for_with = (locals || {});(function (instrument) {
-buf.push("<div" + (jade.cls(['instrument',"" + (instrument.name) + ""], [null,true])) + "><h1>" + (jade.escape((jade_interp = instrument.name) == null ? '' : jade_interp)) + "  " + (jade.escape((jade_interp = instrument.type) == null ? '' : jade_interp)) + "</h1><input type=\"range\" step=\"1\"" + (jade.attr("min", "" + (instrument.range.first) + "", true, false)) + (jade.attr("max", "" + (instrument.range.last) + "", true, false)) + " value=\"30\" class=\"noteValue\"/><div class=\"noteValueDisplay\">30</div><button class=\"trigger\">Trigger</button><button class=\"load\">Load</button></div>");}.call(this,"instrument" in locals_for_with?locals_for_with.instrument:typeof instrument!=="undefined"?instrument:undefined));;return buf.join("");
-},
 "pattern-editor/components/filter": function(locals) {
 var buf = [];
 var jade_mixins = {};
@@ -52,8 +105,8 @@ buf.push("<div class=\"filter component\"><div class=\"remove-button\"></div><di
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
-;var locals_for_with = (locals || {});(function (rhythmInputId, pitchInputId) {
-buf.push("<div id=\"master\" class=\"component\"><div class=\"title\">Master Inputs</div><!-- PORTS--><div id=\"sequencer-inputs\" class=\"inputs\"><div id=\"rhythm-input\"" + (jade.attr("data-connection-id", "" + (rhythmInputId) + "", true, false)) + " class=\"input\"><div class=\"port\"></div>Rhythm</div><div id=\"pitch-input\"" + (jade.attr("data-connection-id", "" + (pitchInputId) + "", true, false)) + " class=\"input\"><div class=\"port\"></div>Pitch</div></div><!-- CONTROLS--><form class=\"component-controls master-controls\"><div class=\"type\"><label><input type=\"radio\" name=\"type\" value=\"none\"/>None</label><label><input type=\"radio\" name=\"type\" value=\"scale\"/>Scale</label><label><input type=\"radio\" name=\"type\" value=\"digital\"/>Digital</label><label><input type=\"radio\" name=\"type\" value=\"saw\"/>Saw</label></div><div class=\"scale-controls\">scale controls</div><div class=\"digital-controls\">digital controls</div><div class=\"saw-controls\">saw controls</div><div class=\"displays\"><div class=\"rhythm-display\"><h3>Output Waveform</h3><svg class=\"waveform\"></svg></div><div class=\"pitch-display\"><h3>Output Waveform</h3><svg class=\"waveform\"></svg></div></div></form></div>");}.call(this,"rhythmInputId" in locals_for_with?locals_for_with.rhythmInputId:typeof rhythmInputId!=="undefined"?rhythmInputId:undefined,"pitchInputId" in locals_for_with?locals_for_with.pitchInputId:typeof pitchInputId!=="undefined"?pitchInputId:undefined));;return buf.join("");
+;var locals_for_with = (locals || {});(function (rhythmInputId, pitchInputId, scaleBias, scaleResolution, numOctaves, baseOctave) {
+buf.push("<div id=\"master\" class=\"component\"><div class=\"title\">Master Inputs</div><!-- PORTS--><div id=\"sequencer-inputs\" class=\"inputs\"><div id=\"rhythm-input\"" + (jade.attr("data-connection-id", "" + (rhythmInputId) + "", true, false)) + " class=\"input\"><div class=\"port\"></div>Rhythm</div><div id=\"pitch-input\"" + (jade.attr("data-connection-id", "" + (pitchInputId) + "", true, false)) + " class=\"input\"><div class=\"port\"></div>Pitch</div></div><!-- CONTROLS--><form class=\"component-controls master-controls\"><div class=\"scale-bias\"><label><input type=\"number\" name=\"type\"" + (jade.attr("value", "" + (scaleBias) + "", true, false)) + " min=\"-6\" max=\"6\"/>Scale Bias</label></div><div class=\"scale-resolution\"><label><input type=\"number\" name=\"type\"" + (jade.attr("value", "" + (scaleResolution) + "", true, false)) + " min=\"1\" max=\"7\"/>Scale Resolution</label></div><div class=\"num-octaves\"><label><input type=\"number\" name=\"type\"" + (jade.attr("value", "" + (numOctaves) + "", true, false)) + " min=\"1\" max=\"9\"/>Number of Octaves</label></div><div class=\"base-octave\"><label><input type=\"number\" name=\"type\"" + (jade.attr("value", "" + (baseOctave) + "", true, false)) + " min=\"0\" max=\"9\"/>Base Octave</label></div><div class=\"displays\"></div></form></div>");}.call(this,"rhythmInputId" in locals_for_with?locals_for_with.rhythmInputId:typeof rhythmInputId!=="undefined"?rhythmInputId:undefined,"pitchInputId" in locals_for_with?locals_for_with.pitchInputId:typeof pitchInputId!=="undefined"?pitchInputId:undefined,"scaleBias" in locals_for_with?locals_for_with.scaleBias:typeof scaleBias!=="undefined"?scaleBias:undefined,"scaleResolution" in locals_for_with?locals_for_with.scaleResolution:typeof scaleResolution!=="undefined"?scaleResolution:undefined,"numOctaves" in locals_for_with?locals_for_with.numOctaves:typeof numOctaves!=="undefined"?numOctaves:undefined,"baseOctave" in locals_for_with?locals_for_with.baseOctave:typeof baseOctave!=="undefined"?baseOctave:undefined));;return buf.join("");
 },
 "pattern-editor/components/oscillator": function(locals) {
 var buf = [];

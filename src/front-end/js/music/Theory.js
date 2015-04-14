@@ -1,5 +1,6 @@
 	var _ = require("underscore");
 	require("underscore.arrayAt");
+	require("underscore.arrayObus");
 
 	var theory = {
 		audioPath: "sound/piano/",
@@ -19,43 +20,7 @@
 			"g",
 			"ga"
 		],
-		chords: {
-			"a": ["a","cd","e"],
-			"b": ["b","de","fg"],
-			"c": ["c","e","g"],
-			"d": ["d","fg","a"],
-			"e": ["e","ga","b"],
-			"f": ["f","a","c"],
-			"g": ["g","b","d"],
-
-			"ab": ["ab","d","e"],
-			"cd": ["cd","f","a"],
-			"de": ["de","g","ab"],
-			"fg": ["fg","ab","cd"],
-			"ga": ["ga","c","de"],
-
-			"am": ["a","c","e"],
-			"bm": ["b","d","fg"],
-			"cm": ["c","de","g"],
-			"dm": ["d","f","a"],
-			"em": ["g","e","b"],
-			"fm": ["f","ga","c"],
-			"gm": ["g","ab","d"],
-
-			"abm": ["ab","cd","f"],
-			"cdm": ["cd","e","ga"],
-			"dem": ["de","fg","ab"],
-			"fgm": ["fg","a","cd"],
-			"gam": ["ga","b","de"],
-
-			"a7": ["a","cd","e","ga"],
-			"b7": ["b","de","fg","ab"],
-			"c7": ["c","e","g","b"],
-			"d7": ["d","fg","a","cd"],
-			"e7": ["g","ef","b","a"],
-			"f7": ["f","a","c","e"],
-			"g7": ["g","b","d","fg"],
-		}
+		chords: {}
 	};
 
 	//render chords
@@ -141,33 +106,116 @@
 		return chord;
 	};
 
-	theory.getScaleFromKey = function(key){
-		key = key || "f";
+	theory.getScale = function(key, resolution, bias){
+		key = key || "c";
 		var s = theory.scale;
 		var rootIndex = s.indexOf(key);
-		var minor = key.slice -1 === "m";
+		bias = bias || 0;
+		var minor = key.slice(-1) === "m";
 		if (!minor){
-			return [
-				key,
-				_.at(s, rootIndex + 2),
-				_.at(s, rootIndex + 4),
-				// _.at(s, rootIndex + 5),
-				_.at(s, rootIndex + 7),
-				_.at(s, rootIndex + 9),
-				// _.at(s, rootIndex + 11),
-			]
+			switch (resolution){
+				case 1: 
+					return [key];
+				case 2: 
+					return [
+							key,
+							_.at(s, rootIndex + 4),
+						];
+				case 3: 
+					return [
+							key,
+							_.at(s, rootIndex + 4),
+							_.at(s, rootIndex + 7),
+						];
+				case 4: 
+					return [
+							key,
+							_.at(s, rootIndex + 4),
+							_.at(s, rootIndex + 5),
+							_.at(s, rootIndex + 7),
+						];
+				case 5: 
+					return [
+							key,
+							_.at(s, rootIndex + 4),
+							_.at(s, rootIndex + 5),
+							_.at(s, rootIndex + 7),
+							_.at(s, rootIndex + 9),
+						];
+				case 6: 
+					return [
+							key,
+							_.at(s, rootIndex + 2),
+							_.at(s, rootIndex + 4),
+							_.at(s, rootIndex + 5),
+							_.at(s, rootIndex + 7),
+							_.at(s, rootIndex + 9),
+						];
+				case 7: // intentional fall through
+				default: 
+				return [
+						key,
+						_.at(s, rootIndex + 2),
+						_.at(s, rootIndex + 4),
+						_.at(s, rootIndex + 5),
+						_.at(s, rootIndex + 7),
+						_.at(s, rootIndex + 9),
+						_.at(s, rootIndex + 11),
+					];
+			}
 		} else {
-			return [
-				key,
-				_.at(s, rootIndex + 2),
-				_.at(s, rootIndex + 3),
-				_.at(s, rootIndex + 5),
-				_.at(s, rootIndex + 7),
-				_.at(s, rootIndex + 8),
-				_.at(s, rootIndex + 10),
-			]
+			switch (resolution){
+				case 1: 
+					return [key];
+				case 2: 
+					return [
+							key,
+							_.at(s, rootIndex + 3),
+						];
+				case 3: 
+					return [
+							key,
+							_.at(s, rootIndex + 3),
+							_.at(s, rootIndex + 7),
+						];
+				case 4: 
+					return [
+							key,
+							_.at(s, rootIndex + 3),
+							_.at(s, rootIndex + 5),
+							_.at(s, rootIndex + 7),
+						];
+				case 5: 
+					return [
+							key,
+							_.at(s, rootIndex + 3),
+							_.at(s, rootIndex + 5),
+							_.at(s, rootIndex + 7),
+							_.at(s, rootIndex + 8),
+						];
+				case 6: 
+					return [
+							key,
+							_.at(s, rootIndex + 2),
+							_.at(s, rootIndex + 3),
+							_.at(s, rootIndex + 5),
+							_.at(s, rootIndex + 7),
+							_.at(s, rootIndex + 8),
+						];
+				case 7: // intentional fall through
+				default: 
+				return [
+						key,
+						_.at(s, rootIndex + 2),
+						_.at(s, rootIndex + 3),
+						_.at(s, rootIndex + 5),
+						_.at(s, rootIndex + 7),
+						_.at(s, rootIndex + 8),
+						_.at(s, rootIndex + 10),
+					];
+			}
 		}
-	}
+	};
 
 
 	theory.getChordsFromKey = function(key, minor){
@@ -221,4 +269,5 @@
 		}
 		return num;
 	}
-modules.exports = theory;
+	
+module.exports = theory;

@@ -34,7 +34,7 @@ var Model = ComponentModel.extend({
 			pitch: this.get("ports").findWhere({control: "pitch"}).get("values")
 		};
 		return values;
-	},
+	}
 });
 
 module.exports = Model;

@@ -1,0 +1,15 @@
+- var measureId = 0
+while (++measureId <= numMeasures)
+	.measure
+		- var beatId = 0
+		while (++beatId <= beatsPerMeasure)
+			.beat(class="beat-#{beatId}")
+				- var beatIndex = 0
+				while (++beatIndex <= 4)
+					.sixteenth(data-count="#{(beatId * beatIndex)}", data-beat-index="#{beatIndex}")
+						.available-notes
+							each noteName in availableNotes.reverse()
+								if (noteName.charAt(0) !== key.charAt(0))
+									.note(class="#{noteName}")
+								else
+									.note.root(class="#{noteName}")

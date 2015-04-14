@@ -22,6 +22,12 @@ var PatternOverviewView = Backbone.Layout.extend({
 		ctx.fillStyle = "white";
 		ctx.arc(50,50,25,0,Math.PI*2);
 		ctx.fill();
+	},
+	serialize: function(){
+		return _.extend(this.model.toJSON(), {
+			trackId: this.model.get("track").get("trackId"),
+			sceneId: this.model.get("scene").get("sceneId")
+		});
 	}
 });
 

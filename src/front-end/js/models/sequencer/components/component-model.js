@@ -17,15 +17,15 @@ var Model = Backbone.Model.extend({
 		});
 	},
 	getValues: function(regen){
-		console.log("getValues")
 		// if (this.get("values") && !regen) return this.get("values");
 
 		var pattern				= this.get("pattern");
-		var ticksPerBeat		= pattern.get("ticksPerBeat");
-		var beatsPerMeasure		= pattern.get("beatsPerMeasure");
-		var measuresPerPhrase	= pattern.get("measuresPerPhrase");
-		var tickWidth			= pattern.get("tickWidth");
-		var numValues			= ticksPerBeat * beatsPerMeasure * measuresPerPhrase;
+		var scene				= pattern.get("scene");
+		var ticksPerBeat		= scene.get("ticksPerBeat");
+		var beatsPerMeasure		= scene.get("beatsPerMeasure");
+		var tickWidth			= scene.get("tickWidth");
+		var numMeasures			= pattern.get("numMeasures");
+		var numValues			= ticksPerBeat * beatsPerMeasure * numMeasures + 1;
 		var inputs				= this.get("ports").where({type: "input"});
 
 		_.each(inputs, function(input){
@@ -49,6 +49,8 @@ var Model = Backbone.Model.extend({
 		this.trigger("regenerate");
 		return values;
 	},
+
+	// This transform Function multiplies the values from each port
 	transformValues: function(inputs, numValues, tickwidth){
 		var values = _.map(inputs,function(input){
 			return input.get("values");
@@ -68,6 +70,7 @@ var Model = Backbone.Model.extend({
 			this.listenTo(this.collection, "connection-request", this.onConnectionRequest);
 			this.listenTo(this.collection, "connection-response", this.onConnectionResponse);
 		}
+		return this;
 	},
 	// triggers
 	triggerConnectionRequest: function(portId){
@@ -113,6 +116,7 @@ var Model = Backbone.Model.extend({
 	destroyConnection: function(port){
 		port.set("partner", null);
 		this.set("values", null);
+		return this;
 	},
 	setupConnection: function(localPort, partnerPort){
 		if (localPort.get("type") === partnerPort.get("type")) return;
@@ -127,6 +131,7 @@ var Model = Backbone.Model.extend({
 			input: (localPort.get("type") === "input") ? localPort : partnerPort,
 			output: (localPort.get("type") === "output") ? localPort : partnerPort
 		});
+		return this;
 	}
 });
 

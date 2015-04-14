@@ -7,7 +7,7 @@ var FilterView		= require("./pattern-editor/components/filter-view");
 var OscillatorView	= require("./pattern-editor/components/oscillator-view");
 var UserPatternView	= require("./pattern-editor/components/user-pattern-view");
 var SplitterView	= require("./pattern-editor/components/splitter-view");
-var PatternModel	= require("../../models/sequencer/pattern");
+var OutputNotesView	= require("./pattern-editor/output-notes-view");
 
 //abstract page class
 var Page = AbstractPage.extend({
@@ -30,9 +30,8 @@ var Page = AbstractPage.extend({
 		// set views
 		this.masterView = new MasterView({
 		});
-
-		this.connectionsView = new ConnectionsView({collection: this.connectionsCollection});
-
+		this.connectionsView = new ConnectionsView({ collection: this.connectionsCollection });
+		this.ouptutNotesView = new OutputNotesView();
 
 		// set listeners
 		this.listenTo(this.controller.model, "edit-pattern", this.onEditPatternEvent);
@@ -48,6 +47,7 @@ var Page = AbstractPage.extend({
 			.get("scenes").findWhere({ sceneId: parseInt(params[0]) })
 			.get("patterns").findWhere({ trackId: parseInt(params[1]) });
 		this.setPatternModelListeners();
+		this.ouptutNotesView.model = this.patternModel;
 
 		this.connectionsCollection = this.patternModel.get("connections");
 		this.connectionsView.setConnectionCollection(this.patternModel.get("connections"));
@@ -71,6 +71,7 @@ var Page = AbstractPage.extend({
 		this.listenTo(components, "connection-response", 		this.completeConnection);
 		this.listenTo(components, "remove", 					this.onRemoveComponent);
 		this.listenTo(components, "add", 						this.onAddComponent);
+		this.listenTo(this.patternModel, "change",				this.onPatternChange);
 
 	},
 	removePatternModelListeners: function(){
@@ -81,9 +82,10 @@ var Page = AbstractPage.extend({
 	// RENDERING
 	beforeRender: function(){
 		
-		this.insertViews({
-			"": this.connectionsView,
-			"#components": [this.masterView]
+		this.setViews({
+			"#connections": this.connectionsView,
+			"#components": this.masterView,
+			"#output-notes": this.ouptutNotesView
 		});
 
 		this.patternModel.get("components").each(
@@ -104,6 +106,9 @@ var Page = AbstractPage.extend({
 	},
 
 	// EVENT HANDLERS
+	onPatternChange: function(){
+		this.ouptutNotesView.render();
+	},
 	onActivateComponent: function($controls){
 		// console.log("------------ onActivateComponent")
 		var $controlHolder = this.$("#component-control-holder");

@@ -31,7 +31,7 @@ var Model = ComponentModel.extend({
 			]),
 			amplitude: 1,
 			frequency: 4, //frequency is in beats
-			offset: -0.5, //offset is in beats
+			offset: 0, //offset is in beats
 		});
 	},
 	initialize: function(options){
@@ -54,11 +54,13 @@ var Model = ComponentModel.extend({
 		var tau					= Math.PI * 2;
 		var pattern				= this.get("pattern");
 		var defaultValue		= this.get("defaultValue");
-		var ticksPerBeat		= pattern.get("ticksPerBeat");
-		var beatsPerMeasure		= pattern.get("beatsPerMeasure");
-		var measuresPerPhrase	= pattern.get("measuresPerPhrase");
-		var tickWidth			= pattern.get("tickWidth");
-		var numValues			= ticksPerBeat * beatsPerMeasure * measuresPerPhrase;
+		// TODO: move these values from pattern to pattern.get("scene")
+		var scene 				= pattern.get("scene");
+		var ticksPerBeat		= scene.get("ticksPerBeat");
+		var beatsPerMeasure		= scene.get("beatsPerMeasure");
+		var tickWidth			= scene.get("tickWidth");
+		var numMeasures			= pattern.get("numMeasures");
+		var numValues			= ticksPerBeat * beatsPerMeasure * numMeasures;
 		
 		var amplitude			= this.get("amplitude");
 		
@@ -71,7 +73,8 @@ var Model = ComponentModel.extend({
 		var frequency			= tau / (this.get("frequency") * ticksPerBeat) || 0;
 
 		var val = 0, i = -1;
-		var iterations = -1;
+		// set to -2 in order to capture the -1 value so we can determine if value at 0 is a peak
+		var iterations = -2;
 		var output = [];
 		while (++iterations < numValues){
 			val = -1 * amplitude * Math.cos((offset) + (frequency * iterations));
@@ -88,6 +91,8 @@ var Model = ComponentModel.extend({
 		//scale outputs by input#multiply
 		var multiplyInputValues = this.get("ports").findWhere({control: "multiply"}).get("values");
 		var addInputValues = this.get("ports").findWhere({control: "add"}).get("values");
+
+
 		output = _.map(output, function(v,i){
 			return (v + addInputValues[i]) * multiplyInputValues[i];
 		});

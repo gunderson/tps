@@ -9,19 +9,53 @@ var View = ComponentView.extend({
 	initialize: function(options){
 		console.log("master");
 	},
-	beforeRender: function(){
+	setControlListeners: function(){
+		this.$controls.find(".scale-bias input").on("input blur", this.onChangeScaleBias.bind(this));
+		this.$controls.find(".scale-resolution input").on("input blur", this.onChangeScaleResolution.bind(this));
+		this.$controls.find(".num-octaves input").on("input blur", this.onChangeNumOctaves.bind(this));
+		this.$controls.find(".base-octave input").on("input blur", this.onChangeBaseOctave.bind(this));
+	},
+	clearControlListeners: function(){
+		this.$controls.find(".scale-bias input").off("input blur");
+		this.$controls.find(".scale-resolution input").off("input blur");
+		this.$controls.find(".num-octaves input").off("input blur");
+		this.$controls.find(".base-octave input").off("input blur");
+	},
+	afterRender: function(){
+		ComponentView.prototype.afterRender.call(this);
+	},
+	onChange: function(){
+		this.renderWaveforms();
+	},
+	// control event handlers
+	onChangeScaleBias: function(e){
+		this.model.get("pattern").set("scaleBias", parseFloat(e.target.value));
+	},
+	onChangeScaleResolution: function(e){
+		this.model.get("pattern").set("scaleResolution", parseFloat(e.target.value));
+	},
+	onChangeNumOctaves: function(e){
+		this.model.get("pattern").set("numOctaves", parseFloat(e.target.value));
+	},
+	onChangeBaseOctave: function(e){
+		this.model.get("pattern").set("baseOctave", parseFloat(e.target.value));
 	},
 	renderWaveforms: function(){
-		var values = this.model.get("values");
-		this.renderWaveform($("#sequencer-display .rhythm-display .waveform"), values.rhythm);
-		this.renderWaveform($("#sequencer-display .pitch-display .waveform"), values.pitch);
+		var ports = this.model.get("ports");
+		this.renderWaveform($("#sequencer-display .rhythm-display .waveform"), this.model.get("values").rhythm);
+		this.renderWaveform($("#sequencer-display .pitch-display .waveform"),  this.model.get("values").pitch);
 		return this;
 	},
 	serialize: function(){
 		var ports = this.model.get("ports");
+		var pattern = this.model.get("pattern");
 		return {
 			rhythmInputId: ports.findWhere({type: "input", control: "rhythm"}).id,
-			pitchInputId: ports.findWhere({type: "input", control: "pitch"}).id
+			pitchInputId: ports.findWhere({type: "input", control: "pitch"}).id,
+			scaleBias: pattern.get("scaleBias"),
+			scaleResolution: pattern.get("scaleResolution"),
+			numOctaves: pattern.get("numOctaves"),
+			baseOctave: pattern.get("baseOctave")
 		};
 	}
 });
