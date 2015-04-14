@@ -29,7 +29,7 @@ var SceneManager = Backbone.Layout.extend({
 	onAddTrack: function(trackModel){
 		//add a pattern to each scene model
 		this.sceneCollection.each(function(sceneModel){
-			sceneModel.addPattern(trackModel.get("trackId"));
+			sceneModel.addPattern(trackModel);
 		});
 	},
 	onAddScene: function(sceneModel, skipRender){
