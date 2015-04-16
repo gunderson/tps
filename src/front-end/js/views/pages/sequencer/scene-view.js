@@ -6,6 +6,9 @@ var SceneView = Backbone.Layout.extend({
 	el: false,
 	keep: true,
 	template: "sequencer/scene",
+	events: {
+		"click": this.setCurrentScene
+	},
 	initialize: function(options){
 		this.listenTo(this.model.get("patterns"), "add", this.onAddPattern);
 	},
@@ -20,6 +23,9 @@ var SceneView = Backbone.Layout.extend({
 	}, 
 	onEditPattern: function(){
 
+	},
+	setCurrentScene: function(){
+		this.model.setCurrentScene();
 	}
 
 });

@@ -18,7 +18,7 @@ var Model = ComponentModel.extend({
 					type: "input",
 					id: _.uniqueId("i_"),
 					partner: null,
-					defaultValue: 0
+					defaultValue: 0.5
 				}
 			]),
 			type: "master"

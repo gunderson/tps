@@ -17,7 +17,7 @@ var Model = Backbone.Model.extend({
 		});
 	},
 	getValues: function(regen){
-		// if (this.get("values") && !regen) return this.get("values");
+		if (this.get("values") && !regen) return this.get("values");
 
 		var pattern				= this.get("pattern");
 		var scene				= pattern.get("scene");
@@ -32,7 +32,7 @@ var Model = Backbone.Model.extend({
 			var output = input.get("partnerPort");
 			var inputValues;
 			if (output){
-				inputValues = output.parent.getValues();
+				inputValues = output.parent.getValues(regen);
 				input.set("values", inputValues);
 				return inputValues;
 			} else {

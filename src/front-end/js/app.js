@@ -37,7 +37,7 @@ var SoundBoardPage         = require("./views/pages/sound-board-view");
 var pages = {
     "#home"           : new HomePage({route: "/"}),
     "#about"          : new AboutPage({route: "/about"}),
-    "#soundcloud"     : new SoundcloudPage({model: new SoundcloudModel(), route: "/soundcloud"}),
+    // "#soundcloud"     : new SoundcloudPage({model: new SoundcloudModel(), route: "/soundcloud"}),
     "#pattern-editor" : new PatternEditorPage({controller: sequencer, route: "/pattern-editor", connectionsCollection: connectionsCollection}),
     "#sound-board"    : new SoundBoardPage({controller: sequencer, route: "/sound-board"}),
     "#sequencer"      : new SequencerPage({controller: sequencer, route: "/sequencer"}),

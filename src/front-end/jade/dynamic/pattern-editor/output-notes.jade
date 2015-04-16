@@ -8,7 +8,8 @@ while (++measureId <= numMeasures)
 				while (++beatIndex <= 4)
 					.sixteenth(data-count="#{(beatId * beatIndex)}", data-beat-index="#{beatIndex}")
 						.available-notes
-							each noteName in availableNotes.reverse()
+							- var revNotes = availableNotes.slice().reverse()
+							each noteName in revNotes
 								if (noteName.charAt(0) !== key.charAt(0))
 									.note(class="#{noteName}")
 								else

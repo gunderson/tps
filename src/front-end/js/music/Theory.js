@@ -241,7 +241,7 @@
 				_.at(s, rootIndex + 9) + "m"
 			];
 		}
-	}
+	};
 
 	theory.findMostFrequentNote = function(key){
 		var chords = theory.getChordsFromKey(key);
@@ -256,11 +256,12 @@
 			});
 		});
 		return counts;
-	}
+	};
 
 	theory.getNextChordFromMap = function(key, currentChord){
 
-	}
+	};
+
 
 	function pad(num, minDigits){
 		num = num.toString();

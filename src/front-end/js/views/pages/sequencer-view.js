@@ -54,11 +54,13 @@ var Page = AbstractPage.extend({
 		});
 		this.sceneManager = new SceneManagerView({
 			sceneCollection: controller.model.get("scenes"),
-			trackCollection: controller.model.get("tracks")
+			trackCollection: controller.model.get("tracks"),
+			controller: controller
 		});
 		this.trackManager = new TrackManagerView({
 			sceneCollection: controller.model.get("scenes"),
 			trackCollection: controller.model.get("tracks"),
+			controller: controller
 		});
 
 		this.setViews({

@@ -13,7 +13,7 @@ function Sequencer(options){
 
 	if (options.audiocontext) audiocontext = options.audiocontext;
 
-	return _.extend({
+	return _.extend(this, {
 		play: play,
 		stop: stop,
 		reset: reset,
@@ -130,26 +130,27 @@ function tick(){
 		_16thTimer = setTimeout(function(){
 			_this.trigger("16th", 
 				_.extend(
-					getStatus(), 
+					this.getStatus(), 
 					{
 						schedule: (next16thTime + _scheduleAhead) / 1000
 					}
 				)
 			);
-		}, next16thDelta);
+		}.bind(this), next16thDelta);
 
 	}
 
 	//schedule next tick
 	_tickTimer = setTimeout(function(){
-		_this.tick.call(_this);
-	}, nextTickDelta);
+		this.tick();
+	}.bind(this), nextTickDelta);
 
 	this.trigger("tick", {currentTick: _currentTick});
 }
 
 function getStatus(schedule){
-	return {		
+	return {
+		currentScene: this.model.get("currentSceneId"),
 		current16th: _last16th,
 		countInBeat: _last16th % 4,
 		currentBeat: _lastBeat,

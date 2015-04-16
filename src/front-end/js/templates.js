@@ -16,9 +16,10 @@ var beatIndex = 0
 while ((++beatIndex <= 4))
 {
 buf.push("<div" + (jade.attr("data-count", "" + ((beatId * beatIndex)) + "", true, false)) + (jade.attr("data-beat-index", "" + (beatIndex) + "", true, false)) + " class=\"sixteenth\"><div class=\"available-notes\">");
-// iterate availableNotes.reverse()
+var revNotes = availableNotes.slice().reverse()
+// iterate revNotes
 ;(function(){
-  var $$obj = availableNotes.reverse();
+  var $$obj = revNotes;
   if ('number' == typeof $$obj.length) {
 
     for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
@@ -59,13 +60,6 @@ buf.push("</div>");
 buf.push("</div>");
 }}.call(this,"numMeasures" in locals_for_with?locals_for_with.numMeasures:typeof numMeasures!=="undefined"?numMeasures:undefined,"beatsPerMeasure" in locals_for_with?locals_for_with.beatsPerMeasure:typeof beatsPerMeasure!=="undefined"?beatsPerMeasure:undefined,"availableNotes" in locals_for_with?locals_for_with.availableNotes:typeof availableNotes!=="undefined"?availableNotes:undefined,"key" in locals_for_with?locals_for_with.key:typeof key!=="undefined"?key:undefined));;return buf.join("");
 },
-"sound-board/instrument": function(locals) {
-var buf = [];
-var jade_mixins = {};
-var jade_interp;
-;var locals_for_with = (locals || {});(function (instrument) {
-buf.push("<div" + (jade.cls(['instrument',"" + (instrument.name) + ""], [null,true])) + "><h1>" + (jade.escape((jade_interp = instrument.name) == null ? '' : jade_interp)) + "  " + (jade.escape((jade_interp = instrument.type) == null ? '' : jade_interp)) + "</h1><input type=\"range\" step=\"1\"" + (jade.attr("min", "" + (instrument.range.first) + "", true, false)) + (jade.attr("max", "" + (instrument.range.last) + "", true, false)) + " value=\"30\" class=\"noteValue\"/><div class=\"noteValueDisplay\">30</div><button class=\"trigger\">Trigger</button><button class=\"load\">Load</button></div>");}.call(this,"instrument" in locals_for_with?locals_for_with.instrument:typeof instrument!=="undefined"?instrument:undefined));;return buf.join("");
-},
 "sequencer/fader": function(locals) {
 var buf = [];
 var jade_mixins = {};
@@ -78,7 +72,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 ;var locals_for_with = (locals || {});(function (sceneId, trackId) {
-buf.push("<div class=\"pattern-overview\"><a" + (jade.attr("href", "#/pattern-editor/" + (sceneId) + "/" + (trackId) + "", true, false)) + " class=\"content\"><canvas class=\"pattern-graph\"></canvas><div class=\"threshold-line\"></div></a></div>");}.call(this,"sceneId" in locals_for_with?locals_for_with.sceneId:typeof sceneId!=="undefined"?sceneId:undefined,"trackId" in locals_for_with?locals_for_with.trackId:typeof trackId!=="undefined"?trackId:undefined));;return buf.join("");
+buf.push("<div class=\"pattern-overview\"><a" + (jade.attr("href", "#/pattern-editor/" + (sceneId) + "/" + (trackId) + "", true, false)) + " class=\"content\"><div class=\"pattern-graph\"></div><div class=\"threshold-line\"></div></a></div>");}.call(this,"sceneId" in locals_for_with?locals_for_with.sceneId:typeof sceneId!=="undefined"?sceneId:undefined,"trackId" in locals_for_with?locals_for_with.trackId:typeof trackId!=="undefined"?trackId:undefined));;return buf.join("");
 },
 "sequencer/scene": function(locals) {
 var buf = [];
@@ -93,6 +87,13 @@ var jade_mixins = {};
 var jade_interp;
 
 buf.push("<div class=\"track\"><div class=\"content\"></div></div>");;return buf.join("");
+},
+"sound-board/instrument": function(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+;var locals_for_with = (locals || {});(function (instrument) {
+buf.push("<div" + (jade.cls(['instrument',"" + (instrument.name) + ""], [null,true])) + "><h1>" + (jade.escape((jade_interp = instrument.name) == null ? '' : jade_interp)) + "  " + (jade.escape((jade_interp = instrument.type) == null ? '' : jade_interp)) + "</h1><input type=\"range\" step=\"1\"" + (jade.attr("min", "" + (instrument.range.first) + "", true, false)) + (jade.attr("max", "" + (instrument.range.last) + "", true, false)) + " value=\"30\" class=\"noteValue\"/><div class=\"noteValueDisplay\">30</div><button class=\"trigger\">Trigger</button><button class=\"load\">Load</button></div>");}.call(this,"instrument" in locals_for_with?locals_for_with.instrument:typeof instrument!=="undefined"?instrument:undefined));;return buf.join("");
 },
 "pattern-editor/components/filter": function(locals) {
 var buf = [];

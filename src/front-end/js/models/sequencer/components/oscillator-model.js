@@ -30,7 +30,7 @@ var Model = ComponentModel.extend({
 				}
 			]),
 			amplitude: 1,
-			frequency: 4, //frequency is in beats
+			frequency: 1, //frequency is in beats
 			offset: 0, //offset is in beats
 		});
 	},

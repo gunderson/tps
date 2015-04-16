@@ -47,7 +47,7 @@ var Page = AbstractPage.extend({
 			.get("scenes").findWhere({ sceneId: parseInt(params[0]) })
 			.get("patterns").findWhere({ trackId: parseInt(params[1]) });
 		this.setPatternModelListeners();
-		this.ouptutNotesView.model = this.patternModel;
+		this.ouptutNotesView.setModel(this.patternModel);
 
 		this.connectionsCollection = this.patternModel.get("connections");
 		this.connectionsView.setConnectionCollection(this.patternModel.get("connections"));
@@ -107,7 +107,7 @@ var Page = AbstractPage.extend({
 
 	// EVENT HANDLERS
 	onPatternChange: function(){
-		this.ouptutNotesView.render();
+		// this.ouptutNotesView.render();
 	},
 	onActivateComponent: function($controls){
 		// console.log("------------ onActivateComponent")

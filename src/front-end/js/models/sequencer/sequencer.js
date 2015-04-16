@@ -8,9 +8,16 @@ var SequencerModel = Backbone.Model.extend({
 		return {
 			bpm: 120,
 			beatsPerMeasure: 4,
+			currentSceneId: 0,
 			tracks: new TrackCollection([{}], {controller:this.controller}),
 			scenes: new SceneCollection([{}])
 		};
+	},
+	save: function(){
+
+	},
+	load:function(){
+
 	},
 	initialize: function(){
 		this.get("scenes").trackCollection = this.get("tracks");

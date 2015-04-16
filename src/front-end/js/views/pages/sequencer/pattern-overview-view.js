@@ -1,5 +1,6 @@
 require("backbone");
 require("backbone.layoutmanager");
+var OutputNotesView = require("../pattern-editor/output-notes-view");
 
 var PatternOverviewView = Backbone.Layout.extend({
 	el: false,
@@ -9,19 +10,30 @@ var PatternOverviewView = Backbone.Layout.extend({
 		"click": "onClickPattern"
 	},
 	initialize: function(options){
+		this.outputNotesView = new OutputNotesView();
+		this.outputNotesView.setModel(this.model);
+		this.listenTo(this.model, "16th", this.on16th);
+
+	},
+	beforeRender: function(){
+		this.setViews({
+			".pattern-graph": this.outputNotesView
+		});
 	},
 	afterRender: function(){
-		this.drawPattern();
+	},
+	on16th: function(patternStatus){
+		// console.log("patternStatus", patternStatus)
+		this.$(".sixteenth")
+			.removeClass("playing")
+				.eq(patternStatus.current16th)
+				.addClass("playing");
 	},
 	onClickPattern: function(e){
 		this.model.trigger("edit-pattern", this.model);
 	},
 	drawPattern: function(){
-		var $canvas = this.$("canvas");
-		var ctx = $canvas[0].getContext("2d");
-		ctx.fillStyle = "white";
-		ctx.arc(50,50,25,0,Math.PI*2);
-		ctx.fill();
+		
 	},
 	serialize: function(){
 		return _.extend(this.model.toJSON(), {

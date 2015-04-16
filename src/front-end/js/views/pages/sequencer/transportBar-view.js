@@ -39,10 +39,10 @@ var TransportBar = Backbone.Layout.extend({
 		this.controller.model.set("loop", !this.controller.model.get("loop"));
 	},
 	onClickSave: function(){
-		
+		this.controller.save();
 	},
 	onClickLoad: function(){
-
+		this.controller.load();
 	}
 });
 
