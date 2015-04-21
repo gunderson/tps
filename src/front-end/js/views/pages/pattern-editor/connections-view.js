@@ -14,19 +14,36 @@ var View = Backbone.Layout.extend({
 		this.listenTo(this.collection, "add remove reset", this.render);
 	},
 	setComponentCollection: function(componentCollection){
-		if (this.componentCollection) this.stopListening(this.componentCollection);
+		if (this.componentCollection) {
+			console.log("setComponentCollection release listeners", this.componentCollection);
+			this.stopListening(this.componentCollection);
+		}
+
+		console.log("setComponentCollection set new listeners", componentCollection);
 		this.componentCollection = componentCollection;
-		this.listenTo(this.componentCollection, "add reset", this.render);
-		this.listenTo(this.componentCollection, "remove", this.onRemoveConnection);
-		this.listenTo(this.componentCollection, "change", this.updateConnections);
+		this.listenTo(componentCollection, "add reset", this.render);
+		this.listenTo(componentCollection, "remove", this.onRemoveConnection);
+		this.listenTo(componentCollection, "change", this.updateConnections);
+
 	},
 	beforeRender: function(){
+		this.$('path').remove();
+		this.collection.each(function(connectionModel){
+			connectionModel.set("path", null);
+		});
 	},
-	updateConnections: function(obj, event){
-		var componentModel = obj;
-		componentModel.get("ports").each(this.updatePort.bind(this));
+	updateAllConnections: function(){
+		this.componentCollection.each(function(componentModel){
+			this.updateConnections(componentModel);
+		}.bind(this));
+	},
+	updateConnections: function(componentModel, event){
+		console.log("updateConnections",componentModel);
+		componentModel.get("ports")
+			.each(this.updatePort.bind(this));
 	},
 	updatePort: function(port){
+		console.log("updatePort",port);
 		var connectionsCollection = this.collection;
 		var connection = connectionsCollection.find(function(conn){
 			if (port.get("type") === "input" && conn.get("input") === port){
@@ -42,27 +59,36 @@ var View = Backbone.Layout.extend({
 		}
 	},
 	afterRender: function(){
+		this.setConnectionCollection(this.collection);
+		this.setComponentCollection(this.componentCollection);
 		// make connections	
 		this.paper = Snap(this.el);
-		//for each connection
-		this.collection.each(function(connection){
-			this.drawConnection(connection);
-		}.bind(this));
+		this.updateAllConnections();
 	},
 	onRemoveConnection: function(connection, collection, event){
 		this.paper.remove(connection.path);
 	},
 	drawConnection: function(connection){
+		console.log("render connection inputOffset", connection);
+
 		var $input = $('.input[data-connection-id="' + connection.get("input").id + '"]');
 		var $inputPort = $input.find(".port");
 		var inputOffset = $input.offset();
+
+		console.log("render connection inputOffset", inputOffset);
+
 		var $output = $('.output[data-connection-id="' + connection.get("output").id + '"]');
 		var $outputPort = $input.find(".port");
 		var outputOffset = $output.offset();
+
+		console.log("render connection outputOffset", outputOffset);
+
 		var dx = inputOffset.left - outputOffset.left;
 		var dy = inputOffset.top - outputOffset.top;
 		var dist = Math.sqrt((dx*dx)+(dy*dy));
 		var elOffset = this.$el.offset();
+
+		console.log("render connection elOffset", elOffset);
 
 		var inputX = ($inputPort.width() >> 1) + inputOffset.left - elOffset.left;
 		var inputY = ($inputPort.height() >> 1) + inputOffset.top - elOffset.top;
@@ -93,6 +119,11 @@ var View = Backbone.Layout.extend({
 				fill: "transparent"
 			});
 		}
+
+
+		console.log("render connection path", d, path);
+
+
 		connection.set("path", path);
 
 	},

@@ -29,6 +29,10 @@
 			label
 				input(type="number", name="type", value="#{baseOctave}", min="0", max="9") 
 				| Base Octave
+		.threshold
+			label
+				input(type="number", name="type", value="#{threshold}", min="0", max="1", step="0.01") 
+				| Threshold
 		.displays
 			//- .rhythm-display
 			//- 	h3 Output Waveform

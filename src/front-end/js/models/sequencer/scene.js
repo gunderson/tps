@@ -30,6 +30,7 @@ var SceneModel = Backbone.Model.extend({
 			track: track,
 			scene: this
 		});
+		// TODO: make sure patterns are in the same order as tracks
 	},
 	getLongestMeasureLength: function(){
 		this.set("maxNumMeasures",

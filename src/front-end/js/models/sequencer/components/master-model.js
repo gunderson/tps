@@ -21,7 +21,8 @@ var Model = ComponentModel.extend({
 					defaultValue: 0.5
 				}
 			]),
-			type: "master"
+			type: "master",
+			threshold: 0.75
 		});
 	},
 

@@ -58,7 +58,7 @@ function SoundManager(){
 		},
 		noteOn: function(instrument, noteId, velocity, schedule){
 
-			console.log("Klang.triggerEvent("+instrument+", "+noteId+", "+velocity+", "+schedule+")");
+			// console.log("Klang.triggerEvent("+instrument+", "+noteId+", "+velocity+", "+schedule+")");
 			Klang.triggerEvent(instrument, noteId, velocity, schedule);
 		},
 		noteOff: function(){
@@ -67,9 +67,10 @@ function SoundManager(){
 
 		note2num: function(note){
 			var s = Theory.scale;
-			var octave = note.slice(-1);
-			if (note.length === 2) return s.indexOf(note.substr(0,1)) + (octave * 13);
-			if (note.length === 3) return s.indexOf(note.substr(0,2)) + (octave * 13);
+			var octave = parseInt(note.slice(-1), 10);
+			var num = s.indexOf(note.substr(0,note.length - 1)) + (octave * 12)
+			console.log("note2num", note, num);
+			return num;
 		}
 	};
 

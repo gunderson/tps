@@ -44,6 +44,15 @@ var PatternModel = Backbone.Model.extend({
 		this.listenTo(this.get("components"), "remove", this.destroyConnections);
 		this.listenTo(this.get("components"), "connection-request", this.onConnectionRequest);
 		this.listenTo(this.get("components"), "change:values remove connection-response", this.refreshValues);
+
+		this.listenTo(this.get("components"), "change:x change:y", function(){
+			console.log("component change x or y");
+		});
+
+
+
+
+
 		this.listenTo(this.get("scene"), "16th", this.on16th);
 		this.on("change:scene", this.onChangeScene, this);
 		this.on("change:baseOctave change:scaleBias change:numOctaves change:scaleResolution change:numMeasures", this.refreshValues, this);
@@ -70,14 +79,12 @@ var PatternModel = Backbone.Model.extend({
 		}
 	},
 	export: function(){
-
 	},
 	import: function(){
-
 	},
 	refreshValues: function(child){
-		console.log(typeof child);
-		if (child && typeof child == "Model" && child.get("type") === "master") return;
+		// console.log(child instanceof MasterModel);
+		// if (child && child instanceof MasterModel) return;
 		this.set("values", null);
 		this.getValues();
 	},
@@ -166,10 +173,18 @@ var PatternModel = Backbone.Model.extend({
 		return availableNotes;
 	},
 	getRhythm: function(){
-		console.log("=======  pattern.getRhythm");
-		var values			= this.master.getValues().rhythm;
-		var peaks			= _.map(values, checkPeak);
-		var peakIndicies	= [];
+		var values		 = this.master.getValues().rhythm;
+		var threshold 	 = this.get("threshold");
+		var peakIndicies = [];
+
+		function checkThreshold(val){
+			return val > threshold ? val : false;
+		}
+
+		var peaks = _.chain(values)
+			.map(checkPeak)
+			.map(checkThreshold)
+			.value();
 
 		_.each(peaks, function(isPeak, i){
 			if (isPeak){
@@ -193,7 +208,7 @@ var PatternModel = Backbone.Model.extend({
 		var values			= this.master.getValues().pitch;
 
 		var pitchesPositions = _.map(peakIndicies, function(index){
-			return Math.round(values[index] * availableNotes.length);
+			return Math.round((values[index] + 0.5) * availableNotes.length);
 		});
 		var key		= scene.get("key");
 		var pitches	= _.map(pitchesPositions, function(pitchPosition){
@@ -269,7 +284,7 @@ function identityMeasure(beatsPerMeasure){
 
 function checkPeak(val, index, values){
 	if (index < 1 || index >= values.length -1) return false;
-	return val < values[index - 1] && val < values[index + 1];
+	return (val > values[index - 1] && val > values[index + 1]) ? val : false;
 }
 
 

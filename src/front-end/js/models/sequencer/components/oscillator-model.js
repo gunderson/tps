@@ -77,7 +77,7 @@ var Model = ComponentModel.extend({
 		var iterations = -2;
 		var output = [];
 		while (++iterations < numValues){
-			val = -1 * amplitude * Math.cos((offset) + (frequency * iterations));
+			val = amplitude * Math.cos((offset) + (frequency * iterations));
 			output.push(val);
 		}
 

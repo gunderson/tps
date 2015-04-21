@@ -18,9 +18,11 @@ var View = Backbone.Layout.extend({
 		//bind dom event handlers
 	},
 	afterRender: function(){
+
+		console.log("afterRender:: place components");
+
 		this.$el.css({
-			translateX: this.model.get("x"),
-			translateY: this.model.get("y"),
+			transform: "translate(" + this.model.get("x") + "px," + this.model.get("y") + "px)"
 		});
 		this.$controls = this.$(".component-controls");
 		this.$controls.detach();
@@ -79,7 +81,6 @@ var View = Backbone.Layout.extend({
 		if (distance > 3){
 			this.cancelClick = true;
 		}
-
 		this.model.set({
 			x: newX - this.mouseDownX,
 			y: newY - this.mouseDownY
@@ -142,10 +143,10 @@ var View = Backbone.Layout.extend({
 
 		var wavescale = $el.height() >> 1;
 		var tickWidth = $el.width() / data.length;
-		var commands = ["M", 0, (data[0] * 50) + 50];
+		var commands = ["M", 0, (data[0] * -50) + 50];
 
 		for (var i = 1, endi = data.length; i < endi; i++){
-			commands.push("L", i * tickWidth, (data[i] * 50) + 50);
+			commands.push("L", i * tickWidth, (data[i] * -50) + 50);
 		}
 
 

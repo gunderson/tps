@@ -15,7 +15,7 @@ var ConnectionsCollection = Backbone.Collection.extend({
 		}
 	}),
 	findByPort: function(port){
-		var portType = port.get("type")
+		var portType = port.get("type");
 		return this.find(function(connection){	
 			if (portType === "input" && connection.get("input") === port){
 				return connection;

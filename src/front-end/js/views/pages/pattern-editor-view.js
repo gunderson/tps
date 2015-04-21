@@ -47,6 +47,7 @@ var Page = AbstractPage.extend({
 			.get("scenes").findWhere({ sceneId: parseInt(params[0]) })
 			.get("patterns").findWhere({ trackId: parseInt(params[1]) });
 		this.setPatternModelListeners();
+
 		this.ouptutNotesView.setModel(this.patternModel);
 
 		this.connectionsCollection = this.patternModel.get("connections");
@@ -71,20 +72,27 @@ var Page = AbstractPage.extend({
 		this.listenTo(components, "connection-response", 		this.completeConnection);
 		this.listenTo(components, "remove", 					this.onRemoveComponent);
 		this.listenTo(components, "add", 						this.onAddComponent);
-		this.listenTo(this.patternModel, "change",				this.onPatternChange);
+		this.listenTo(this.patternModel, "change:values",		this.onPatternChange);
+		this.listenTo(this.patternModel, "change:threshold",	this.onThresholdChange);
 
 	},
 	removePatternModelListeners: function(){
-		if (this.patternModel) this.stopListening(this.patternModel.get("components"));
+		if (this.patternModel) {
+			this.stopListening(this.patternModel.get("components"));
+			this.stopListening(this.patternModel);
+		}
 	},
 
 
 	// RENDERING
 	beforeRender: function(){
 		
+		this.getViews("#components").each(function(nestedView) {
+			nestedView.remove();
+		});
+
 		this.setViews({
-			"#connections": this.connectionsView,
-			"#components": this.masterView,
+			"": this.connectionsView,
 			"#output-notes": this.ouptutNotesView
 		});
 
@@ -95,22 +103,25 @@ var Page = AbstractPage.extend({
 		);
 	},
 	afterRender: function(){
-
+		this.$(".rhythm-display .threshold").css({
+			top: ((1 - this.patternModel.get("threshold")) * 100) + "%"
+		});
+		this.onResize();
 	},
 	onResize: function(){
-		var $connections = this.$("#connections");
-		this.$("#connections").attr({
-			width: $connections.width(),
-			height: $connections.height()
-		});
 	},
 
 	// EVENT HANDLERS
+	onThresholdChange: function(model, val){
+		this.$(".threshold").css({
+			top: ((1-val) * 100) + "%"
+		});
+		this.onPatternChange();
+	},
 	onPatternChange: function(){
-		// this.ouptutNotesView.render();
+		this.ouptutNotesView.render();
 	},
 	onActivateComponent: function($controls){
-		// console.log("------------ onActivateComponent")
 		var $controlHolder = this.$("#component-control-holder");
 		var $currentControls = $controlHolder.find(".component-controls");
 		if ($currentControls) $currentControls.detach();
@@ -146,6 +157,9 @@ var Page = AbstractPage.extend({
 				break;
 			case "splitter":
 				insertView.call(this, SplitterView, componentModel);
+				break;
+			case "master":
+				insertView.call(this, MasterView, componentModel);
 				break;
 		}
 	},
@@ -195,6 +209,7 @@ var Page = AbstractPage.extend({
 		AbstractPage.prototype.transitionIn.apply(this, arguments);
 	},
 	transitionInComplete: function(){
+		this.connectionsView.updateAllConnections();
 	},
 	transitionOut: function(){
 		AbstractPage.prototype.transitionOut.apply(this, arguments);

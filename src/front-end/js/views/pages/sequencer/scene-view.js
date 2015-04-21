@@ -12,6 +12,17 @@ var SceneView = Backbone.Layout.extend({
 	initialize: function(options){
 		this.listenTo(this.model.get("patterns"), "add", this.onAddPattern);
 	},
+	beforeRender: function(){
+		// make a fresh slate
+		this.getViews(".patterns").each(function(nestedView){
+			nestedView.remove();
+		});
+
+		var patterns = this.model.get("patterns");
+		patterns.each(function(pattern){
+			this.onAddPattern(pattern);
+		}.bind(this));
+	},
 	onAddPattern: function(patternModel){
 		var patternView = new PatternOverviewView({
 			model: patternModel

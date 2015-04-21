@@ -14,18 +14,23 @@ var View = ComponentView.extend({
 		this.$controls.find(".scale-resolution input").on("input blur", this.onChangeScaleResolution.bind(this));
 		this.$controls.find(".num-octaves input").on("input blur", this.onChangeNumOctaves.bind(this));
 		this.$controls.find(".base-octave input").on("input blur", this.onChangeBaseOctave.bind(this));
+		this.$controls.find(".threshold input").on("input blur", this.onChangethreshold.bind(this));
 	},
 	clearControlListeners: function(){
 		this.$controls.find(".scale-bias input").off("input blur");
 		this.$controls.find(".scale-resolution input").off("input blur");
 		this.$controls.find(".num-octaves input").off("input blur");
 		this.$controls.find(".base-octave input").off("input blur");
+		this.$controls.find(".threshold input").off("input blur");
 	},
 	afterRender: function(){
 		ComponentView.prototype.afterRender.call(this);
 	},
 	onChange: function(){
 		this.renderWaveforms();
+	},
+	onChangethreshold: function(e){
+		this.model.get("pattern").set("threshold", parseFloat(e.target.value));
 	},
 	// control event handlers
 	onChangeScaleBias: function(e){
@@ -55,7 +60,8 @@ var View = ComponentView.extend({
 			scaleBias: pattern.get("scaleBias"),
 			scaleResolution: pattern.get("scaleResolution"),
 			numOctaves: pattern.get("numOctaves"),
-			baseOctave: pattern.get("baseOctave")
+			baseOctave: pattern.get("baseOctave"),
+			threshold: pattern.get("threshold")
 		};
 	}
 });
