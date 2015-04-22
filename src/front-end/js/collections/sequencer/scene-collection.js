@@ -7,6 +7,17 @@ var SceneCollection = Backbone.Collection.extend({
 	initialize: function(){
 		this.on("add", this.onAdd);
 	},
+	export: function(){
+		return this.map(function(scene){
+			return scene.export();
+		});
+	},
+	import: function(scenes){
+		this.reset(scenes);
+		this.each(function(scene){
+			scene.import();
+		});
+	},
 	onAdd: function(sceneModel, collection){
 		sceneModel.set({
 			sceneId: this.indexOf(sceneModel),

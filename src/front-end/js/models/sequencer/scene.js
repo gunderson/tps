@@ -5,6 +5,7 @@ var PatternCollection = require("../../collections/sequencer/pattern-collection"
 var SceneModel = Backbone.Model.extend({
 	defaults: function(){
 		var settings = {
+			// controller: null,
 			sceneId: 0,
 			patterns: new PatternCollection([]),
 			ticksPerBeat: 128,
@@ -18,10 +19,29 @@ var SceneModel = Backbone.Model.extend({
 		settings.tickWidth = (Math.PI * 2) / settings.ticksPerBeat;
 		return settings;
 	},
-	initialize: function(){
-		this.listenTo(this.get("patterns"), "edit-pattern", this.onEditPattern);
-		this.listenTo(this.get("patterns"), "add remove change:numMeasures", this.getLongestMeasureLength);
+	initialize: function(options){
+		this.setPatternListeners();
 		this.on("change:controller", this.onSetController, this);
+		this.on("change:patterns", this.onSetController, this);
+	},
+	setPatternListeners: function(){
+		this.listenTo(this.get("patterns"), "edit-pattern", this.onEditPattern);
+		this.listenTo(this.get("patterns"), "reset add remove change:numMeasures", this.getLongestMeasureLength);
+	},
+	removePatternListeners: function(){
+		this.stopListening(this.get("patterns"));
+	},
+	export: function(){
+		var output = Backbone.Model.prototype.toJSON.call(this);
+		delete output.controller;
+		output.patterns = output.patterns.export();
+		return output;
+	},
+	import: function(){
+		var patternArray = this.get("patterns");
+		var patterns = new PatternCollection();
+		this.set({"patterns": patterns});
+		patterns.set(patternArray);
 	},
 	addPattern: function(track){
 		this.get("patterns").add({
@@ -46,6 +66,9 @@ var SceneModel = Backbone.Model.extend({
 	},
 	onSetController: function(){
 		this.listenTo(this.get("controller"), "16th", this.on16th);
+	},
+	onSetPatterns: function(){
+		this.setPatternListeners();
 	},
 	on16th: function(status){
 		//if the message isn't for me, ignore it

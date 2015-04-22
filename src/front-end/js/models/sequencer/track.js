@@ -1,6 +1,5 @@
 require("backbone");
 var _				= require("underscore");
-var PatternModel	= require("./pattern");
 var SoundManager	= require("../../controllers/sequencer/sound-manager")();
 
 var TrackModel = Backbone.Model.extend({
@@ -11,12 +10,14 @@ var TrackModel = Backbone.Model.extend({
 				name: "piano"
 			},
 			trackId: 0,
-			patterns: new Backbone.Collection([],{model: PatternModel})
 		};
 	},
 	initialize: function(){
 		this.on("change:instrument", this.onChangeInstrument, this);
 		this.onChangeInstrument();
+	},
+	export: function(){
+		return this.toJSON();
 	},
 	onChangeInstrument: function(){
 		SoundManager.load(this.get("instrument").name);

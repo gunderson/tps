@@ -45,9 +45,9 @@ var PatternModel = Backbone.Model.extend({
 		this.listenTo(this.get("components"), "connection-request", this.onConnectionRequest);
 		this.listenTo(this.get("components"), "change:values remove connection-response", this.refreshValues);
 
-		this.listenTo(this.get("components"), "change:x change:y", function(){
-			console.log("component change x or y");
-		});
+		// this.listenTo(this.get("components"), "change:x change:y", function(){
+		// 	console.log("component change x or y");
+		// });
 
 
 
@@ -55,7 +55,7 @@ var PatternModel = Backbone.Model.extend({
 
 		this.listenTo(this.get("scene"), "16th", this.on16th);
 		this.on("change:scene", this.onChangeScene, this);
-		this.on("change:baseOctave change:scaleBias change:numOctaves change:scaleResolution change:numMeasures", this.refreshValues, this);
+		this.on("change:threshold change:baseOctave change:scaleBias change:numOctaves change:scaleResolution change:numMeasures", this.refreshValues, this);
 		// this.on("change:numMeasures");
 		this.getValues();
 	},
@@ -79,8 +79,17 @@ var PatternModel = Backbone.Model.extend({
 		}
 	},
 	export: function(){
-	},
-	import: function(){
+		var output = this.toJSON();
+		//components
+		output.components = output.components.export();
+		//connections
+		output.connections = output.connections.export();
+		//scene
+		output.scene = output.scene.get("sceneId");
+		//track
+		output.track = output.track.get("trackId");
+		delete output.values;
+		return output;
 	},
 	refreshValues: function(child){
 		// console.log(child instanceof MasterModel);
@@ -269,6 +278,15 @@ var PatternModel = Backbone.Model.extend({
 	},
 	addSplitter: function(){
 		var model = this.get("components").add(new SplitterModel({
+				pattern: this,
+				connectionsCollection: this.get("connections")
+			})
+		);
+		model.setupCollection();
+		return model;
+	},
+	addMaster: function(){
+		var model = this.get("components").add(new MasterModel({
 				pattern: this,
 				connectionsCollection: this.get("connections")
 			})

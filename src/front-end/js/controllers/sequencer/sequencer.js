@@ -33,12 +33,14 @@ function Sequencer(options){
 function play(){
 	if (!this.playing){
 		this.playing = true;
-		if (_startTime === 0){
-			_startTime = audioContext.currentTime * 1000;
-		}
+		_startTime = audioContext.currentTime * 1000;
 		this.trigger("play");
 		this.tick();
 	}
+}
+
+function pause(){
+	
 }
 
 function stop(){
@@ -50,7 +52,6 @@ function stop(){
 
 function reset(){
 	stop();
-	_startTime		= 0;
 	beatCount		= 0;
 	current16th		= 0;
 	countInBeat		= 0;

@@ -1,11 +1,13 @@
 require("backbone");
 var ComponentModel = require("./component-model");
+var PortCollection = require("../../../collections/sequencer/port-collection");
+console.log("PortCollection PortCollection PortCollection PortCollection", PortCollection);
 
 var Model = ComponentModel.extend({
 	defaults: function(){
 		return _.extend({}, _.result(ComponentModel.prototype, "defaults"),
 		{
-			ports: new Backbone.Collection([
+			ports: new PortCollection([
 				{
 					control: "rhythm",
 					type: "input",

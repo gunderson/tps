@@ -38,12 +38,12 @@ var View = Backbone.Layout.extend({
 		}.bind(this));
 	},
 	updateConnections: function(componentModel, event){
-		console.log("updateConnections",componentModel);
+		// console.log("updateConnections",componentModel);
 		componentModel.get("ports")
 			.each(this.updatePort.bind(this));
 	},
 	updatePort: function(port){
-		console.log("updatePort",port);
+		// console.log("updatePort",port);
 		var connectionsCollection = this.collection;
 		var connection = connectionsCollection.find(function(conn){
 			if (port.get("type") === "input" && conn.get("input") === port){

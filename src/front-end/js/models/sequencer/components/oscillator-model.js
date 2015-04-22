@@ -1,5 +1,6 @@
 require("backbone");
 var ComponentModel = require("./component-model");
+var PortCollection = require("../../../collections/sequencer/port-collection");
 
 var Model = ComponentModel.extend({
 	defaults: function(){
@@ -8,7 +9,7 @@ var Model = ComponentModel.extend({
 			type: "oscillator",
 			mode: "cos",
 
-			ports: new Backbone.Collection([
+			ports: new PortCollection([
 				{
 					control: "add",
 					type: "input",

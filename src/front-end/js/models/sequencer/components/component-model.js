@@ -1,5 +1,6 @@
 require("underscore.filledArray");
 require("backbone");
+var PortModel = require("../port-model");
 
 var Model = Backbone.Model.extend({
 	dirty: false,
@@ -12,9 +13,30 @@ var Model = Backbone.Model.extend({
 	},
 	initialize: function(options){
 		var portParent = this;
-		this.get("ports").each(function(port){
-			port.parent = portParent;
+		var ports = this.get("ports")
+			.each(function(port){
+				port.parent = portParent;
+			});
+	},
+	export: function(){
+		var output = this.toJSON();
+		output.ports = output.ports.export();
+		delete output.controller;
+		delete output.values;
+		delete output.connectionsCollection;
+		delete output.pattern;
+		return output;
+	},
+	import: function(){
+		var portParent = this;
+		var ports = this.get("ports");
+		var portsCollection = new Backbone.Collection([], {
+			model: PortModel.extend({
+				portParent: portParent
+			})
 		});
+		this.set("ports", portsCollection);
+
 	},
 	getValues: function(regen){
 		if (this.get("values") && !regen) return this.get("values");
@@ -73,11 +95,12 @@ var Model = Backbone.Model.extend({
 		return this;
 	},
 	// triggers
-	triggerConnectionRequest: function(portId){
+	triggerConnectionRequest: function(portId, partnerId){
 		var port = this.get("ports").get(portId);
 		this.trigger("connection-request", {
 			model: this,
-			port: port
+			port: port,
+			partnerId: partnerId
 		});
 	},
 	destroy: function(){
@@ -103,6 +126,10 @@ var Model = Backbone.Model.extend({
 		// ignore your own connection requests to prevent connecting to yourself
 		if (this.get("ports").contains(data.port)) {
 			return;
+		} else if (this.get("ports").get(data.partnerId)){
+			//it's a direct request, honor it.
+			this.triggerConnectionResponse(this.get("ports").get(data.partnerId).id);
+			return;
 		}
 
 		// set connection mode by putting an object in the connectionRequest slot
@@ -114,7 +141,7 @@ var Model = Backbone.Model.extend({
 	},
 
 	destroyConnection: function(port){
-		port.set("partner", null);
+		port.set("partnerPort", null);
 		this.set("values", null);
 		return this;
 	},

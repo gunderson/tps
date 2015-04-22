@@ -1,6 +1,7 @@
 require("backbone");
 var _ = require("underscore");
 var ComponentModel = require("./component-model");
+var PortCollection = require("../../../collections/sequencer/port-collection");
 
 // filters take an array of values and 
 
@@ -8,7 +9,7 @@ var Model = ComponentModel.extend({
 	defaults: function (){
 		return _.extend({}, _.result(ComponentModel.prototype, "defaults"),
 		{
-			ports: new Backbone.Collection([
+			ports: new PortCollection([
 				{
 					control: "line",
 					type: "input",

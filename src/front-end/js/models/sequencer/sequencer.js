@@ -14,14 +14,42 @@ var SequencerModel = Backbone.Model.extend({
 		};
 	},
 	save: function(){
-
+		var filecontents = JSON.stringify(this.export());
+		var $a = $("a").attr({
+			href: "data:application/json;," + filecontents,
+			download: "autopeggiator_" + btoa(Date.now().toString().split("").reverse().join("")).substr(0,5)
+		});
+		$a[0].click();
+		return filecontents;
 	},
-	load:function(){
-
+	export: function(){
+		var output = this.toJSON();
+		delete output.controller;
+		output.tracks = output.tracks.export();
+		output.scenes = output.scenes.export();
+		return output;
+	},
+	import: function(data){
+		this.set({
+			bpm: data.bpm,
+			beatsPerMeasure: data.beatsPerMeasure
+		});
+		this.tracks.import(data.tracks);
+		this.scenes.import(data.scenes);
 	},
 	initialize: function(){
 		this.get("scenes").trackCollection = this.get("tracks");
 		this.listenTo(this.get("scenes"), "edit-pattern", this.onEditPatternEvent);
+
+		$(window).on("keydown", this.onKeyDown.bind(this));
+	},
+	onKeyDown: function(e){
+		console.log("Key Pressed", e.keyCode);
+		switch (e.keyCode){
+			case 32: //spacebar
+				console.log("export", this.save());
+				break;
+		}
 	},
 	onEditPatternEvent: function(patternModel){
 		//forward the event
