@@ -32,10 +32,8 @@ var PatternOverviewView = Backbone.Layout.extend({
 	onClickPattern: function(e){
 		this.model.trigger("edit-pattern", this.model);
 	},
-	drawPattern: function(){
-		
-	},
 	serialize: function(){
+		console.log("PatternOverviewView::serialize", this.model.get("track"));
 		return _.extend(this.model.toJSON(), {
 			trackId: this.model.get("track").get("trackId"),
 			sceneId: this.model.get("scene").get("sceneId")

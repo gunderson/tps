@@ -20,13 +20,17 @@ var SceneModel = Backbone.Model.extend({
 		return settings;
 	},
 	initialize: function(options){
-		this.setPatternListeners();
+		if (!(this.get("patterns") instanceof Array)){
+			this.setPatternListeners();
+		}
 		this.on("change:controller", this.onSetController, this);
-		this.on("change:patterns", this.onSetController, this);
+		// this.on("change:patterns", this.onSetController, this);
 	},
 	setPatternListeners: function(){
-		this.listenTo(this.get("patterns"), "edit-pattern", this.onEditPattern);
-		this.listenTo(this.get("patterns"), "reset add remove change:numMeasures", this.getLongestMeasureLength);
+		var patterns = this.get("patterns");
+
+		this.listenTo(patterns, "edit-pattern", this.onEditPattern);
+		this.listenTo(patterns, "add remove change:numMeasures", this.getLongestMeasureLength);
 	},
 	removePatternListeners: function(){
 		this.stopListening(this.get("patterns"));
@@ -38,10 +42,19 @@ var SceneModel = Backbone.Model.extend({
 		return output;
 	},
 	import: function(){
+		console.log("Scene::import", this.collection.trackCollection);
 		var patternArray = this.get("patterns");
 		var patterns = new PatternCollection();
 		this.set({"patterns": patterns});
+		this.setPatternListeners();
+		_.each(patternArray, function(pattern){
+			pattern.track = this.collection.trackCollection.findWhere({trackId: pattern.trackId});	
+		}.bind(this));
 		patterns.set(patternArray);
+		patterns.import(this);
+	},
+	destroy: function(){
+		this.removePatternListeners();
 	},
 	addPattern: function(track){
 		this.get("patterns").add({

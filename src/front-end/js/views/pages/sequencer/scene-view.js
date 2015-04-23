@@ -24,6 +24,7 @@ var SceneView = Backbone.Layout.extend({
 		}.bind(this));
 	},
 	onAddPattern: function(patternModel){
+		console.log("scene-view::onAddPattern");
 		var patternView = new PatternOverviewView({
 			model: patternModel
 		});

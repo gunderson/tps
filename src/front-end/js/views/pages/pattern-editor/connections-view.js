@@ -6,7 +6,6 @@ var View = Backbone.Layout.extend({
 	el: "#connections",
 	// keep: true,
 	initialize: function(){
-		this.listenTo(this.collection, "add remove reset", this.render);
 	},
 	setConnectionCollection: function(collection){
 		if (this.collection) this.stopListening(this.collection);

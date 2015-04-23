@@ -9,9 +9,15 @@ var SequencerModel = Backbone.Model.extend({
 			bpm: 120,
 			beatsPerMeasure: 4,
 			currentSceneId: 0,
-			tracks: new TrackCollection([{}], {controller:this.controller}),
+			tracks: new TrackCollection([{}]),
 			scenes: new SceneCollection([{}])
 		};
+	},
+	initialize: function(){
+		this.get("scenes").trackCollection = this.get("tracks");
+		this.listenTo(this.get("scenes"), "edit-pattern", this.onEditPatternEvent);
+
+		$(window).on("keydown", this.onKeyDown.bind(this));
 	},
 	save: function(){
 		var filecontents = JSON.stringify(this.export());
@@ -21,6 +27,20 @@ var SequencerModel = Backbone.Model.extend({
 		});
 		$a[0].click();
 		return filecontents;
+	},
+	load: function(file){
+		var reader = new FileReader();
+		reader.onload = function(){
+			var data;
+			// if the json data doesn't parse we don't want to kill the app
+			try{
+				data = JSON.parse(reader.result);
+			} catch(err){
+				return;
+			}
+			this.import(data);
+		}.bind(this);
+		reader.readAsText(file);
 	},
 	export: function(){
 		var output = this.toJSON();
@@ -34,14 +54,8 @@ var SequencerModel = Backbone.Model.extend({
 			bpm: data.bpm,
 			beatsPerMeasure: data.beatsPerMeasure
 		});
-		this.tracks.import(data.tracks);
-		this.scenes.import(data.scenes);
-	},
-	initialize: function(){
-		this.get("scenes").trackCollection = this.get("tracks");
-		this.listenTo(this.get("scenes"), "edit-pattern", this.onEditPatternEvent);
-
-		$(window).on("keydown", this.onKeyDown.bind(this));
+		this.get("tracks").import(data.tracks);
+		this.get("scenes").import(data.scenes);
 	},
 	onKeyDown: function(e){
 		console.log("Key Pressed", e.keyCode);

@@ -13,8 +13,14 @@ var SceneCollection = Backbone.Collection.extend({
 		});
 	},
 	import: function(scenes){
+		this.each(function(scene){
+			scene.destroy();
+		});
 		this.reset(scenes);
 		this.each(function(scene){
+			scene.set({
+				"controller": this.controller
+			});
 			scene.import();
 		});
 	},

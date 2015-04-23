@@ -9,6 +9,16 @@ var PatternCollection = Backbone.Collection.extend({
 		return this.map(function(pattern){
 			return pattern.export();
 		});
+	},
+	import: function(scene){
+		this.each(function(pattern){
+			console.log(pattern);
+			pattern.import();
+			pattern.set({
+				values: [],
+				scene: scene
+			});
+		});
 	}
 });
 

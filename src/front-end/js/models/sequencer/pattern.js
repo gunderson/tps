@@ -29,7 +29,7 @@ var PatternModel = Backbone.Model.extend({
 			connections				: connectionsCollection,
 			numMeasures				: 4,
 			sixteenths				: [],
-			availableNotes			: null,
+			availableNotes			: [],
 			scaleBias				: 0, // offsets the first note available
 			scaleResolution			: 5, // number of notes per octave available to this pattern
 			numOctaves				: 3, // how many octaves are available
@@ -40,24 +40,28 @@ var PatternModel = Backbone.Model.extend({
 		return settings;
 	},
 	initialize: function(){
-		this.master = this.get("components").at(0).setupCollection();
-		this.listenTo(this.get("components"), "remove", this.destroyConnections);
-		this.listenTo(this.get("components"), "connection-request", this.onConnectionRequest);
-		this.listenTo(this.get("components"), "change:values remove connection-response", this.refreshValues);
+		var components = this.get("components");
+		if (components && !_.isArray(components)){
+			console.log(components);
+			this.setListeners();
+		}
 
-		// this.listenTo(this.get("components"), "change:x change:y", function(){
-		// 	console.log("component change x or y");
-		// });
-
-
-
+	},
+	setListeners: function(){
+		var components = this.get("components");
 
 
-		this.listenTo(this.get("scene"), "16th", this.on16th);
+		console.log("pattern::setListeners", components);
+
+
+		this.master = components
+			.at(0)
+			.setupCollection();
+		this.listenTo(components, "remove", this.destroyConnections);
+		this.listenTo(components, "connection-request", this.onConnectionRequest);
+		this.listenTo(components, "change:values remove connection-response", this.refreshValues);
 		this.on("change:scene", this.onChangeScene, this);
 		this.on("change:threshold change:baseOctave change:scaleBias change:numOctaves change:scaleResolution change:numMeasures", this.refreshValues, this);
-		// this.on("change:numMeasures");
-		this.getValues();
 	},
 	on16th: function(sceneStatus){
 		var patternStatus = _.extend({}, sceneStatus, {
@@ -91,6 +95,39 @@ var PatternModel = Backbone.Model.extend({
 		delete output.values;
 		return output;
 	},
+	import: function(){
+		var connectionsArray = this.get("connections");
+		var connections = new ConnectionsCollection();
+
+		var commonProps = {
+			pattern: this,
+			connectionsCollection: connections
+		};
+
+		var componentsArray = _.map(this.get("components"), function(component){
+			switch (component.type){
+				case "filter":
+					return new FilterModel(_.extend(component, commonProps)).import();
+				case "oscillator":
+					return new OscillatorModel(_.extend(component, commonProps)).import();
+				case "user-pattern":
+					return new UserPatternModel(_.extend(component, commonProps)).import();
+				case "splitter":
+					return new SplitterModel(_.extend(component, commonProps)).import();
+				case "master":
+					return new MasterModel(_.extend(component, commonProps)).import();
+			}
+		});
+		var components = new ComponentsCollection(componentsArray);
+		this.set({
+			"connections": connections,
+			"components": components
+		});
+
+		connections.set(connectionsArray);
+
+		this.setListeners();
+	},
 	refreshValues: function(child){
 		// console.log(child instanceof MasterModel);
 		// if (child && child instanceof MasterModel) return;
@@ -101,7 +138,7 @@ var PatternModel = Backbone.Model.extend({
 		//optimize this by caching the values
 		var values = this.get("values");
 		if (values) return values;
-
+		if (!this.master) return [];
 		this.master.getValues(true);
 		var peaksAboveThreshold = this.getRhythm();
 		var pitches = this.getPitches(peaksAboveThreshold);
@@ -127,6 +164,11 @@ var PatternModel = Backbone.Model.extend({
 		return promise;
 	},
 	onChangeScene: function(){
+		var scene = this.get("scene");
+		this.listenTo(scene, "16th", this.on16th);
+		this.get("components").each(function(component){
+			component.set("scene", scene);
+		});
 		this.onChangePatternLength();
 	},
 	onChangePatternLength: function(){
@@ -210,7 +252,7 @@ var PatternModel = Backbone.Model.extend({
 		});
 	},
 	getPitches: function(peakIndicies){
-		console.log("peakIndicies", peakIndicies);
+		// console.log("peakIndicies", peakIndicies);
 		var scene			= this.get("scene");
 		// var availableNotes	= this.get("availableNotes") || this.getNotes();
 		var availableNotes	= this.getNotes();
@@ -223,7 +265,7 @@ var PatternModel = Backbone.Model.extend({
 		var pitches	= _.map(pitchesPositions, function(pitchPosition){
 			return _.at(availableNotes, pitchPosition);
 		});
-		console.log("pitches", pitches);
+		// console.log("pitches", pitches);
 
 		return pitches;
 	},
@@ -243,7 +285,7 @@ var PatternModel = Backbone.Model.extend({
 		if ( connection ) this.destroyConnection( connection );
 	},
 	destroyConnection: function( connection ){
-		console.log("collection data", arguments);
+		// console.log("collection data", arguments);
 		connection.get("path").remove();
 		connection.get( "input" ).parent.destroyConnection(connection.get( "input" ));
 		connection.get( "output" ).parent.destroyConnection(connection.get( "output" ));

@@ -39,11 +39,22 @@ var TransportBar = Backbone.Layout.extend({
 		this.controller.model.set("loop", !this.controller.model.get("loop"));
 	},
 	onClickSave: function(){
-		this.controller.save();
+		this.controller.model.save();
 	},
-	onClickLoad: function(){
-		this.controller.load();
+	onClickLoad: function(e){
+		var $loadFile = this.$("#load-file");
+		$loadFile.on("change", this.loadData.bind(this));
+		$loadFile[0].click();
+	},
+	loadData: function(e){
+		var $loadFile = this.$("#load-file");
+		$loadFile.off();
+		if ($loadFile[0].files.length > 0){
+			this.controller.model.load($loadFile[0].files[0]);
+		}
 	}
 });
+
+
 
 module.exports = TransportBar;

@@ -11,8 +11,10 @@ var SceneManager = Backbone.Layout.extend({
 	initialize: function(options){
 		this.trackCollection = options.trackCollection;
 		this.sceneCollection = options.sceneCollection;
-		this.listenTo(this.sceneCollection, "reset add", this.onAddScene);
-		this.listenTo(this.trackCollection, "reset add", this.onAddTrack);
+		this.listenTo(this.sceneCollection, "add", this.onAddScene);
+		this.listenTo(this.trackCollection, "add", this.onAddTrack);
+		this.listenTo(this.sceneCollection, "reset", this.render);
+		this.listenTo(this.trackCollection, "reset", this.render);
 	},
 	beforeRender: function(){
 		console.log("Scene-manager-view::beforeRender", this.sceneCollection.length);

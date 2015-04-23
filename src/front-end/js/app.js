@@ -15,7 +15,6 @@ var Sequencer              = require("./controllers/sequencer/sequencer");
 
 // Instances
 
-var connectionsCollection  = new (require("./collections/sequencer/connections-collection"))();
 var router                 = require("./controllers/router");
 var sequencer              = new Sequencer({model:new SequencerModel()});
 sequencer.model.controller = sequencer;
@@ -38,7 +37,7 @@ var pages = {
     "#home"           : new HomePage({route: "/"}),
     "#about"          : new AboutPage({route: "/about"}),
     // "#soundcloud"     : new SoundcloudPage({model: new SoundcloudModel(), route: "/soundcloud"}),
-    "#pattern-editor" : new PatternEditorPage({controller: sequencer, route: "/pattern-editor", connectionsCollection: connectionsCollection}),
+    "#pattern-editor" : new PatternEditorPage({controller: sequencer, route: "/pattern-editor"}),
     "#sound-board"    : new SoundBoardPage({controller: sequencer, route: "/sound-board"}),
     "#sequencer"      : new SequencerPage({controller: sequencer, route: "/sequencer"}),
 };

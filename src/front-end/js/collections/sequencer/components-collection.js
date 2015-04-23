@@ -7,6 +7,11 @@ var Collection = Backbone.Collection.extend({
 		return this.map(function(component){
 			return component.export();
 		});
+	},
+	import: function(){
+		this.each(function(component){
+			component.import();
+		});
 	}
 });
 

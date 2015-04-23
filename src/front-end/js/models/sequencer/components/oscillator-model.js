@@ -43,10 +43,16 @@ var Model = ComponentModel.extend({
 			this.getOscillation(true);
 			this.getValues(true);
 		}, this);
+	},
+	onChangePorts: function(){
 		this.listenTo(this.get("ports"), "change", function(){
 			this.getOscillation(true);
 			this.getValues(true);
 		});
+	},
+	import: function(){
+		ComponentModel.prototype.import.call(this);
+		return this;
 	},
 
 	getOscillation: function(regen){

@@ -30,7 +30,7 @@ var Page = AbstractPage.extend({
 		// set views
 		this.masterView = new MasterView({
 		});
-		this.connectionsView = new ConnectionsView({ collection: this.connectionsCollection });
+		this.connectionsView = new ConnectionsView();
 		this.ouptutNotesView = new OutputNotesView();
 
 		// set listeners
@@ -50,7 +50,6 @@ var Page = AbstractPage.extend({
 
 		this.ouptutNotesView.setModel(this.patternModel);
 
-		this.connectionsCollection = this.patternModel.get("connections");
 		this.connectionsView.setConnectionCollection(this.patternModel.get("connections"));
 		this.connectionsView.setComponentCollection(this.patternModel.get("components"));
 

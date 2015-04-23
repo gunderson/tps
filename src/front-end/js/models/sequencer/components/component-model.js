@@ -1,6 +1,7 @@
 require("underscore.filledArray");
 require("backbone");
 var PortModel = require("../port-model");
+var PortCollection = require("../../../collections/sequencer/port-collection");
 
 var Model = Backbone.Model.extend({
 	dirty: false,
@@ -12,14 +13,24 @@ var Model = Backbone.Model.extend({
 		defaultValue: 1
 	},
 	initialize: function(options){
+		this.on("change:ports", this.onChangePorts, this);
+
 		var portParent = this;
-		var ports = this.get("ports")
-			.each(function(port){
+		var ports = this.get("ports");
+		// collections initialized from loaded data are arrays
+		// don't setup here if it's an array
+		if (!_.isArray(ports)){
+			ports.each(function(port){
 				port.parent = portParent;
 			});
+		}
+	},
+	onChangePorts: function(){
+
 	},
 	export: function(){
 		var output = this.toJSON();
+		console.log(output.ports);
 		output.ports = output.ports.export();
 		delete output.controller;
 		delete output.values;
@@ -28,21 +39,25 @@ var Model = Backbone.Model.extend({
 		return output;
 	},
 	import: function(){
+		console.log("ComponentModel::import()", this.get("type"));
 		var portParent = this;
 		var ports = this.get("ports");
-		var portsCollection = new Backbone.Collection([], {
+		var portsCollection = new PortCollection(ports, {
 			model: PortModel.extend({
-				portParent: portParent
+				parent: portParent
 			})
 		});
 		this.set("ports", portsCollection);
-
+		return this;
 	},
 	getValues: function(regen){
 		if (this.get("values") && !regen) return this.get("values");
 
 		var pattern				= this.get("pattern");
 		var scene				= pattern.get("scene");
+
+		if (!scene || !pattern) return [];
+
 		var ticksPerBeat		= scene.get("ticksPerBeat");
 		var beatsPerMeasure		= scene.get("beatsPerMeasure");
 		var tickWidth			= scene.get("tickWidth");
@@ -53,7 +68,9 @@ var Model = Backbone.Model.extend({
 		_.each(inputs, function(input){
 			var output = input.get("partnerPort");
 			var inputValues;
-			if (output){
+			// when loading from file and building the connection network, the output.parent is an id, not the actual object
+			// wait for the actual object
+			if (output && typeof output === "object"){
 				inputValues = output.parent.getValues(regen);
 				input.set("values", inputValues);
 				return inputValues;
@@ -128,6 +145,7 @@ var Model = Backbone.Model.extend({
 			return;
 		} else if (this.get("ports").get(data.partnerId)){
 			//it's a direct request, honor it.
+			//these are usually only sent when loading files.
 			this.triggerConnectionResponse(this.get("ports").get(data.partnerId).id);
 			return;
 		}

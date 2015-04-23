@@ -29,6 +29,8 @@ var Model = ComponentModel.extend({
 	},
 
 	transformValues: function(inputs, numValues, tickwidth){
+
+
 		var values = _.map(inputs,function(input){
 			return input.get("values");
 		});
