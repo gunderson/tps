@@ -20,12 +20,43 @@ var ConnectionsCollection = Backbone.Collection.extend({
 			delete output.svgPath;
 			delete output.path;
 			return output;
+		},
+		import: function(){
+
 		}
 	}),
 	export: function(){
 		return this.map(function(connection){
 			return connection.export();
 		});
+	},
+	import: function(portsCollection){
+		var portIds = portsCollection.pluck("id");
+		var matchingConnections = _.filter(portIds, function(portId){
+			var connection = this.findWhere({"output": portId});
+			var port = null;
+			if (connection){
+				port = portsCollection.get(portId);
+				if (typeof connection.get("input") === "object"){
+					port.set("partnerPort", connection.get("input"));
+				}
+				return connection.set("output", port);
+			}
+
+			connection = this.findWhere({"input": portId});
+			if (connection){
+				port = portsCollection.get(portId);
+				if (typeof connection.get("output") === "object"){
+					port.set("partnerPort", connection.get("output"));
+				}
+				return connection.set("input", port);
+			}
+
+			return false;
+				
+		}.bind(this));
+
+		console.log("ConnectionsCollection::import", this.toJSON());
 	},
 	findByPort: function(port){
 		var portType = port.get("type");

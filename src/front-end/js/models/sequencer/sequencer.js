@@ -2,6 +2,9 @@ require("backbone");
 var _ = require("underscore");
 var SceneCollection = require("../../collections/sequencer/scene-collection");
 var TrackCollection = require("../../collections/sequencer/track-collection");
+// var PatternCollection = require("../../collections/sequencer/pattern-collection");
+// var ComponentCollection = require("../../collections/sequencer/component-collection");
+// var PortCollection = require("../../collections/sequencer/port-collection");
 
 var SequencerModel = Backbone.Model.extend({
 	defaults: function(){
@@ -10,7 +13,10 @@ var SequencerModel = Backbone.Model.extend({
 			beatsPerMeasure: 4,
 			currentSceneId: 0,
 			tracks: new TrackCollection([{}]),
-			scenes: new SceneCollection([{}])
+			scenes: new SceneCollection([{}]),
+			// patterns: new PatternCollection(),
+			// components: new ComponentCollection(),
+			// ports: new PortCollection()
 		};
 	},
 	initialize: function(){
@@ -20,17 +26,27 @@ var SequencerModel = Backbone.Model.extend({
 		$(window).on("keydown", this.onKeyDown.bind(this));
 	},
 	save: function(){
-		var filecontents = JSON.stringify(this.export());
-		var $a = $("a").attr({
-			href: "data:application/json;," + filecontents,
-			download: "autopeggiator_" + btoa(Date.now().toString().split("").reverse().join("")).substr(0,5)
-		});
-		$a[0].click();
-		return filecontents;
+			console.log("pre-stringify",this.export());
+		try{
+			var filecontents = JSON.stringify(this.export());
+			var $a = $("a").attr({
+				href: "data:application/json;," + filecontents,
+				download: "autopeggiator_" + btoa(Date.now().toString().split("").reverse().join("")).substr(0,5)
+			});
+			$a[0].click();
+			return filecontents;
+		} catch (err){
+			console.log(this.export());
+			console.error(err);
+			return "";
+		}
 	},
 	load: function(file){
+		var promise = $.Deferred();
 		var reader = new FileReader();
-		reader.onload = function(){
+
+		promise.done(function(){
+			reader.onload = null;
 			var data;
 			// if the json data doesn't parse we don't want to kill the app
 			try{
@@ -39,7 +55,11 @@ var SequencerModel = Backbone.Model.extend({
 				return;
 			}
 			this.import(data);
-		}.bind(this);
+		}.bind(this));
+
+		reader.onload = function(){
+			promise.resolve();
+		};
 		reader.readAsText(file);
 	},
 	export: function(){

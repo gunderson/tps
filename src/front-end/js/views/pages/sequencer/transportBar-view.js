@@ -33,7 +33,7 @@ var TransportBar = Backbone.Layout.extend({
 		this.controller.play();
 	},
 	onClickStop: function(){
-		this.controller.stop();
+		this.controller.reset();
 	},
 	onClickLoop: function(){
 		this.controller.model.set("loop", !this.controller.model.get("loop"));
@@ -51,6 +51,7 @@ var TransportBar = Backbone.Layout.extend({
 		$loadFile.off();
 		if ($loadFile[0].files.length > 0){
 			this.controller.model.load($loadFile[0].files[0]);
+			$loadFile.val([]);
 		}
 	}
 });

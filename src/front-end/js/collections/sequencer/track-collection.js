@@ -6,11 +6,10 @@ var TrackCollection = Backbone.Collection.extend({
 	model: TrackModel,
 	initialize: function(){
 		this.on("add", this.onAdd);
+		this.on("change:solo", this.onChangeSolo);
 	},
 	export: function(){
 		return this.map(function(track){
-			// replace instrument with flat version
-			// track.instrument = track.instrument.toJSON();
 			return track.export();
 		});
 	},
@@ -25,6 +24,11 @@ var TrackCollection = Backbone.Collection.extend({
 			trackId: this.indexOf(trackModel)
 		});
 	},
+	soloTracks: [],
+	onChangeSolo: function(){
+		this.soloTracks = this.where({"solo":true});
+		return this;
+	}
 });
 
 module.exports = TrackCollection;

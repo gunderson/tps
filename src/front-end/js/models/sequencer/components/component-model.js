@@ -32,22 +32,35 @@ var Model = Backbone.Model.extend({
 		var output = this.toJSON();
 		console.log(output.ports);
 		output.ports = output.ports.export();
+		output.scene = output.pattern.get("scene").get("sceneId");
 		delete output.controller;
-		delete output.values;
 		delete output.connectionsCollection;
 		delete output.pattern;
+		delete output.values;
 		return output;
 	},
 	import: function(){
-		console.log("ComponentModel::import()", this.get("type"));
 		var portParent = this;
 		var ports = this.get("ports");
+
+		console.log("ComponentModel::import", this.get("ports"));
+		if (!_.isArray(ports)) return this;
+
+
 		var portsCollection = new PortCollection(ports, {
 			model: PortModel.extend({
 				parent: portParent
 			})
 		});
 		this.set("ports", portsCollection);
+
+		portsCollection.each(function(port){
+			console.log("ComponentModel::Load ports, create connection: ", port.id, port.get("partnerPort"));
+			this.triggerConnectionRequest(port, port.get("partnerPort"));
+		}.bind(this));
+
+		this.get("connectionsCollection").import(portsCollection);
+		// this.getValues(true);
 		return this;
 	},
 	getValues: function(regen){
@@ -105,6 +118,7 @@ var Model = Backbone.Model.extend({
 		return values;
 	},
 	setupCollection: function(){
+		console.log("ComponentModel::setupCollection",this.collection);
 		if (this.collection){
 			this.listenTo(this.collection, "connection-request", this.onConnectionRequest);
 			this.listenTo(this.collection, "connection-response", this.onConnectionResponse);
@@ -113,6 +127,8 @@ var Model = Backbone.Model.extend({
 	},
 	// triggers
 	triggerConnectionRequest: function(portId, partnerId){
+		console.log("ComponentModel::triggerConnectionRequest", portId, partnerId);
+
 		var port = this.get("ports").get(portId);
 		this.trigger("connection-request", {
 			model: this,
@@ -140,18 +156,21 @@ var Model = Backbone.Model.extend({
 
 	//handlers
 	onConnectionRequest: function(data){
+		console.log("ComponentModel::onConnectionRequest", data.portId, data.partnerId);
 		// ignore your own connection requests to prevent connecting to yourself
 		if (this.get("ports").contains(data.port)) {
-			return;
-		} else if (this.get("ports").get(data.partnerId)){
-			//it's a direct request, honor it.
-			//these are usually only sent when loading files.
-			this.triggerConnectionResponse(this.get("ports").get(data.partnerId).id);
 			return;
 		}
 
 		// set connection mode by putting an object in the connectionRequest slot
 		this.connectionRequest = data;
+
+		if (this.get("ports").get(data.partnerId)){
+			//it's a direct request, honor it.
+			//these are usually only sent when loading files.
+			this.triggerConnectionResponse(this.get("ports").get(data.partnerId).id);
+			return;
+		}
 	},
 	onConnectionResponse: function(){
 		// cancel connection mode
@@ -164,6 +183,10 @@ var Model = Backbone.Model.extend({
 		return this;
 	},
 	setupConnection: function(localPort, partnerPort){
+
+		console.log("ComponentModel::setupConnection", localPort.id, partnerPort.id);
+
+		// inputs must connect only to outputs
 		if (localPort.get("type") === partnerPort.get("type")) return;
 		this.set("values", null);
 		localPort.set({

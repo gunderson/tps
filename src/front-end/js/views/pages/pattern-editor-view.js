@@ -54,6 +54,7 @@ var Page = AbstractPage.extend({
 		this.connectionsView.setComponentCollection(this.patternModel.get("components"));
 
 		this.masterView.model = this.patternModel.get("components").findWhere({"type": "master"});
+		this.patternModel.refreshValues();
 
 		this.render();
 
@@ -65,6 +66,9 @@ var Page = AbstractPage.extend({
 	},
 	setPatternModelListeners: function(){
 		var components = this.patternModel.get("components");
+
+		console.log("PatternEditorView:: setPatternModelListeners", this.patternModel.get("components"))
+
 		this.listenTo(components, "connection-request", 		this.beginConnection);
 		this.listenTo(components, "cancel-connection-request", 	this.cancelConnection);
 		this.listenTo(components, "activate-component", 		this.onActivateComponent);

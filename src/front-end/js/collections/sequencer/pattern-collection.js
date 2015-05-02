@@ -11,13 +11,14 @@ var PatternCollection = Backbone.Collection.extend({
 		});
 	},
 	import: function(scene){
+		console.log("PatternCollection::import !_!_!__!_!!__!!_!_!_!_!__!!!__!_!_!!__!!")
+
 		this.each(function(pattern){
-			console.log(pattern);
-			pattern.import();
 			pattern.set({
 				values: [],
 				scene: scene
 			});
+			pattern.import(scene);
 		});
 	}
 });

@@ -7,9 +7,11 @@ var TrackModel = Backbone.Model.extend({
 		return {
 			//TODO, replace with instrument class
 			instrument: {
-				name: "piano"
+				name: "prophet_3"
 			},
 			trackId: 0,
+			solo: false,
+			mute: false
 		};
 	},
 	initialize: function(){
@@ -17,7 +19,17 @@ var TrackModel = Backbone.Model.extend({
 		this.onChangeInstrument();
 	},
 	export: function(){
+		// TODO: replace instrument with flat version
+		// track.instrument = track.instrument.toJSON();
 		return this.toJSON();
+	},
+	toggleSolo: function(){
+		var v = this.get("solo");
+		return this.set("solo", !v);
+	},
+	toggleMute: function(){
+		var v = this.get("mute");
+		return this.set("mute", !v);
 	},
 	onChangeInstrument: function(){
 		SoundManager.load(this.get("instrument").name);

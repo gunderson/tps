@@ -9,6 +9,12 @@ var Collection = Backbone.Collection.extend({
 		});
 	},
 	import: function(){
+		console.log("**************************************")
+		console.trace();
+		// all componenets must be set up prior to import
+		this.each(function(component){
+			component.setupCollection();
+		});
 		this.each(function(component){
 			component.import();
 		});

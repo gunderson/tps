@@ -33,7 +33,7 @@ var PatternModel = Backbone.Model.extend({
 			scaleBias				: 0, // offsets the first note available
 			scaleResolution			: 5, // number of notes per octave available to this pattern
 			numOctaves				: 3, // how many octaves are available
-			baseOctave				: 2, // index of the first octave
+			baseOctave				: 4, // index of the first octave
 			threshold				: 0.5 // peak level cutoff
 		};
 		settings.tickWidth = (Math.PI * 2) / settings.ticksPerBeat;
@@ -49,11 +49,6 @@ var PatternModel = Backbone.Model.extend({
 	},
 	setListeners: function(){
 		var components = this.get("components");
-
-
-		console.log("pattern::setListeners", components);
-
-
 		this.master = components
 			.at(0)
 			.setupCollection();
@@ -62,6 +57,7 @@ var PatternModel = Backbone.Model.extend({
 		this.listenTo(components, "change:values remove connection-response", this.refreshValues);
 		this.on("change:scene", this.onChangeScene, this);
 		this.on("change:threshold change:baseOctave change:scaleBias change:numOctaves change:scaleResolution change:numMeasures", this.refreshValues, this);
+		if (this.get("scene")) this.onChangeScene();
 	},
 	on16th: function(sceneStatus){
 		var patternStatus = _.extend({}, sceneStatus, {
@@ -71,6 +67,10 @@ var PatternModel = Backbone.Model.extend({
 		this.playNotes(patternStatus.current16th);
 	},
 	playNotes: function(current16th){
+
+		if (this.get("track").get("mute")) return this;
+		if (this.get("track").collection.soloTracks.length > 0 && !this.get("track").get("solo")) return this;
+
 		var values = this.get("values");
 		var noteIndex = values.rhythmIn16ths.indexOf(current16th);
 		if (noteIndex > -1){
@@ -95,9 +95,10 @@ var PatternModel = Backbone.Model.extend({
 		delete output.values;
 		return output;
 	},
-	import: function(){
+	import: function(scene){
 		var connectionsArray = this.get("connections");
 		var connections = new ConnectionsCollection();
+		connections.set(connectionsArray);
 
 		var commonProps = {
 			pattern: this,
@@ -118,13 +119,17 @@ var PatternModel = Backbone.Model.extend({
 					return new MasterModel(_.extend(component, commonProps)).import();
 			}
 		});
+
+		console.log("PatternModel::import ----------------------------------------------\n\n", scene);
+
 		var components = new ComponentsCollection(componentsArray);
 		this.set({
 			"connections": connections,
-			"components": components
+			"components": components,
+			"scene": scene
 		});
-
-		connections.set(connectionsArray);
+		components.import();
+		this.getValues(true);
 
 		this.setListeners();
 	},
@@ -134,11 +139,14 @@ var PatternModel = Backbone.Model.extend({
 		this.set("values", null);
 		this.getValues();
 	},
-	getValues: function(){
+	getValues: function(regen){
+		console.log('PatternModel::getValues', this.get("values"), this.master, this.get("components"))
 		//optimize this by caching the values
 		var values = this.get("values");
-		if (values) return values;
-		if (!this.master) return [];
+		if (values && !regen) return values;
+		if (!this.master) {
+			this.setListeners();
+		}
 		this.master.getValues(true);
 		var peaksAboveThreshold = this.getRhythm();
 		var pitches = this.getPitches(peaksAboveThreshold);
@@ -246,6 +254,7 @@ var PatternModel = Backbone.Model.extend({
 		return peakIndicies;
 	},
 	getRhythmIn16ths: function(rhythmIndicies){
+		console.log("\n\n==================================\n\n", this.get("scene").get("ticksPerBeat"));
 		var ticksPer16th = this.get("scene").get("ticksPerBeat") * 0.25;
 		return _.map(rhythmIndicies, function(val){
 			return Math.round((val - 1) / ticksPer16th);

@@ -34,6 +34,7 @@ var Model = ComponentModel.extend({
 		var values = _.map(inputs,function(input){
 			return input.get("values");
 		});
+		console.log('MasterModel', this.get("ports").models);
 		values = {
 			rhythm: this.get("ports").findWhere({control: "rhythm"}).get("values"),
 			pitch: this.get("ports").findWhere({control: "pitch"}).get("values")

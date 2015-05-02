@@ -44,14 +44,16 @@ var SceneModel = Backbone.Model.extend({
 	import: function(){
 		console.log("Scene::import", this.collection.trackCollection);
 		var patternArray = this.get("patterns");
+		_.each(patternArray, function(pattern){
+			pattern.track = this.collection.trackCollection.findWhere({trackId: pattern.trackId});
+			pattern.scene = this;	
+		}.bind(this));
+		
 		var patterns = new PatternCollection();
 		this.set({"patterns": patterns});
-		this.setPatternListeners();
-		_.each(patternArray, function(pattern){
-			pattern.track = this.collection.trackCollection.findWhere({trackId: pattern.trackId});	
-		}.bind(this));
 		patterns.set(patternArray);
 		patterns.import(this);
+		this.setPatternListeners();
 	},
 	destroy: function(){
 		this.removePatternListeners();

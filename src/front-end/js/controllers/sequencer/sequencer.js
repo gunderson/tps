@@ -51,13 +51,15 @@ function stop(){
 }
 
 function reset(){
-	stop();
+	this.stop();
 	beatCount		= 0;
 	current16th		= 0;
 	countInBeat		= 0;
 	currentBeat		= 0;
 	currentMeasure	= 0;
 	beatInMeasure	= 0;
+	_currentTick	= -1;
+	_last16th		= -1;
 }
 
 //getters and setters
@@ -85,7 +87,7 @@ var _beatsPerMeasure		= 4,
 	_lastTickTime			= 0,
 	_currentTick			= -1,
 
-	_last16th				= 0,
+	_last16th				= -1,
 	_lastBeat				= 0,
 	_lastMeasure			= 0,
 	_startTime				= 0;
@@ -98,17 +100,16 @@ function tick(){
 	_lastTick 			= _currentTick;
 	_currentTick		= (duration / _millisPerTick) >> 0;
 
-	var lastTickTime	= _lastTick * _millisPerTick,
-		nextTickTime	= _lastTickTime + _millisPerTick,
+	var lastTickTime	= _lastTick * _millisPerTick + _startTime,
+		nextTickTime	= lastTickTime + _millisPerTick,
 		nextTickDelta	=  nextTickTime - now,
 		next16th		= (((duration / _millisPer16th) >> 0) + 1),
-		next16thTime	= next16th * _millisPer16th,
+		next16thTime	= next16th * _millisPer16th + _startTime,
 		next16thDelta	= next16thTime - now;
-
 
 	if (
 		// if next16thTime is less than now + _scheduleAhead
-		next16thTime < now + _scheduleAhead &&
+		next16thTime < now + 100 &&
 		// and next16th > last16th
 		next16th > _last16th
 	){

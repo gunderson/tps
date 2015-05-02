@@ -74,13 +74,13 @@ var View = Backbone.Layout.extend({
 		var $inputPort = $input.find(".port");
 		var inputOffset = $input.offset();
 
-		console.log("render connection inputOffset", inputOffset);
+		console.log("render connection inputOffset", inputOffset, connection.get("input").id);
 
 		var $output = $('.output[data-connection-id="' + connection.get("output").id + '"]');
 		var $outputPort = $input.find(".port");
 		var outputOffset = $output.offset();
 
-		console.log("render connection outputOffset", outputOffset);
+		console.log("render connection outputOffset", outputOffset, connection.get("output").id);
 
 		var dx = inputOffset.left - outputOffset.left;
 		var dy = inputOffset.top - outputOffset.top;
@@ -113,8 +113,8 @@ var View = Backbone.Layout.extend({
 				inputId: connection.get("input").id,
 				outputId: connection.get("output").id,
 				class: "connection",
-				stroke: "#fa0",
-				strokeWidth: "5px",
+				stroke: "#f0a",
+				strokeWidth: "2px",
 				fill: "transparent"
 			});
 		}
@@ -142,8 +142,8 @@ var View = Backbone.Layout.extend({
 		this.path = this.paper.path().attr({
 			id: this.currentPortId,
 			class: "connection",
-			stroke: "#fa0",
-			strokeWidth: "5px",
+			stroke: "#f0a",
+			strokeWidth: "2px",
 			fill: "transparent"
 		});
 	},
