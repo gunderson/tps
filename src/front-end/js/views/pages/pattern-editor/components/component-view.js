@@ -1,6 +1,8 @@
 require("backbone");
 require("backbone.layoutmanager");
 var Snap = require("snapsvg");
+var makeDragNumberInput = require("../../../../lib/DragNumberInput");
+
 
 var View = Backbone.Layout.extend({
 	el: false,
@@ -25,6 +27,10 @@ var View = Backbone.Layout.extend({
 			transform: "translate(" + this.model.get("x") + "px," + this.model.get("y") + "px)"
 		});
 		this.$controls = this.$(".component-controls");
+		this.$controls.find("input[type=number]").each(function(){
+			makeDragNumberInput(this);
+		});
+
 		this.$controls.detach();
 
 		this.setControlListeners();
