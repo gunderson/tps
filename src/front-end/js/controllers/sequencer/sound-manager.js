@@ -2,6 +2,7 @@ var Klang = require("../../lib/klang-1.0.5-19")();
 var _ = require("underscore");
 var $ = require("jquery");
 var Theory = require("../../music/Theory");
+var WebMidi = require("../../music/WebMidi");
 
 
 var instance;
@@ -10,6 +11,9 @@ var loadGroups;
 function SoundManager(){
 	var _this = this;
 	var instrumentLoadQueue = [];
+
+	this.midiOutput = null;
+	this.webMidi = WebMidi;
 	
 
 	// ------------------------ Setup Klang
@@ -59,7 +63,18 @@ function SoundManager(){
 		noteOn: function(instrument, noteId, velocity, schedule){
 
 			// console.log("Klang.triggerEvent("+instrument+", "+noteId+", "+velocity+", "+schedule+")");
-			Klang.triggerEvent(instrument, noteId, velocity, schedule);
+			// Klang.triggerEvent(instrument, noteId, velocity, schedule);
+
+			// defaults to midi output 0, can be chosen by the user by redefining this.midiOutput from list of outputs in this.webMidi
+			if (!this.midiOutput && this.webMidi && this.webMidi.outputs.length > 0) {
+				this.midiOutput = this.webMidi.outputs[0];
+			} else if (!this.midiOutput){
+				return;
+			}
+
+			var noteOnMessage = [0x90, noteId, 0x79];
+			this.midiOutput.send( noteOnMessage );  //omitting the timestamp means send immediately.
+			this.midiOutput.send( [0x80, noteId, 0x40], window.performance.now() + 1000.0 ); // Inlined array creation- note off 
 		},
 		noteOff: function(){
 			Klang.triggerEvent.apply(Klang, arguments);
@@ -68,7 +83,7 @@ function SoundManager(){
 		note2num: function(note){
 			var s = Theory.scale;
 			var octave = parseInt(note.slice(-1), 10);
-			var num = s.indexOf(note.substr(0,note.length - 1)) + (octave * 12)
+			var num = s.indexOf(note.substr(0,note.length - 1)) + (octave * 12);
 			console.log("note2num", note, num);
 			return num;
 		}
@@ -76,7 +91,7 @@ function SoundManager(){
 
 	pub.loading.then(function(){
 		pub.load(instrumentLoadQueue);
-	}.bind(this))
+	}.bind(this));
 
 	_.extend(this, pub);
 

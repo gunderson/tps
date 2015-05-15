@@ -105,16 +105,11 @@ var Page = Backbone.Layout.extend({
 		
 		this.$el
 			.velocity("stop")
-			// add in initial position with duration 0 so the first time through velocity catches
 			.velocity({
-				translateX: startX,
-				translateY: startY
-			}, {
-				duration:0
-			})
-			.velocity({
-				translateX: 0,
-				translateY: 0
+				translateX: [0, startX],
+				translateY: [0, startY]
+				// translateX: [startX, 0],
+				// translateY: [startY, 0]
 			},{
 				display:"block",
 				duration: PAGE_TRANSITION_TIME,
@@ -143,16 +138,11 @@ var Page = Backbone.Layout.extend({
 
 		this.$el
 			.velocity("stop")
-			// add in initial position with duration 0 so the first time through velocity catches
 			.velocity({
-				translateX: 0,
-				translateY: 0
-			}, {
-				duration:0
-			})
-			.velocity({
-				translateX: endX,
-				translateY: endY
+				translateX: [endX, 0],
+				translateY: [endY, 0]
+				// translateX: [0, endX],
+				// translateY: [0, endY]
 			},{
 				display:"none",
 				duration: PAGE_TRANSITION_TIME,

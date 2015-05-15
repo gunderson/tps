@@ -58,7 +58,7 @@ var Page = AbstractPage.extend({
 
 		this.render();
 
-		_.defer(function(){
+		this.once("afterRender", function(){
 			promise.resolve();
 		});
 

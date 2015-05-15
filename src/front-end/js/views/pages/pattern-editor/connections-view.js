@@ -62,7 +62,7 @@ var View = Backbone.Layout.extend({
 		this.setComponentCollection(this.componentCollection);
 		// make connections	
 		this.paper = Snap(this.el);
-		this.updateAllConnections();
+		requestAnimationFrame(this.updateAllConnections.bind(this));
 	},
 	onRemoveConnection: function(connection, collection, event){
 		this.paper.remove(connection.path);
