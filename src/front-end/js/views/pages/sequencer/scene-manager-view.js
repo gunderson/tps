@@ -22,7 +22,7 @@ var SceneManager = Backbone.Layout.extend({
 			nestedView.remove();
 		});
 		this.sceneCollection.each(function(sceneModel){
-			this.onAddScene(this.sceneCollection, sceneModel);
+			this.onAddScene(sceneModel,this.sceneCollection);
 		}.bind(this));
 	},
 	addScene: function(){
@@ -32,20 +32,17 @@ var SceneManager = Backbone.Layout.extend({
 		this.addScene();
 	},
 	onAddTrack: function(trackModel){
-		//add a pattern to each scene model
-		this.sceneCollection.each(function(sceneModel){
-			sceneModel.addPattern(trackModel);
-		});
+		console.log("Scene-manager-view::onAddTrack", arguments)
 	},
-	onAddScene: function(collection, sceneModel, skipRender){
-
-		console.log("Scene-manager-view::num scenes", collection.length);
+	onAddScene: function(sceneModel, collection, skipRender){
+		console.log("Scene-manager-view::onAddScene num scenes", collection.length);
 		sceneModel.set("controller", this.controller);
 		var sceneView = new SceneView({
 			model: sceneModel
 		});
 
 		var patterns = sceneModel.get("patterns");
+		console.log(sceneModel);
 		if (patterns.length < this.trackCollection.length){
 			// add patterns to scene
 			console.log("Scene-manager-view::num tracks", collection.length);

@@ -42,22 +42,25 @@ var PatternModel = Backbone.Model.extend({
 	initialize: function(){
 		var components = this.get("components");
 		if (components && !_.isArray(components)){
-			console.log(components);
+			this.master = components
+				.at(0)
+				.setupCollection();
 			this.setListeners();
 		}
-
 	},
 	setListeners: function(){
 		var components = this.get("components");
-		this.master = components
-			.at(0)
-			.setupCollection();
+		this.master = components.at(0);
 		this.listenTo(components, "remove", this.destroyConnections);
 		this.listenTo(components, "connection-request", this.onConnectionRequest);
 		this.listenTo(components, "change:values remove connection-response", this.refreshValues);
 		this.on("change:scene", this.onChangeScene, this);
 		this.on("change:threshold change:baseOctave change:scaleBias change:numOctaves change:scaleResolution change:numMeasures", this.refreshValues, this);
 		if (this.get("scene")) this.onChangeScene();
+	},
+	destroy: function(){
+		this.stopListening();
+		this.off();
 	},
 	on16th: function(sceneStatus){
 		var patternStatus = _.extend({}, sceneStatus, {
@@ -69,6 +72,7 @@ var PatternModel = Backbone.Model.extend({
 	playNotes: function(current16th){
 
 		if (this.get("track").get("mute")) return this;
+		console.log("track",this.get("track"));
 		if (this.get("track").collection.soloTracks.length > 0 && !this.get("track").get("solo")) return this;
 
 		var values = this.get("values");
@@ -98,7 +102,7 @@ var PatternModel = Backbone.Model.extend({
 	import: function(scene){
 		var connectionsArray = this.get("connections");
 		var connections = new ConnectionsCollection();
-		connections.set(connectionsArray);
+		// connections.set(connectionsArray);
 
 		var commonProps = {
 			pattern: this,
@@ -108,30 +112,31 @@ var PatternModel = Backbone.Model.extend({
 		var componentsArray = _.map(this.get("components"), function(component){
 			switch (component.type){
 				case "filter":
-					return new FilterModel(_.extend(component, commonProps)).import();
+					return new FilterModel(_.extend(component, commonProps));
 				case "oscillator":
-					return new OscillatorModel(_.extend(component, commonProps)).import();
+					return new OscillatorModel(_.extend(component, commonProps));
 				case "user-pattern":
-					return new UserPatternModel(_.extend(component, commonProps)).import();
+					return new UserPatternModel(_.extend(component, commonProps));
 				case "splitter":
-					return new SplitterModel(_.extend(component, commonProps)).import();
+					return new SplitterModel(_.extend(component, commonProps));
 				case "master":
-					return new MasterModel(_.extend(component, commonProps)).import();
+					return new MasterModel(_.extend(component, commonProps));
 			}
 		});
 
 		console.log("PatternModel::import ----------------------------------------------\n\n", scene);
 
 		var components = new ComponentsCollection(componentsArray);
+
 		this.set({
 			"connections": connections,
 			"components": components,
 			"scene": scene
 		});
+		this.setListeners();
 		components.import();
 		this.getValues(true);
 
-		this.setListeners();
 	},
 	refreshValues: function(child){
 		// console.log(child instanceof MasterModel);
@@ -194,6 +199,7 @@ var PatternModel = Backbone.Model.extend({
 		//delete all components
 	},
 	onConnectionRequest: function(connectionRequest){
+		console.log("Pattern::onConnectionRequest", connectionRequest)
 		this.destroyPort(connectionRequest.port);
 	},
 	getMeasureLinePath: function(){

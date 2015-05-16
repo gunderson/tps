@@ -22,6 +22,7 @@ var SequencerModel = Backbone.Model.extend({
 	initialize: function(){
 		this.get("scenes").trackCollection = this.get("tracks");
 		this.listenTo(this.get("scenes"), "edit-pattern", this.onEditPatternEvent);
+		this.listenTo(this.get("tracks"), "add", this.onAddTrack);
 
 		$(window).on("keydown", this.onKeyDown.bind(this));
 	},
@@ -88,6 +89,13 @@ var SequencerModel = Backbone.Model.extend({
 	onEditPatternEvent: function(patternModel){
 		//forward the event
 		this.trigger("edit-pattern", patternModel);
+	},
+	onAddTrack: function(trackModel){
+		console.log("Sequencer::onAddTrack");
+		//add a pattern to each scene model
+		this.get("scenes").each(function(sceneModel){
+			sceneModel.addPattern(trackModel);
+		});
 	}
 });
 

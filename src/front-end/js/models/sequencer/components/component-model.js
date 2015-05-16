@@ -55,11 +55,13 @@ var Model = Backbone.Model.extend({
 		this.set("ports", portsCollection);
 
 		portsCollection.each(function(port){
-			console.log("ComponentModel::Load ports, create connection: ", port.id, port.get("partnerPort"));
-			this.triggerConnectionRequest(port, port.get("partnerPort"));
+			if (port.get("partnerPort")){
+				console.log("ComponentModel::Load ports, create connection: ", port.id, port.get("partnerPort"));
+				this.triggerConnectionRequest(port.id, port.get("partnerPort"));
+			}
 		}.bind(this));
 
-		this.get("connectionsCollection").import(portsCollection);
+		// this.get("connectionsCollection").import(portsCollection);
 		// this.getValues(true);
 		return this;
 	},
@@ -68,15 +70,17 @@ var Model = Backbone.Model.extend({
 
 		var pattern				= this.get("pattern");
 		var scene				= pattern.get("scene");
+		var ports 				= this.get("ports");
 
-		if (!scene || !pattern) return [];
+		//ports is an array during import
+		if (!scene || !pattern || !ports || _.isArray(ports)) return [];
 
 		var ticksPerBeat		= scene.get("ticksPerBeat");
 		var beatsPerMeasure		= scene.get("beatsPerMeasure");
 		var tickWidth			= scene.get("tickWidth");
 		var numMeasures			= pattern.get("numMeasures");
 		var numValues			= ticksPerBeat * beatsPerMeasure * numMeasures + 1;
-		var inputs				= this.get("ports").where({type: "input"});
+		var inputs				= ports.where({type: "input"});
 
 		_.each(inputs, function(input){
 			var output = input.get("partnerPort");
@@ -141,6 +145,7 @@ var Model = Backbone.Model.extend({
 		this.collection.remove(this);
 	},
 	triggerConnectionResponse: function(portId){
+		console.log("ComponentModel::triggerConnectionResponse", portId);
 		var port = this.get("ports").get(portId);
 		//if source is an output
 		if (this.connectionRequest){
@@ -157,22 +162,26 @@ var Model = Backbone.Model.extend({
 	//handlers
 	onConnectionRequest: function(data){
 		console.log("ComponentModel::onConnectionRequest", data.portId, data.partnerId);
+		var ports = this.get("ports");
 		// ignore your own connection requests to prevent connecting to yourself
-		if (this.get("ports").contains(data.port)) {
+		// ports is an array during import, if not imported, ignore request
+		if (_.isArray(ports) || ports.contains(data.port)) {
 			return;
 		}
 
 		// set connection mode by putting an object in the connectionRequest slot
 		this.connectionRequest = data;
 
-		if (this.get("ports").get(data.partnerId)){
+		if (ports.get(data.partnerId)){
 			//it's a direct request, honor it.
 			//these are usually only sent when loading files.
-			this.triggerConnectionResponse(this.get("ports").get(data.partnerId).id);
+			this.triggerConnectionResponse(ports.get(data.partnerId).id);
 			return;
 		}
 	},
 	onConnectionResponse: function(){
+		console.log("ComponentModel::onConnectionResponse");
+
 		// cancel connection mode
 		this.connectionRequest = null;
 	},

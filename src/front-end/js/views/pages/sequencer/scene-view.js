@@ -10,7 +10,7 @@ var SceneView = Backbone.Layout.extend({
 		"click": this.setCurrentScene
 	},
 	initialize: function(options){
-		this.listenTo(this.model.get("patterns"), "add", this.onAddPattern);
+		this.listenTo(this.model, "pattern:add", this.onAddPattern);
 	},
 	beforeRender: function(){
 		// make a fresh slate

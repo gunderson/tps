@@ -6,7 +6,7 @@ var TrackCollection = Backbone.Collection.extend({
 	model: TrackModel,
 	initialize: function(){
 		this.on("add", this.onAdd);
-		this.on("change:solo", this.onChangeSolo);
+		this.on("change:solo reset", this.onChangeSolo);
 	},
 	export: function(){
 		return this.map(function(track){

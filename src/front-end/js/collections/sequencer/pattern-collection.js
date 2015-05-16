@@ -20,6 +20,11 @@ var PatternCollection = Backbone.Collection.extend({
 			});
 			pattern.import(scene);
 		});
+	},
+	destroy: function(){
+		this.each(function(p){
+			p.destroy();
+		});
 	}
 });
 
