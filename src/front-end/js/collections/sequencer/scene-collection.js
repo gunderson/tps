@@ -24,6 +24,13 @@ var SceneCollection = Backbone.Collection.extend({
 			scene.import();
 		});
 	},
+	getActiveScene: function(){
+		var activeScene = this.findWhere({active: true});
+		if (!activeScene){
+			activeScene = this.at(0).set("active", true);
+		}
+		return activeScene;
+	},
 	onAdd: function(sceneModel, collection){
 		sceneModel.set({
 			sceneId: this.indexOf(sceneModel),

@@ -19,6 +19,7 @@ function Sequencer(options){
 		reset: reset,
 		tick: tick,
 		getStatus: getStatus,
+		setMeasure: setMeasure,
 		model: options.model,
 		//getters & setters
 		get bpm(){
@@ -159,6 +160,10 @@ function getStatus(schedule){
 		currentMeasure: _lastMeasure,
 		beatInMeasure: _lastBeat % _beatsPerMeasure
 	};
+}
+
+function setMeasure(index){
+	_lastMeasure = index;
 }
 
 function recalculateTiming(){

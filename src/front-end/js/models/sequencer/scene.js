@@ -92,15 +92,15 @@ var SceneModel = Backbone.Model.extend({
 	},
 	on16th: function(status){
 		//if the message isn't for me, ignore it
-		if (status.currentSceneId !== this.id) return;
+		if (status.currentScene !== this.get("sceneId")) {
+			this.trigger("inactive");
+			this.set("active", false);
+			return;
+		}
 
 		var sceneStatus = {};
 
-		if (status.currentBeat === this.get("beatsPerMeasure")){
-			sceneStatus.currentMeasure = status.currentMeasure + 1;
-		}
-		if (sceneStatus.currentMeasure > this.get("maxNumMeasures")){
-			sceneStatus.currentMeasure = 0;
+		if (status.currentMeasure > this.get("maxNumMeasures")){
 			this.trigger("end-scene");
 		} else {
 			this.trigger("16th", _.extend(sceneStatus, status));

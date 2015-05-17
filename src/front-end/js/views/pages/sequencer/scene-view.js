@@ -11,6 +11,7 @@ var SceneView = Backbone.Layout.extend({
 	},
 	initialize: function(options){
 		this.listenTo(this.model, "pattern:add", this.onAddPattern);
+		this.listenTo(this.model, "inactive", this.onInactive);
 	},
 	beforeRender: function(){
 		// make a fresh slate
@@ -22,6 +23,9 @@ var SceneView = Backbone.Layout.extend({
 		patterns.each(function(pattern){
 			this.onAddPattern(pattern);
 		}.bind(this));
+	},
+	onInactive: function(){
+		this.$(".sixteenth").removeClass("playing");
 	},
 	onAddPattern: function(patternModel){
 		console.log("scene-view::onAddPattern");

@@ -17,7 +17,7 @@ var Sequencer              = require("./controllers/sequencer/sequencer");
 
 var router                 = require("./controllers/router");
 var sequencer              = new Sequencer({model:new SequencerModel()});
-sequencer.model.controller = sequencer;
+sequencer.model.setController(sequencer);
 
 //-------------------------------------------------------------
 // Top level Views

@@ -72,7 +72,6 @@ var PatternModel = Backbone.Model.extend({
 	playNotes: function(current16th){
 
 		if (this.get("track").get("mute")) return this;
-		console.log("track",this.get("track"));
 		if (this.get("track").collection.soloTracks.length > 0 && !this.get("track").get("solo")) return this;
 
 		var values = this.get("values");

@@ -11,7 +11,8 @@ var SequencerModel = Backbone.Model.extend({
 		return {
 			bpm: 120,
 			beatsPerMeasure: 4,
-			currentSceneId: 0,
+			currentScene: 0,
+			looping: false,
 			tracks: new TrackCollection([{}]),
 			scenes: new SceneCollection([{}]),
 			// patterns: new PatternCollection(),
@@ -19,15 +20,50 @@ var SequencerModel = Backbone.Model.extend({
 			// ports: new PortCollection()
 		};
 	},
-	initialize: function(){
+	initialize: function(options){
 		this.get("scenes").trackCollection = this.get("tracks");
 		this.listenTo(this.get("scenes"), "edit-pattern", this.onEditPatternEvent);
 		this.listenTo(this.get("tracks"), "add", this.onAddTrack);
 
 		$(window).on("keydown", this.onKeyDown.bind(this));
 	},
+	setController: function(controller){
+		this.controller = controller;
+		this.listenTo(controller, "16th", this.on16th);
+	},
+	on16th: function(status){
+		// get active scene
+		var scenes = this.get("scenes");
+		var activeScene = scenes.getActiveScene();
+
+		// check how long it is against current 16th
+		if (status.currentMeasure >= activeScene.get("maxNumMeasures")){
+			// advance the scene
+			status.currentMeasure = 0;
+			this.controller.setMeasure(0);
+
+			if (!this.get("looping")){
+				activeScene.set("active", false);
+				activeScene = scenes.at(1 + scenes.indexOf(activeScene));
+				if (activeScene){
+					activeScene.set("active", true);
+				} else {
+					this.controller.stop();
+					this.trigger("stopped");
+					return;
+				}
+			}
+		}
+
+		this.trigger("16th", _.extend(status, {
+			currentScene: activeScene.get("sceneId")
+		}));
+	},
+	onChangeCurrentScene: function(){
+
+	},
 	save: function(){
-			console.log("pre-stringify",this.export());
+			// console.log("pre-stringify",this.export());
 		try{
 			var filecontents = JSON.stringify(this.export());
 			var $a = $("a").attr({
@@ -79,7 +115,7 @@ var SequencerModel = Backbone.Model.extend({
 		this.get("scenes").import(data.scenes);
 	},
 	onKeyDown: function(e){
-		console.log("Key Pressed", e.keyCode);
+		// console.log("Key Pressed", e.keyCode);
 		switch (e.keyCode){
 			case 32: //spacebar
 				console.log("export", this.save());
@@ -91,7 +127,7 @@ var SequencerModel = Backbone.Model.extend({
 		this.trigger("edit-pattern", patternModel);
 	},
 	onAddTrack: function(trackModel){
-		console.log("Sequencer::onAddTrack");
+		// console.log("Sequencer::onAddTrack");
 		//add a pattern to each scene model
 		this.get("scenes").each(function(sceneModel){
 			sceneModel.addPattern(trackModel);
