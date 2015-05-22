@@ -16,10 +16,10 @@ var View = Backbone.Layout.extend({
 
 		var rhythmIn16ths = patternValues.rhythmIn16ths;
 
-		console.log("rhythmIn16ths",patternValues.rhythmIn16ths)
+		// console.log("rhythmIn16ths",patternValues.rhythmIn16ths)
 
 		this.$(".measure").css({
-			width: (100/this.model.get("numMeasures")) + "%"
+			width: (100/this.model.get("length")) + "%"
 		});
 		this.$(".beat").css({
 			width: (100/scene.get("beatsPerMeasure")) + "%"

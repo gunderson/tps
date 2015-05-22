@@ -8,6 +8,11 @@
 		font-size: 14px
 		&:hover
 			color: #fff
+	.settings-button
+		position: absolute
+		bottom: 0
+		right: 0
+
 	&.active
 		box-shadow: 0 0 20px #000
 		z-index: 1
@@ -22,3 +27,23 @@
 		.output
 			.port
 				// float: right
+	
+	.settings
+		display: none
+		width: 150px
+		height: 300px
+		border-radius: 4px
+		background: #666
+		position: absolute
+		top: 100%
+		left: 100%
+
+	.component-controls
+		display: none
+		position: absolute
+		top: 0
+		left: 100%
+		background: #333
+		width: 200px
+		height: 300px
+		padding: 8px

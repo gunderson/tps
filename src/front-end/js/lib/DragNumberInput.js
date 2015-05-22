@@ -7,6 +7,7 @@ function onMouseDown(e){
   startValue = parseFloat(target.value);
   document.addEventListener("mousemove", onMouseMove);
   document.addEventListener("mouseup", onMouseUp);
+  e.stopImmediatePropagation();
 }
 function onMouseMove(e){
   var dx = e.pageX - startX;
@@ -16,6 +17,8 @@ function onMouseMove(e){
       startValue + (target.step || 1) * ((-dy / resolution) >> 0)
     )
   );
+  e.stopImmediatePropagation();
+  e.preventDefault();
 }
 
 function onMouseUp(e){

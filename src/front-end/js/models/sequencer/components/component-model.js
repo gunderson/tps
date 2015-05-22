@@ -78,8 +78,8 @@ var Model = Backbone.Model.extend({
 		var ticksPerBeat		= scene.get("ticksPerBeat");
 		var beatsPerMeasure		= scene.get("beatsPerMeasure");
 		var tickWidth			= scene.get("tickWidth");
-		var numMeasures			= pattern.get("numMeasures");
-		var numValues			= ticksPerBeat * beatsPerMeasure * numMeasures + 1;
+		var length				= pattern.get("length");
+		var numValues			= ticksPerBeat * beatsPerMeasure * length + 1;
 		var inputs				= ports.where({type: "input"});
 
 		_.each(inputs, function(input){
@@ -100,14 +100,14 @@ var Model = Backbone.Model.extend({
 			}
 		});
 		//transform values
-		var values = this.transformValues(inputs, numValues, tickWidth);
+		var values = this.transformValues(inputs, numValues, tickWidth, regen);
 		this.set("values", values);
 		this.trigger("regenerate");
 		return values;
 	},
 
 	// This transform Function multiplies the values from each port
-	transformValues: function(inputs, numValues, tickwidth){
+	transformValues: function(inputs, numValues, tickwidth, regen){
 		var values = _.map(inputs,function(input){
 			return input.get("values");
 		});

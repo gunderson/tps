@@ -1,3 +1,35 @@
 .scene
 	.scene-id #{sceneId + 1}
+
+		.button-1.delete-button.fa.fa-close
+		.buttons
+			.button-1.duplicate-button.fa.fa-plus
+			.button-1.settings-button.fa.fa-cog
+		.settings
+			label.key Key Root
+				select
+					option(value="ga") a flat
+					option(value="a", selected=true) a
+					option(value="ab") b flat
+					option(value="b") b
+					option(value="c") c
+					option(value="cd") d flat
+					option(value="d") d
+					option(value="e") e flat
+					option(value="e") e
+					option(value="f") f
+					option(value="fg") g flat
+					option(value="g") g
+
+			label.mode Mode
+				select
+					option(value="", selected=true) Major
+					option(value="m") Minor
+
+			label.repeat Repeat
+				select
+					option(value="1", selected=true) 1x
+					option(value="2") 2x
+					option(value="4") 4x
+					option(value="8") 8x
 	.patterns

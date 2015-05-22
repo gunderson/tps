@@ -2,22 +2,19 @@ require("backbone");
 var _ = require("underscore");
 var SceneCollection = require("../../collections/sequencer/scene-collection");
 var TrackCollection = require("../../collections/sequencer/track-collection");
-// var PatternCollection = require("../../collections/sequencer/pattern-collection");
-// var ComponentCollection = require("../../collections/sequencer/component-collection");
-// var PortCollection = require("../../collections/sequencer/port-collection");
 
 var SequencerModel = Backbone.Model.extend({
 	defaults: function(){
 		return {
+			playing: false,
 			bpm: 120,
 			beatsPerMeasure: 4,
-			currentScene: 0,
-			looping: false,
+			currentSceneId: 0,
+			loop: false,
 			tracks: new TrackCollection([{}]),
 			scenes: new SceneCollection([{}]),
-			// patterns: new PatternCollection(),
-			// components: new ComponentCollection(),
-			// ports: new PortCollection()
+			nextSceneId: null,
+			repeat: 1
 		};
 	},
 	initialize: function(options){
@@ -27,9 +24,22 @@ var SequencerModel = Backbone.Model.extend({
 
 		$(window).on("keydown", this.onKeyDown.bind(this));
 	},
+	play: function(){
+		this.controller.play();
+	},
+	stop: function(){
+		this.controller.stop();
+	},
+	reset: function(){
+		this.controller.reset();
+	},
 	setController: function(controller){
 		this.controller = controller;
 		this.listenTo(controller, "16th", this.on16th);
+		this.listenTo(controller, "play stop", this.onChangePlay);
+	},
+	onChangePlay: function(){
+		this.set("playing", this.controller.playing);
 	},
 	on16th: function(status){
 		// get active scene
@@ -38,25 +48,38 @@ var SequencerModel = Backbone.Model.extend({
 
 		// check how long it is against current 16th
 		if (status.currentMeasure >= activeScene.get("maxNumMeasures")){
-			// advance the scene
 			status.currentMeasure = 0;
 			this.controller.setMeasure(0);
+			if (this.get("repeat") + 1 > activeScene.get("repeat")){
+				// advance the scene
+				if (!this.get("loop")){
 
-			if (!this.get("looping")){
-				activeScene.set("active", false);
-				activeScene = scenes.at(1 + scenes.indexOf(activeScene));
-				if (activeScene){
-					activeScene.set("active", true);
-				} else {
-					this.controller.stop();
-					this.trigger("stopped");
-					return;
+					this.set("repeat", 1);
+					activeScene.set("active", false);
+
+					var nextSceneId = this.get("nextSceneId") || 1 + activeScene.get("sceneId");
+					activeScene = scenes.findWhere({sceneId: nextSceneId});
+					
+					if (activeScene){
+						activeScene.set("active", true);
+						this.set("repeat", activeScene.get("repeat"));
+					} else {
+						this.set({
+							"currentSceneId": 0
+						});
+						this.controller.reset();
+						return;
+					}
 				}
+			} else {
+				this.set("repeat", this.get("repeat") + 1);
 			}
+
+
 		}
 
 		this.trigger("16th", _.extend(status, {
-			currentScene: activeScene.get("sceneId")
+			currentSceneId: activeScene.get("sceneId")
 		}));
 	},
 	onChangeCurrentScene: function(){
@@ -66,11 +89,11 @@ var SequencerModel = Backbone.Model.extend({
 			// console.log("pre-stringify",this.export());
 		try{
 			var filecontents = JSON.stringify(this.export());
-			var $a = $("a").attr({
+			var $a = $("<a>").attr({
 				href: "data:application/json;," + filecontents,
 				download: "autopeggiator_" + btoa(Date.now().toString().split("").reverse().join("")).substr(0,5)
 			});
-			$a[0].click();
+			$a.click();
 			return filecontents;
 		} catch (err){
 			console.log(this.export());

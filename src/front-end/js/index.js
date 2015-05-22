@@ -3,6 +3,7 @@ window._ = require('underscore');
 window.Backbone = require('backbone');
 Backbone.$ = $;
 require("backbone.layoutmanager");
+require("backbone.toggle");
 require("velocity-animate");
 
 

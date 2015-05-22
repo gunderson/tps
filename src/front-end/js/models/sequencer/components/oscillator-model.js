@@ -66,8 +66,8 @@ var Model = ComponentModel.extend({
 		var ticksPerBeat		= scene.get("ticksPerBeat");
 		var beatsPerMeasure		= scene.get("beatsPerMeasure");
 		var tickWidth			= scene.get("tickWidth");
-		var numMeasures			= pattern.get("numMeasures");
-		var numValues			= ticksPerBeat * beatsPerMeasure * numMeasures;
+		var length				= pattern.get("length");
+		var numValues			= ticksPerBeat * beatsPerMeasure * length;
 		
 		var amplitude			= this.get("amplitude");
 		
@@ -92,8 +92,8 @@ var Model = ComponentModel.extend({
 		return output;
 
 	},
-	transformValues: function(inputs){
-		var output = this.getOscillation();
+	transformValues: function(inputs, numValues, tickWidth, regen){
+		var output = this.getOscillation(regen);
 		//add output by input#add
 		//scale outputs by input#multiply
 		var multiplyInputValues = this.get("ports").findWhere({control: "multiply"}).get("values");

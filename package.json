@@ -12,6 +12,7 @@
   "browser": {
     "jquery": "./node_modules/jquery/dist/jquery.js",
     "constants": "./src/shared/constants.js",
+    "backbone.toggle": "./src/lib/backbone.toggle.js",
     "underscore.filledArray": "./src/lib/underscore.filledArray.js",
     "underscore.arrayAt": "./src/lib/underscore.arrayAt.js",
     "underscore.arrayObus": "./src/lib/underscore.arrayObus.js"
@@ -54,6 +55,7 @@
     "backbone": "^1.1.2",
     "backbone.layoutmanager": "http://github.com/tbranyen/backbone.layoutmanager/tarball/master",
     "body-parser": "^1.10.0",
+    "bootstrap-sass": "^3.3.4",
     "colors": "^1.0.3",
     "git": "^0.1.5",
     "install": "^0.1.8",

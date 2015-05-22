@@ -1,5 +1,5 @@
 - var measureId = 0
-while (++measureId <= numMeasures)
+while (++measureId <= length)
 	.measure
 		- var beatId = 0
 		while (++beatId <= beatsPerMeasure)
@@ -10,7 +10,7 @@ while (++measureId <= numMeasures)
 						.available-notes
 							- var revNotes = availableNotes.slice().reverse()
 							each noteName in revNotes
-								if (noteName.charAt(0) !== key.charAt(0))
-									.note(class="#{noteName}")
-								else
+								if (noteName.charAt(0) === key.charAt(0) && ["a","b","c","d","e","f","g"].indexOf(noteName.charAt(1)) === -1)
 									.note.root(class="#{noteName}")
+								else
+									.note(class="#{noteName}")

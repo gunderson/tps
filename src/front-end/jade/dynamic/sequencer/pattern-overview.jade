@@ -2,3 +2,34 @@
 	a(href="#/pattern-editor/#{sceneId}/#{trackId}").content
 		.pattern-graph
 		.threshold-line
+	.settings-buttons
+		.button-1.copy-button.fa.fa-copy
+		.button-1.settings-button.fa.fa-cog
+	.settings
+		label.key Key Root
+			select
+				option(value="ga") a flat
+				option(value="a", selected=true) a
+				option(value="ab") b flat
+				option(value="b") b
+				option(value="c") c
+				option(value="cd") d flat
+				option(value="d") d
+				option(value="e") e flat
+				option(value="e") e
+				option(value="f") f
+				option(value="fg") g flat
+				option(value="g") g
+
+		label.mode Key Mode
+			select
+				option(value="") Major
+				option(value="m") Minor
+		label.length Length
+			select
+				option(value="1") 1
+				option(value="2") 2
+				option(value="4", selected=true) 4
+				option(value="8") 8
+				option(value="16") 16
+				option(value="32") 32

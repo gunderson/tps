@@ -28,6 +28,13 @@ var SceneManager = Backbone.Layout.extend({
 	addScene: function(){
 		this.sceneCollection.add({});
 	},
+	onChangeLoop: function(){
+
+	},
+	onChangeNextScene: function(){
+		// remove 'next' class from all scenes
+		// add 'next' class to active scene
+	},
 	onClickAddNewSceneButton: function(){
 		this.addScene();
 	},

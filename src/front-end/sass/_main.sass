@@ -11,6 +11,7 @@
 	text-align: center
 
 .button-0
+	cursor: pointer
 	color: #ccc
 	background-color: #000
 	border: 0
@@ -23,3 +24,34 @@
 	&.active
 		color: #ddd
 		background-color: #222
+
+.button-1
+	cursor: pointer
+	width: 14px
+	height: 14px
+	font-size: 14px
+	color: #ccc
+	z-index: 1;
+	margin: 4px
+	&:hover
+		color: #fff
+
+.settings
+	display: none
+	width: 170px
+	height: 90px
+	padding: 8px
+	border-radius: 4px
+	background: #666
+	position: absolute
+	top: 0
+	left: 100%
+	z-index: 2
+	label
+		display: block
+		font-size: 0.7em
+		text-transform: uppercase
+		width: 100%
+		line-height: 2em
+		input, select
+			float: right

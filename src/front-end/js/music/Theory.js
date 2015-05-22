@@ -3,9 +3,6 @@
 	require("underscore.arrayObus");
 
 	var theory = {
-		audioPath: "sound/piano/",
-		octaveRange: 4,
-		numNotes: 64,
 		scale: [
 			"a",
 			"ab",
@@ -20,227 +17,92 @@
 			"g",
 			"ga"
 		],
-		chords: {}
+		scales: {},
+		chords: {},
+		getRoot:getRoot
 	};
 
 	//render chords
 
+	var modes = {
+		"major": [0,2,4,5,7,9,11],
+		"minor": [0,2,3,5,7,8,10]
+	};
+
+	function toNotes(indexMap, root){
+		root = theory.scale.indexOf(root);
+		return indexMap.map(function(scaleIndex){
+			return _.at(theory.scale, root + scaleIndex);
+		});
+	}
+
 	theory.scale.forEach(function(note){
-		theory.chords[note]				= major(note);
-		theory.chords[note + "7"]		= seventh(note);
-		theory.chords[note + 'm']		= minor(note);
-		theory.chords[note + 'maj7']	= maj7th(note);
-		theory.chords[note + 'm7']		= minor7th(note);
-		theory.chords[note + 'aug']		= aug(note);
-		theory.chords[note + 'aug7']	= aug7th(note);
+		theory.scales[note]				= toNotes(modes.major, note);
+		theory.scales[note + "m"]		= toNotes(modes.minor, note);
 	});
 
-	function major(key){
-		var s = theory.scale;
-		var rootIndex = s.indexOf(key);
-		return [
-			s[rootIndex],
-			s[(rootIndex + 4) % s.length],
-			s[(rootIndex + 7) % s.length]
-		];
+	theory.parseKey = function(key){
+		var root = getRoot(key);
+		var mode = key.split(root)[1];
+		return {
+			root: root,
+			mode: (mode) ? mode : ""
+		};
+	};
+
+	function getRoot(key){
+		switch (key.length){
+			case 1:
+				// natural major
+				return key;
+			case 2:
+				if (key.charAt(1) === "m" || key.charAt(1) === "7"){
+					// natural minor
+					// major 7th
+					return key.charAt(0);
+				} 
+				// accidental major
+				return key;
+			case 3:
+				if (key.charAt(2) === "m"){
+					// accidental minor
+					return key.substr(0,2);
+				} else if (key.charAt(2) === "7"){
+					// minor 7th
+					return key.charAt(0);
+				} 
+				// accidental major 7th
+				return key.substr(0,2);
+			case 4:
+				// accidental minor 7th
+				return key.substr(0,2);
+
+		}
 	}
 
-	function minor(key){
-		var s = theory.scale;
-		var rootIndex = s.indexOf(key);
-		return [
-			s[rootIndex],
-			s[(rootIndex + 3) % s.length],
-			s[(rootIndex + 7) % s.length]
-		];
-	}
-
-	function seventh(key){
-		var s = theory.scale;
-		var rootIndex = s.indexOf(key);
-		var chord = major(key);
-		chord.push(s[(rootIndex + 10) % s.length]);
-		return chord;
-	}
-
-	function maj7th(key){
-		var s = theory.scale;
-		var rootIndex = s.indexOf(key);
-		var chord = major(key);
-		chord.push(s[(rootIndex + 11) % s.length]);
-		return chord;
-	}
-
-	function minor7th(key){
-		var s = theory.scale;
-		var rootIndex = s.indexOf(key);
-		var chord = minor(key);
-		chord.push(s[(rootIndex + 10) % s.length]);
-		return chord;
-	}
-
-	function aug(key){
-		var s = theory.scale;
-		var rootIndex = s.indexOf(key);
-		return [
-			s[rootIndex],
-			s[(rootIndex + 4) % s.length],
-			s[(rootIndex + 8) % s.length]
-		];
-	}
-
-	function aug7th(key){
-		var s = theory.scale;
-		var rootIndex = s.indexOf(key);
-		var chord = aug(key);
-		chord.push(s[(rootIndex + 11) % s.length]);
-		return chord;
-	}
+	var scaleFilters = [
+		[0],
+		[0,2],
+		[0,2,4],
+		[0,2,3,4],
+		[0,2,3,4,5],
+		[0,1,2,3,4,5],
+		[0,1,2,3,4,5,6],
+		[0,1,2,3,4,5,6,7]
+	];
 
 	var startOctave = 1;
 
-	theory.getNotesInChord = function(chordName){
-		var notesInChord = [];
-		var chord = theory.chords[chordName];
-		if (!chord) console.error("Chord Not Found: " + chordName, theory.chords);
-		return chord;
-	};
-
 	theory.getScale = function(key, resolution, bias){
 		key = key || "c";
-		var s = theory.scale;
-		var rootIndex = s.indexOf(key);
 		bias = bias || 0;
-		var minor = key.slice(-1) === "m";
-		if (!minor){
-			switch (resolution){
-				case 1: 
-					return [key];
-				case 2: 
-					return [
-							key,
-							_.at(s, rootIndex + 4),
-						];
-				case 3: 
-					return [
-							key,
-							_.at(s, rootIndex + 4),
-							_.at(s, rootIndex + 7),
-						];
-				case 4: 
-					return [
-							key,
-							_.at(s, rootIndex + 4),
-							_.at(s, rootIndex + 5),
-							_.at(s, rootIndex + 7),
-						];
-				case 5: 
-					return [
-							key,
-							_.at(s, rootIndex + 4),
-							_.at(s, rootIndex + 5),
-							_.at(s, rootIndex + 7),
-							_.at(s, rootIndex + 9),
-						];
-				case 6: 
-					return [
-							key,
-							_.at(s, rootIndex + 2),
-							_.at(s, rootIndex + 4),
-							_.at(s, rootIndex + 5),
-							_.at(s, rootIndex + 7),
-							_.at(s, rootIndex + 9),
-						];
-				case 7: // intentional fall through
-				default: 
-				return [
-						key,
-						_.at(s, rootIndex + 2),
-						_.at(s, rootIndex + 4),
-						_.at(s, rootIndex + 5),
-						_.at(s, rootIndex + 7),
-						_.at(s, rootIndex + 9),
-						_.at(s, rootIndex + 11),
-					];
-			}
-		} else {
-			switch (resolution){
-				case 1: 
-					return [key];
-				case 2: 
-					return [
-							key,
-							_.at(s, rootIndex + 3),
-						];
-				case 3: 
-					return [
-							key,
-							_.at(s, rootIndex + 3),
-							_.at(s, rootIndex + 7),
-						];
-				case 4: 
-					return [
-							key,
-							_.at(s, rootIndex + 3),
-							_.at(s, rootIndex + 5),
-							_.at(s, rootIndex + 7),
-						];
-				case 5: 
-					return [
-							key,
-							_.at(s, rootIndex + 3),
-							_.at(s, rootIndex + 5),
-							_.at(s, rootIndex + 7),
-							_.at(s, rootIndex + 8),
-						];
-				case 6: 
-					return [
-							key,
-							_.at(s, rootIndex + 2),
-							_.at(s, rootIndex + 3),
-							_.at(s, rootIndex + 5),
-							_.at(s, rootIndex + 7),
-							_.at(s, rootIndex + 8),
-						];
-				case 7: // intentional fall through
-				default: 
-				return [
-						key,
-						_.at(s, rootIndex + 2),
-						_.at(s, rootIndex + 3),
-						_.at(s, rootIndex + 5),
-						_.at(s, rootIndex + 7),
-						_.at(s, rootIndex + 8),
-						_.at(s, rootIndex + 10),
-					];
-			}
-		}
-	};
-
-
-	theory.getChordsFromKey = function(key, minor){
-		key = key || "f";
-		var s = theory.scale;
-		var rootIndex = s.indexOf(key);
-		if (!minor){
-			return [
-				key,
-				_.at(s, rootIndex + 2) + "m",
-				_.at(s, rootIndex + 4) + "m",
-				_.at(s, rootIndex + 5),
-				_.at(s, rootIndex + 7),
-				_.at(s, rootIndex + 9) + "m"
-			];
-		} else {
-			return [
-				key,
-				_.at(s, rootIndex + 2) + "m",
-				_.at(s, rootIndex + 4) + "m",
-				_.at(s, rootIndex + 5),
-				_.at(s, rootIndex + 7),
-				_.at(s, rootIndex + 9) + "m"
-			];
-		}
+		return _.obus(
+			 _.filter(theory.scales[key], function(noteName, index){
+				if (scaleFilters[resolution].indexOf(index) > -1) return noteName;
+				return false;
+			}),
+			bias
+		);
 	};
 
 	theory.findMostFrequentNote = function(key){
@@ -257,11 +119,6 @@
 		});
 		return counts;
 	};
-
-	theory.getNextChordFromMap = function(key, currentChord){
-
-	};
-
 
 	function pad(num, minDigits){
 		num = num.toString();

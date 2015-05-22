@@ -61,6 +61,7 @@ function reset(){
 	beatInMeasure	= 0;
 	_currentTick	= -1;
 	_last16th		= -1;
+	this.trigger("reset");
 }
 
 //getters and setters
@@ -153,7 +154,7 @@ function tick(){
 
 function getStatus(schedule){
 	return {
-		currentScene: this.model.get("currentSceneId"),
+		currentSceneId: null,
 		current16th: _last16th,
 		countInBeat: _last16th % 4,
 		currentBeat: _lastBeat,

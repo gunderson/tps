@@ -6,6 +6,7 @@ var SceneCollection = Backbone.Collection.extend({
 	model: SceneModel,
 	initialize: function(){
 		this.on("add", this.onAdd);
+		this.on("change:active", this.onSetActive);
 	},
 	export: function(){
 		return this.map(function(scene){
@@ -27,9 +28,19 @@ var SceneCollection = Backbone.Collection.extend({
 	getActiveScene: function(){
 		var activeScene = this.findWhere({active: true});
 		if (!activeScene){
-			activeScene = this.at(0).set("active", true);
+			activeScene = this.at(0).set({active: true});
 		}
 		return activeScene;
+	},
+	onSetActive: function(model, activated, changed){
+		// only change when a scene is activated
+		// ignore deactivations
+		if (!activated) return;
+		this.each(function(scene){
+			if (model !== scene){
+				scene.set("active", false);
+			}
+		});
 	},
 	onAdd: function(sceneModel, collection){
 		sceneModel.set({

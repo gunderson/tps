@@ -27,7 +27,9 @@ var PatternModel = Backbone.Model.extend({
 				})
 			]),
 			connections				: connectionsCollection,
-			numMeasures				: 4,
+			length					: 4,
+			copyAction				: false,
+			key						: null,
 			sixteenths				: [],
 			availableNotes			: [],
 			scaleBias				: 0, // offsets the first note available
@@ -39,6 +41,7 @@ var PatternModel = Backbone.Model.extend({
 		settings.tickWidth = (Math.PI * 2) / settings.ticksPerBeat;
 		return settings;
 	},
+	copyRequest: null,
 	initialize: function(){
 		var components = this.get("components");
 		if (components && !_.isArray(components)){
@@ -55,7 +58,7 @@ var PatternModel = Backbone.Model.extend({
 		this.listenTo(components, "connection-request", this.onConnectionRequest);
 		this.listenTo(components, "change:values remove connection-response", this.refreshValues);
 		this.on("change:scene", this.onChangeScene, this);
-		this.on("change:threshold change:baseOctave change:scaleBias change:numOctaves change:scaleResolution change:numMeasures", this.refreshValues, this);
+		this.on("change:threshold change:baseOctave change:scaleBias change:numOctaves change:scaleResolution change:length change:key", this.refreshValues, this);
 		if (this.get("scene")) this.onChangeScene();
 	},
 	destroy: function(){
@@ -64,7 +67,7 @@ var PatternModel = Backbone.Model.extend({
 	},
 	on16th: function(sceneStatus){
 		var patternStatus = _.extend({}, sceneStatus, {
-			current16th: sceneStatus.current16th % (4 * this.get("scene").get("beatsPerMeasure") * this.get("numMeasures"))
+			current16th: sceneStatus.current16th % (4 * this.get("scene").get("beatsPerMeasure") * this.get("length"))
 		});
 		this.trigger("16th", patternStatus);
 		this.playNotes(patternStatus.current16th);
@@ -144,7 +147,7 @@ var PatternModel = Backbone.Model.extend({
 		this.getValues();
 	},
 	getValues: function(regen){
-		console.log('PatternModel::getValues', this.get("values"), this.master, this.get("components"))
+		// console.log('PatternModel::getValues', this.get("values"), this.master, this.get("components"))
 		//optimize this by caching the values
 		var values = this.get("values");
 		if (values && !regen) return values;
@@ -181,6 +184,7 @@ var PatternModel = Backbone.Model.extend({
 		this.get("components").each(function(component){
 			component.set("scene", scene);
 		});
+		if (!this.get("key")) this.set("key", scene.get("key"));
 		this.onChangePatternLength();
 	},
 	onChangePatternLength: function(){
@@ -198,9 +202,29 @@ var PatternModel = Backbone.Model.extend({
 		//delete all components
 	},
 	onConnectionRequest: function(connectionRequest){
-		console.log("Pattern::onConnectionRequest", connectionRequest)
+		// console.log("Pattern::onConnectionRequest", connectionRequest);
 		this.destroyPort(connectionRequest.port);
 	},
+
+
+	onCopyRequest: function(model){
+
+	},
+	toggleCopyAction: function(){
+
+	},
+	onExecuteCopy: function(){
+
+	},
+
+
+
+
+
+
+
+
+
 	getMeasureLinePath: function(){
 		if (this.measureLinePath){
 			return this.measureLinePath;
@@ -217,20 +241,23 @@ var PatternModel = Backbone.Model.extend({
 	},
 	getNotes: function(){
 		var scene			= this.get("scene");
+		var key				= this.get("key");
 		var baseOctave		= this.get("baseOctave");
 		var numOctaves		= this.get("numOctaves");
 		var scaleBias		= this.get("scaleBias");
 		var scaleResolution	= this.get("scaleResolution");
-		var scaleNotes 		= Theory.getScale(scene.key, scaleResolution, scaleBias);
-		var availableNotes 	= [];
-		//stat at -1 so availableNotes[0] gets the correct octave
+		var scaleNotes 		= Theory.getScale(key, scaleResolution, scaleBias);
 		var currentOctave 	= baseOctave;
+		var availableNotes 	= [scaleNotes[0] + baseOctave];
+		var rootIndex = Theory.scale.indexOf(Theory.getRoot(key));
 
-		for (var i = 0, endi = scaleNotes.length * numOctaves; i<endi; i++){
-			if ((i + scaleBias) % scaleResolution === 0 && i !== 0){
+		for (var i = 1, endi = scaleNotes.length * numOctaves; i<endi; i++){
+			var currentNote = scaleNotes[i % scaleNotes.length];
+			var prevNote = scaleNotes[(i-1) % scaleNotes.length];
+			if (Theory.scale.indexOf(currentNote) <= Theory.scale.indexOf(prevNote)){
 				currentOctave++;
 			}
-			availableNotes.push(_.at(scaleNotes, i + scaleBias) + currentOctave);
+			availableNotes.push(currentNote + currentOctave);
 		}
 
 		this.set("availableNotes", availableNotes);
@@ -259,7 +286,7 @@ var PatternModel = Backbone.Model.extend({
 		return peakIndicies;
 	},
 	getRhythmIn16ths: function(rhythmIndicies){
-		console.log("\n\n==================================\n\n", this.get("scene").get("ticksPerBeat"));
+		// console.log("\n\n==================================\n\n", this.get("scene").get("ticksPerBeat"));
 		var ticksPer16th = this.get("scene").get("ticksPerBeat") * 0.25;
 		return _.map(rhythmIndicies, function(val){
 			return Math.round((val - 1) / ticksPer16th);

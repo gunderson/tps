@@ -10,11 +10,11 @@ var SceneModel = Backbone.Model.extend({
 			patterns: new PatternCollection([]),
 			ticksPerBeat: 128,
 			beatsPerMeasure: 4, // should match the song beatsPerMeasure
-			key: "c",
-			currentChange: 0,
+			key: "dm",
 			currentMeasure: 0,
 			maxNumMeasures: 1,
-			changesPattern: [4] // each member of the array is a duration in beats. Should total to a factor of measureLength * beatsPerMeasure.
+			active: false,
+			repeat: 1
 		};
 		settings.tickWidth = (Math.PI * 2) / settings.ticksPerBeat;
 		return settings;
@@ -24,13 +24,19 @@ var SceneModel = Backbone.Model.extend({
 			this.setPatternListeners();
 		}
 		this.on("change:controller", this.onSetController, this);
+		this.on("change:key", this.onChangeKey, this);
 		// this.on("change:patterns", this.onSetController, this);
+	},
+	destroy: function(){
+		this.collection.remove(this);
+		this.get("patterns").destroy();
+		this.stopListening();
 	},
 	setPatternListeners: function(){
 		var patterns = this.get("patterns");
 		this.listenTo(patterns, "edit-pattern", this.onEditPattern);
 		this.listenTo(patterns, "add", this.onAddPattern);
-		this.listenTo(patterns, "add remove change:numMeasures", this.getLongestMeasureLength);
+		this.listenTo(patterns, "add remove change:length", this.getLongestMeasureLength);
 	},
 	onAddPattern: function(model){
 		console.log("Scene::onAddPattern", model);
@@ -59,10 +65,6 @@ var SceneModel = Backbone.Model.extend({
 		this.setPatternListeners();
 		this.getLongestMeasureLength();
 	},
-	destroy: function(){
-		this.removePatternListeners();
-		this.get("patterns").destroy();
-	},
 	addPattern: function(track){
 		var p = this.get("patterns").add({
 			trackId: track.get("trackId"),
@@ -75,7 +77,7 @@ var SceneModel = Backbone.Model.extend({
 	getLongestMeasureLength: function(){
 		this.set("maxNumMeasures",
 			this.get("patterns")
-				.pluck("numMeasures")
+				.pluck("length")
 				.reduce(function(memo, num){
 				return memo > num ? memo: num;
 			}, 1)
@@ -87,14 +89,19 @@ var SceneModel = Backbone.Model.extend({
 	onSetController: function(){
 		this.listenTo(this.get("controller"), "16th", this.on16th);
 	},
+	onChangeKey: function(obj, val){
+		this.get("patterns").each(function(pattern){
+			pattern.set("key", val);
+		});
+	},
 	onSetPatterns: function(){
 		this.setPatternListeners();
 	},
 	on16th: function(status){
 		//if the message isn't for me, ignore it
-		if (status.currentScene !== this.get("sceneId")) {
-			this.trigger("inactive");
-			this.set("active", false);
+		if (status.currentSceneId !== this.get("sceneId")) {
+			// this.trigger("inactive");
+			// this.set("active", false);
 			return;
 		}
 

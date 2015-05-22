@@ -10,16 +10,24 @@
 		height: 100%
 		background-color: #555
 		vertical-align: top
+		position: relative
 	.patterns
 		display: inline-block
 		height: 100%
 		width: calc(100% - #{$track-width})
 		padding-right: $track-width
-		overflow-x: hidden
-		overflow-y: hidden
 	.pattern
 		display: inline-block
 		width: $track-width
 		height: 100%
 		margin: 0 2px
 		background-color: #444
+	&.active
+		background: #F33
+	.buttons
+		position: absolute
+		bottom: 0
+		float: right
+		.duplicate-button
+		.settings-button
+	.settings

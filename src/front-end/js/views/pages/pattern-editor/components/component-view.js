@@ -13,7 +13,8 @@ var View = Backbone.Layout.extend({
 		"mouseup .port"					: "onPortMouseUp",
 		"click"							: "onClick",
 		"mousedown"						: "onDragStart",
-		"click .remove-button"          : "onClickRemove"
+		"click .remove-button"          : "onClickRemove",
+		"click .settings-button"		: "onClickSettings"
 	},
 	views: {},
 	initialize: function(options){
@@ -21,7 +22,7 @@ var View = Backbone.Layout.extend({
 	},
 	afterRender: function(){
 
-		console.log("afterRender:: place components");
+		// console.log("afterRender:: place components");
 
 		this.$el.css({
 			transform: "translate(" + this.model.get("x") + "px," + this.model.get("y") + "px)"
@@ -31,7 +32,7 @@ var View = Backbone.Layout.extend({
 			makeDragNumberInput(this);
 		});
 
-		this.$controls.detach();
+		this.$controls.hide();
 
 		this.setControlListeners();
 		this.listenTo(this.model, "regenerate", this.renderWaveforms, this);
@@ -45,6 +46,10 @@ var View = Backbone.Layout.extend({
 	setControlListeners: function(){},
 	clearControlListeners: function(){},
 	// event handlers
+
+	onClickSettings: function(){
+		this.$controls.toggle();
+	},
 	onClickRemove: function(e){
 		e.stopImmediatePropagation();
 		this.model.destroy();
@@ -52,7 +57,8 @@ var View = Backbone.Layout.extend({
 	onClick: function(){
 		if (this.cancelClick) return;
 		//trigger menu to show correct options for type
-		this.model.trigger("activate-component", this.$controls);
+		// this.model.trigger("activate-component", this.$controls);
+
 		// deactivate everything
 		// then activate this
 		this.$el.parent().find(".component").removeClass("active");
