@@ -11,7 +11,6 @@ var PatternCollection = Backbone.Collection.extend({
 		});
 	},
 	import: function(scene){
-		console.log("PatternCollection::import !_!_!__!_!!__!!_!_!_!_!__!!!__!_!_!!__!!")
 
 		this.each(function(pattern){
 			pattern.set({

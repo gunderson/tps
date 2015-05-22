@@ -14,13 +14,15 @@ var SequencerModel = Backbone.Model.extend({
 			tracks: new TrackCollection([{}]),
 			scenes: new SceneCollection([{}]),
 			nextSceneId: null,
-			repeat: 1
+			repeat: 1,
+			copyRequest: null
 		};
 	},
 	initialize: function(options){
 		this.get("scenes").trackCollection = this.get("tracks");
 		this.listenTo(this.get("scenes"), "edit-pattern", this.onEditPatternEvent);
 		this.listenTo(this.get("tracks"), "add", this.onAddTrack);
+		this.listenTo(this.get("scenes"), "add", this.onAddScene);
 
 		$(window).on("keydown", this.onKeyDown.bind(this));
 	},
@@ -37,6 +39,19 @@ var SequencerModel = Backbone.Model.extend({
 		this.controller = controller;
 		this.listenTo(controller, "16th", this.on16th);
 		this.listenTo(controller, "play stop", this.onChangePlay);
+	},
+
+	triggerCopyRequest: function(pattern){
+		this.get("scenes").triggerCopyRequest(pattern);
+		this.set("copyRequest", pattern);
+	},
+	triggerCancelCopyRequest: function(){
+		this.get("scenes").triggerCancelCopyRequest();
+		this.set("copyRequest", null);
+	},
+	triggerExecuteCopy: function(pattern){
+		this.get("scenes").executeCopy(pattern);
+		this.set("copyRequest", null);
 	},
 	onChangePlay: function(){
 		this.set("playing", this.controller.playing);
@@ -150,11 +165,18 @@ var SequencerModel = Backbone.Model.extend({
 		this.trigger("edit-pattern", patternModel);
 	},
 	onAddTrack: function(trackModel){
+		this.triggerCancelCopyRequest();
 		// console.log("Sequencer::onAddTrack");
 		//add a pattern to each scene model
 		this.get("scenes").each(function(sceneModel){
 			sceneModel.addPattern(trackModel);
 		});
+	},
+	onAddScene: function(trackModel){
+		this.triggerCancelCopyRequest();
+		// console.log("Sequencer::onAddTrack");
+		//add a pattern to each scene model
+		
 	}
 });
 

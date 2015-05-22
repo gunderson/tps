@@ -23,6 +23,21 @@ var SceneCollection = Backbone.Collection.extend({
 				"controller": this.controller
 			});
 			scene.import();
+		}.bind(this));
+	},
+	triggerCopyRequest: function(source){
+		this.each(function(scene){
+			scene.triggerCopyRequest(source);
+		});
+	},
+	triggerCancelCopyRequest: function(){
+		this.each(function(scene){
+			scene.cancelCopyRequest();
+		});
+	},
+	executeCopy: function(source){
+		this.each(function(scene){
+			scene.executeCopy(source);
 		});
 	},
 	getActiveScene: function(){

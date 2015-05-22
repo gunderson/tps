@@ -24,6 +24,7 @@ function onMouseMove(e){
 function onMouseUp(e){
   document.removeEventListener("mousemove", onMouseMove);
   document.removeEventListener("mouseup", onMouseUp);
+  target.blur();
 }
 
 function applyEffect(node){

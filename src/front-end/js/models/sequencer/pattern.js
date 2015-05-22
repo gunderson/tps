@@ -28,7 +28,8 @@ var PatternModel = Backbone.Model.extend({
 			]),
 			connections				: connectionsCollection,
 			length					: 4,
-			copyAction				: false,
+			executeCopy				: false,
+			copyRequest 			: null,
 			key						: null,
 			sixteenths				: [],
 			availableNotes			: [],
@@ -41,7 +42,6 @@ var PatternModel = Backbone.Model.extend({
 		settings.tickWidth = (Math.PI * 2) / settings.ticksPerBeat;
 		return settings;
 	},
-	copyRequest: null,
 	initialize: function(){
 		var components = this.get("components");
 		if (components && !_.isArray(components)){
@@ -104,8 +104,6 @@ var PatternModel = Backbone.Model.extend({
 	import: function(scene){
 		var connectionsArray = this.get("connections");
 		var connections = new ConnectionsCollection();
-		// connections.set(connectionsArray);
-
 		var commonProps = {
 			pattern: this,
 			connectionsCollection: connections
@@ -126,8 +124,6 @@ var PatternModel = Backbone.Model.extend({
 			}
 		});
 
-		console.log("PatternModel::import ----------------------------------------------\n\n", scene);
-
 		var components = new ComponentsCollection(componentsArray);
 
 		this.set({
@@ -141,13 +137,10 @@ var PatternModel = Backbone.Model.extend({
 
 	},
 	refreshValues: function(child){
-		// console.log(child instanceof MasterModel);
-		// if (child && child instanceof MasterModel) return;
 		this.set("values", null);
 		this.getValues();
 	},
 	getValues: function(regen){
-		// console.log('PatternModel::getValues', this.get("values"), this.master, this.get("components"))
 		//optimize this by caching the values
 		var values = this.get("values");
 		if (values && !regen) return values;
@@ -167,6 +160,7 @@ var PatternModel = Backbone.Model.extend({
 		this.set("values", values);
 		return values;
 	},
+
 	// override fetch() since this doesn't need to get page info from server
 	fetch: function(){
 		// create a promise to send back since calling fetch() expects a promise to be returned
@@ -178,9 +172,19 @@ var PatternModel = Backbone.Model.extend({
 		});
 		return promise;
 	},
-	onChangeScene: function(){
+
+
+	// Model attribute handlers ---------------------------------------------------------
+
+	onChangeScene: function(model, val, changed){
+		console.log("PatternModel::onChangeScene", arguments);
 		var scene = this.get("scene");
+
 		this.listenTo(scene, "16th", this.on16th);
+		this.listenTo(scene, "copy-request", this.onCopyRequest);
+		this.listenTo(scene, "cancel-copy-request", this.onCancelCopyRequest);
+		this.listenTo(scene, "execute-copy-request", this.onExecuteCopy);
+
 		this.get("components").each(function(component){
 			component.set("scene", scene);
 		});
@@ -202,28 +206,92 @@ var PatternModel = Backbone.Model.extend({
 		//delete all components
 	},
 	onConnectionRequest: function(connectionRequest){
-		// console.log("Pattern::onConnectionRequest", connectionRequest);
 		this.destroyPort(connectionRequest.port);
 	},
 
+	// Actions ---------------------------------------------------------
 
-	onCopyRequest: function(model){
-
+	triggerCopyRequest: function(){
+		this.get("scene").get("controller").model.triggerCopyRequest(this);
 	},
-	toggleCopyAction: function(){
+	triggerExecuteCopy: function(){
+		this.get("scene").get("controller").model.triggerExecuteCopy(this);
+	},
+	addFilter: function(){
+		var model = this.get("components").add(new FilterModel({
+				pattern: this,
+				connectionsCollection: this.get("connections")
+			})
+		);
+		model.setupCollection();
+		return model;
+	},
+	addOscillator: function(){
+		var model = this.get("components").add(new OscillatorModel({
+				pattern: this,
+				connectionsCollection: this.get("connections")
+			})
+		);
+		model.setupCollection();
+		return model;
+	},
+	addUserPattern: function(){
+		var model = this.get("components").add(new UserPatternModel({
+				pattern: this,
+				connectionsCollection: this.get("connections")
+			})
+		);
+		model.setupCollection();
+		return model;
+	},
+	addSplitter: function(){
+		var model = this.get("components").add(new SplitterModel({
+				pattern: this,
+				connectionsCollection: this.get("connections")
+			})
+		);
+		model.setupCollection();
+		return model;
+	},
+	addMaster: function(){
+		var model = this.get("components").add(new MasterModel({
+				pattern: this,
+				connectionsCollection: this.get("connections")
+			})
+		);
+		model.setupCollection();
+		return model;
+	},
 
+	// Event Listeners ---------------------------------------------------------
+
+	onCopyRequest: function(source){
+		this.set("copyRequest", source);
+	},
+	onCancelCopyRequest: function(source){
+		this.set({
+			"copyRequest": null,
+			"executeCopy": false
+		});
 	},
 	onExecuteCopy: function(){
-
+		if (this.get("executeCopy") === true){
+			var source = this.get("copyRequest").export();
+			delete source.copyRequest;
+			delete source.track;
+			delete source.scene;
+			this.set(source);
+			this.import(this.get("scene"));
+			this.get("scene").getLongestMeasureLength();
+		}
+		this.onCancelCopyRequest();
 	},
 
 
 
 
 
-
-
-
+	// Model Functions ---------------------------------------------------------
 
 	getMeasureLinePath: function(){
 		if (this.measureLinePath){
@@ -310,9 +378,7 @@ var PatternModel = Backbone.Model.extend({
 
 		return pitches;
 	},
-	renderRhythm: function(){
 
-	},
 	destroyConnections: function( component ){
 		var destroyPort = this.destroyPort.bind(this);
 		component.get( "ports" ).each(function( port ){
@@ -331,57 +397,8 @@ var PatternModel = Backbone.Model.extend({
 		connection.get( "input" ).parent.destroyConnection(connection.get( "input" ));
 		connection.get( "output" ).parent.destroyConnection(connection.get( "output" ));
 		this.get( "connections" ).remove( connection );
-	},
-	addFilter: function(){
-		var model = this.get("components").add(new FilterModel({
-				pattern: this,
-				connectionsCollection: this.get("connections")
-			})
-		);
-		model.setupCollection();
-		return model;
-	},
-	addOscillator: function(){
-		var model = this.get("components").add(new OscillatorModel({
-				pattern: this,
-				connectionsCollection: this.get("connections")
-			})
-		);
-		model.setupCollection();
-		return model;
-	},
-	addUserPattern: function(){
-		var model = this.get("components").add(new UserPatternModel({
-				pattern: this,
-				connectionsCollection: this.get("connections")
-			})
-		);
-		model.setupCollection();
-		return model;
-	},
-	addSplitter: function(){
-		var model = this.get("components").add(new SplitterModel({
-				pattern: this,
-				connectionsCollection: this.get("connections")
-			})
-		);
-		model.setupCollection();
-		return model;
-	},
-	addMaster: function(){
-		var model = this.get("components").add(new MasterModel({
-				pattern: this,
-				connectionsCollection: this.get("connections")
-			})
-		);
-		model.setupCollection();
-		return model;
 	}
 });
-
-function identityMeasure(beatsPerMeasure){
-
-}
 
 function checkPeak(val, index, values){
 	if (index < 1 || index >= values.length -1) return false;

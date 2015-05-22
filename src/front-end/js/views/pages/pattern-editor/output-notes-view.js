@@ -6,6 +6,10 @@ var View = Backbone.Layout.extend({
 	// el: false,
 	initialize: function(options){
 	},
+	beforeRender: function(){
+		console.log("OutputNotesView::beforeRender", this.model)
+		console.trace();
+	},
 	afterRender: function(){
 		//scale everthing!
 		var scene = this.model.get("scene");
@@ -15,8 +19,6 @@ var View = Backbone.Layout.extend({
 		var ticksPerBeat = scene.get("ticksPerBeat");
 
 		var rhythmIn16ths = patternValues.rhythmIn16ths;
-
-		// console.log("rhythmIn16ths",patternValues.rhythmIn16ths)
 
 		this.$(".measure").css({
 			width: (100/this.model.get("length")) + "%"
@@ -39,6 +41,8 @@ var View = Backbone.Layout.extend({
 		this.listenTo(model, "change",	this.render);
 	},
 	serialize: function(){
+		console.log("OutputNotesView::serialize", this.el)
+		console.trace();
 		return _.extend(
 			this.model.toJSON(), 
 			this.model.get("scene").toJSON());

@@ -25,7 +25,6 @@ var SceneModel = Backbone.Model.extend({
 		}
 		this.on("change:controller", this.onSetController, this);
 		this.on("change:key", this.onChangeKey, this);
-		// this.on("change:patterns", this.onSetController, this);
 	},
 	destroy: function(){
 		this.collection.remove(this);
@@ -38,12 +37,67 @@ var SceneModel = Backbone.Model.extend({
 		this.listenTo(patterns, "add", this.onAddPattern);
 		this.listenTo(patterns, "add remove change:length", this.getLongestMeasureLength);
 	},
-	onAddPattern: function(model){
-		console.log("Scene::onAddPattern", model);
-		this.trigger("pattern:add", model);
-	},
 	removePatternListeners: function(){
 		this.stopListening(this.get("patterns"));
+	},
+
+	// Event Listeners --------------------------------------------------------------
+
+	onAddPattern: function(model){
+		this.trigger("pattern:add", model);
+	},
+	onSetController: function(){
+		console.log("Scene::onSetController", arguments);
+		this.listenTo(this.get("controller"), "copy-request", this.onCopyRequest);
+		this.listenTo(this.get("controller"), "execute-copy", this.onExecuteCopy);
+		this.listenTo(this.get("controller"), "16th", this.on16th);
+	},
+	onExecuteCopy: function(source){
+		this.trigger("execute-copy", source);
+	},
+	onCopyRequest: function(source){
+		this.trigger("copy-request", source);
+	},
+	onChangeKey: function(obj, val){
+		this.get("patterns").each(function(pattern){
+			pattern.set("key", val);
+		});
+	},
+	onSetPatterns: function(){
+		this.setPatternListeners();
+	},
+	on16th: function(status){
+		//if the message isn't for me, ignore it
+		if (status.currentSceneId !== this.get("sceneId")) {
+			return;
+		}
+		var sceneStatus = {};
+		if (status.currentMeasure > this.get("maxNumMeasures")){
+			this.trigger("end-scene");
+		} else {
+			this.trigger("16th", _.extend(sceneStatus, status));
+		}
+	},
+	
+	onRemovePattern: function(){
+	},
+	onEditPattern: function(obj, data){
+		// forward the event
+		this.trigger("edit-pattern", obj);
+	},
+	onDeleteTrack: function(){
+	},
+
+
+	// Directives --------------------------------------------------------------
+	triggerCopyRequest: function(sourcePattern){
+		this.trigger("copy-request", sourcePattern);
+	},
+	cancelCopyRequest: function(){
+		this.trigger("cancel-copy-request");
+	},
+	executeCopy: function(){
+		this.trigger("execute-copy-request");
 	},
 	export: function(){
 		var output = Backbone.Model.prototype.toJSON.call(this);
@@ -52,11 +106,10 @@ var SceneModel = Backbone.Model.extend({
 		return output;
 	},
 	import: function(){
-		console.log("Scene::import", this.collection.trackCollection);
 		var patternArray = this.get("patterns");
 		_.each(patternArray, function(pattern){
 			pattern.track = this.collection.trackCollection.findWhere({trackId: pattern.trackId});
-			pattern.scene = this;	
+			pattern.scene = this;
 		}.bind(this));
 
 		var patterns = new PatternCollection(patternArray);
@@ -72,7 +125,6 @@ var SceneModel = Backbone.Model.extend({
 			track: track,
 			scene: this
 		});
-		// TODO: make sure patterns are in the same order as tracks
 	},
 	getLongestMeasureLength: function(){
 		this.set("maxNumMeasures",
@@ -85,46 +137,6 @@ var SceneModel = Backbone.Model.extend({
 	},
 	setCurrentScene: function(){
 		this.get("controller").model.set("currentSceneId", this.id);
-	},
-	onSetController: function(){
-		this.listenTo(this.get("controller"), "16th", this.on16th);
-	},
-	onChangeKey: function(obj, val){
-		this.get("patterns").each(function(pattern){
-			pattern.set("key", val);
-		});
-	},
-	onSetPatterns: function(){
-		this.setPatternListeners();
-	},
-	on16th: function(status){
-		//if the message isn't for me, ignore it
-		if (status.currentSceneId !== this.get("sceneId")) {
-			// this.trigger("inactive");
-			// this.set("active", false);
-			return;
-		}
-
-		var sceneStatus = {};
-
-		if (status.currentMeasure > this.get("maxNumMeasures")){
-			this.trigger("end-scene");
-		} else {
-			this.trigger("16th", _.extend(sceneStatus, status));
-		}
-
-
-	},
-	
-	onRemovePattern: function(){
-
-	},
-	onEditPattern: function(obj, data){
-		// forward the event
-		this.trigger("edit-pattern", obj);
-	},
-	onDeleteTrack: function(){
-
 	},
 	cleanup:function(){
 	}

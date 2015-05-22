@@ -70,15 +70,13 @@ var Page = AbstractPage.extend({
 		});
 
 		this.on("transitionInComplete", this.transitionInComplete);
+
+		this.listenTo(controller.model, "change:copyRequest", this.onChangeCopyRequest);
 	},
 	beforeRender: function(){
-		// console.log("Sequencer-view::beforeRender", this.route)
 	},
 	afterRender: function(){
-		// console.log("Sequencer-view::afterRender");
 		this.$(".tracks").on("scroll", this.syncScroll.bind(this));
-		// this.listenTo(this.sceneManager, "afterRender", this.syncScroll);
-		// this.listenTo(this.trackManager,"afterRender", this.syncScroll);
 	},
 	transitionInComplete: function(){
 		// controller.play();
@@ -87,6 +85,13 @@ var Page = AbstractPage.extend({
 		// controller.stop();
 		AbstractPage.prototype.transitionOut.apply(this, arguments);
 	},
+
+	// Event Listeners ------------------------------------------------------------------
+
+	onChangeCopyRequest: function(model, value){
+		this.$el.toggleClass("copy-mode", !!value);
+	},
+
 	syncScroll: function(){
 		this.$("#scene-manager .scene .patterns").scrollLeft(this.$("#track-manager .tracks").scrollLeft());
 	},
