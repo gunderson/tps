@@ -59,6 +59,7 @@ var SceneModel = Backbone.Model.extend({
 		this.trigger("copy-request", source);
 	},
 	onChangeKey: function(obj, val){
+		console.log("SceneModel::onChangeKey", val);
 		this.get("patterns").each(function(pattern){
 			pattern.set("key", val);
 		});

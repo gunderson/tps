@@ -5,12 +5,15 @@
 		svg#connections
 		include ./pattern-editor/_menu
 		#sequencer-display
-			.rhythm-display
-				svg.waveform
-				.threshold
-				.phrase-progress-bar
-			.pitch-display
-				svg.waveform
-				.progress-bar
 			#output-notes
+			#waveform-manager
+				.rhythm-display.waveform-display
+					svg.waveform
+					.threshold
+				.pitch-display.waveform-display
+					svg.waveform
+				.output-display.waveform-display
+					svg.waveform
+				.oscillation-display.waveform-display
+					svg.waveform
 

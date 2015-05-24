@@ -101,17 +101,18 @@ var SequencerModel = Backbone.Model.extend({
 
 	},
 	save: function(){
-			// console.log("pre-stringify",this.export());
+			// console.log("pre-stringify",JSON.stringify(this.export()));
 		try{
 			var filecontents = JSON.stringify(this.export());
-			var $a = $("<a>").attr({
+			console.log(filecontents);
+			var $a = $("a#saver").attr({
 				href: "data:application/json;," + filecontents,
 				download: "autopeggiator_" + btoa(Date.now().toString().split("").reverse().join("")).substr(0,5)
 			});
-			$a.click();
+			$a[0].click();
 			return filecontents;
 		} catch (err){
-			console.log(this.export());
+			// console.log(this.export());
 			console.error(err);
 			return "";
 		}

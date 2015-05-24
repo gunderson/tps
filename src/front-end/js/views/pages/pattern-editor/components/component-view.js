@@ -19,6 +19,7 @@ var View = Backbone.Layout.extend({
 	views: {},
 	initialize: function(options){
 		//bind dom event handlers
+		this.listenTo(this.model, "regenerate", this.renderWaveforms, this);
 	},
 	afterRender: function(){
 
@@ -32,10 +33,11 @@ var View = Backbone.Layout.extend({
 			makeDragNumberInput(this);
 		});
 
+		// this.renderWaveforms();
+
 		this.$controls.hide();
 
 		this.setControlListeners();
-		this.listenTo(this.model, "regenerate", this.renderWaveforms, this);
 	},
 	cleanup: function(){
 		this.clearControlListeners();
@@ -81,7 +83,7 @@ var View = Backbone.Layout.extend({
 	},
 	onDrag:function(e){
 		//TODO cancel click
-		e.preventDefault();
+		// e.preventDefault();
 		var parentPos = $("#components").offset();
 		var newX = e.pageX - parentPos.left;
 		var newY = e.pageY - parentPos.top;
@@ -145,26 +147,39 @@ var View = Backbone.Layout.extend({
 		return this;
 	},
 	renderWaveforms: function(){
-		this.renderWaveform(this.$controls.find(".output-display .waveform"), this.model.get("values") || [0]);
+		var $outputDisplay = $("#sequencer-display .output-display .waveform");
+		this.renderWaveform($outputDisplay, this.model.get("values") || [0], "#0ff");
+		$outputDisplay.parent().addClass("active");
+
+		var $oscillationDisplay = $("#sequencer-display .oscillation-display .waveform");
+		Snap($oscillationDisplay[0]).clear();
+		$oscillationDisplay.removeClass("active");
+
+		var $rhythmDisplay = $("#sequencer-display .rhythm-display .waveform");
+		$rhythmDisplay.parent().removeClass("active");
+
+		var $pitchDisplay = $("#sequencer-display .pitch-display .waveform");
+		$pitchDisplay.parent().removeClass("active");
+
 		return this;
 	},
-	renderWaveform: function($el, data){
-
+	renderWaveform: function($el, data, color){
+		color = color || "#0ff";
 		var paper = Snap($el[0]);
 		paper.clear();
 
 		var wavescale = $el.height() >> 1;
 		var tickWidth = $el.width() / data.length;
-		var commands = ["M", 0, (data[0] * -50) + 50];
+		var commands = ["M", 0, (data[0] * -wavescale) + wavescale];
 
 		for (var i = 1, endi = data.length; i < endi; i++){
-			commands.push("L", i * tickWidth, (data[i] * -50) + 50);
+			commands.push("L", i * tickWidth, (data[i] * -wavescale) + wavescale);
 		}
 
 
 		var p = paper.path({
 			d: commands.join(" "),
-			stroke: "#0ff",
+			stroke: color,
 			strokeWidth: "1px",
 			fill: "transparent"
 		});

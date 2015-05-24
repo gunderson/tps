@@ -7,7 +7,7 @@ var View = ComponentView.extend({
 	// keep: true,
 	template: "pattern-editor/components/master",
 	initialize: function(options){
-		console.log("master");
+		// console.log("master");
 	},
 	setControlListeners: function(){
 		this.$controls.find(".scale-bias input").on("input blur", this.onChangeScaleBias.bind(this));
@@ -25,6 +25,7 @@ var View = ComponentView.extend({
 	},
 	afterRender: function(){
 		ComponentView.prototype.afterRender.call(this);
+		this.renderWaveforms();
 	},
 	onChange: function(){
 		this.renderWaveforms();
@@ -47,8 +48,24 @@ var View = ComponentView.extend({
 	},
 	renderWaveforms: function(){
 		var ports = this.model.get("ports");
-		this.renderWaveform($("#sequencer-display .rhythm-display .waveform"), this.model.get("values").rhythm);
-		this.renderWaveform($("#sequencer-display .pitch-display .waveform"),  this.model.get("values").pitch);
+
+		var $outputDisplay = $("#sequencer-display .output-display .waveform");
+		Snap($outputDisplay[0]).clear();
+		$outputDisplay.parent().removeClass("active");
+
+		var $oscillationDisplay = $("#sequencer-display .oscillation-display .waveform");
+		Snap($oscillationDisplay[0]).clear();
+		$oscillationDisplay.parent().removeClass("active");
+
+		var $rhythmDisplay = $("#sequencer-display .rhythm-display .waveform");
+		this.model.getValues();
+		this.renderWaveform($rhythmDisplay, this.model.get("values").rhythm, "#ff0");
+		$rhythmDisplay.parent().addClass("active");
+
+		var $pitchDisplay = $("#sequencer-display .pitch-display .waveform");
+		this.renderWaveform($pitchDisplay,  this.model.get("values").pitch, "#f0f");
+		$pitchDisplay.parent().addClass("active");
+
 		return this;
 	},
 	serialize: function(){

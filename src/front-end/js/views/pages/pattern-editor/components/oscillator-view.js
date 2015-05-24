@@ -26,9 +26,24 @@ var View = ComponentView.extend({
 	onChange: function(){
 		this.renderWaveforms();
 	},
+		
 	renderWaveforms: function(){
-		this.renderWaveform(this.$controls.find(".output-display .waveform"), this.model.get("values") || [0]);
-		this.renderWaveform(this.$controls.find(".oscillation-display .waveform"), this.model.getOscillation() || [0]);
+
+		var $outputDisplay = $("#sequencer-display .output-display .waveform");
+		this.renderWaveform($outputDisplay, this.model.get("values") || [0], "#0ff");
+		$outputDisplay.parent().addClass("active");
+
+		var $oscillationDisplay = $("#sequencer-display .oscillation-display .waveform");
+		this.renderWaveform($oscillationDisplay, this.model.getOscillation() || [0], "#0aa");
+		$oscillationDisplay.parent().addClass("active");
+
+		var $rhythmDisplay = $("#sequencer-display .rhythm-display .waveform");
+		$rhythmDisplay.parent().removeClass("active");
+
+		var $pitchDisplay = $("#sequencer-display .pitch-display .waveform");
+		$pitchDisplay.parent().removeClass("active");
+
+
 		return this;
 	},
 	

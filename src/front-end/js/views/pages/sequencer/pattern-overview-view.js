@@ -64,8 +64,9 @@ var PatternOverviewView = Backbone.Layout.extend({
 	},
 	onChangeKey: function(obj, val){
 		var $settings = this.$(".settings");
-		var root = Theory.parseKey(val).root; 
-		var mode = Theory.parseKey(val).mode; 
+		var parsed = Theory.parseKey(val);
+		var root = parsed.root; 
+		var mode = parsed.mode; 
 		$settings.find("label.key>select").val(root);
 		$settings.find("label.mode>select").val(mode);
 		this.outputNotesView.render();	
@@ -103,7 +104,7 @@ var PatternOverviewView = Backbone.Layout.extend({
 		this.model.set(
 			"key", 
 			$settings.find("label.key select").val() +
-			$settings.find("label.module select").val()
+			$settings.find("label.mode select").val()
 		);
 	},
 	onChangeLengthUI: function(e){

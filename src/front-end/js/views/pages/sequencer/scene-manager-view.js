@@ -39,20 +39,20 @@ var SceneManager = Backbone.Layout.extend({
 		this.addScene();
 	},
 	onAddTrack: function(trackModel){
-		console.log("Scene-manager-view::onAddTrack", arguments)
+		// console.log("Scene-manager-view::onAddTrack", arguments)
 	},
 	onAddScene: function(sceneModel, collection, skipRender){
-		console.log("Scene-manager-view::onAddScene num scenes", collection.length);
+		// console.log("Scene-manager-view::onAddScene num scenes", collection.length);
 		sceneModel.set("controller", this.controller);
 		var sceneView = new SceneView({
 			model: sceneModel
 		});
 
 		var patterns = sceneModel.get("patterns");
-		console.log(sceneModel);
+		// console.log(sceneModel);
 		if (patterns.length < this.trackCollection.length){
 			// add patterns to scene
-			console.log("Scene-manager-view::num tracks", collection.length);
+			// console.log("Scene-manager-view::num tracks", collection.length);
 			this.trackCollection.each(function(trackModel, i){
 				// insert any track into the scene that doesn't already exist
 				if (!patterns.findWhere({trackId: trackModel.id})){

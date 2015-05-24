@@ -46,6 +46,7 @@ var Page = AbstractPage.extend({
 		this.patternModel = this.controller.model
 			.get("scenes").findWhere({ sceneId: parseInt(params[0]) })
 			.get("patterns").findWhere({ trackId: parseInt(params[1]) });
+
 		this.setPatternModelListeners();
 
 		this.ouptutNotesView.setModel(this.patternModel);
@@ -65,9 +66,9 @@ var Page = AbstractPage.extend({
 		return promise;
 	},
 	setPatternModelListeners: function(){
+		console.log("PatternEditorView:: setPatternModelListeners", this.patternModel);
 		var components = this.patternModel.get("components");
 
-		console.log("PatternEditorView:: setPatternModelListeners", this.patternModel.get("components"))
 
 		this.listenTo(components, "connection-request", 		this.beginConnection);
 		this.listenTo(components, "cancel-connection-request", 	this.cancelConnection);
@@ -109,6 +110,7 @@ var Page = AbstractPage.extend({
 		this.$(".rhythm-display .threshold").css({
 			top: ((1 - this.patternModel.get("threshold")) * 100) + "%"
 		});
+		this.masterView.renderWaveforms();
 		this.onResize();
 	},
 	onResize: function(){
@@ -122,6 +124,7 @@ var Page = AbstractPage.extend({
 		this.onPatternChange();
 	},
 	onPatternChange: function(){
+		this.masterView.renderWaveforms();
 		this.ouptutNotesView.render();
 	},
 	onActivateComponent: function($controls){
@@ -131,6 +134,7 @@ var Page = AbstractPage.extend({
 		$controlHolder.append($controls);
 	},
 	onEditPatternEvent: function(patternModel){
+		console.log("%%%%%%%%%%%%%%%%%% onEditPatternEvent %%%%%%%%%%%%%%%%%%", patternModel);
 		this.removePatternModelListeners();
 		this.patternModel = patternModel;
 		this.setPatternModelListeners();

@@ -12,7 +12,7 @@ var SceneView = Backbone.Layout.extend({
 		"click .settings-button": "onClickSettingsButton",
 		"click .remove-button": "onClickRemoveButton",
 		"click .duplicate-button": "onClickDuplicateButton",
-		"change .scene-id>.settings>label.key>select .scene-id>.settings>label.mode>select ": "onChangeKeyUI",
+		"change .scene-id>.settings>label.key>select,.scene-id>.settings>label.mode>select ": "onChangeKeyUI",
 		"change .scene-id>.settings>label.repeat>select": "onChangeRepeatUI",
 
 	},
@@ -49,9 +49,9 @@ var SceneView = Backbone.Layout.extend({
 			}
 		});
 
-		var scale = Theory.parseKey(key).scale;
-		this.$(".settings label.scale option").each(function(i, el){
-			if (el.value === scale){
+		var mode = Theory.parseKey(key).mode;
+		this.$(".settings label.mode option").each(function(i, el){
+			if (el.value === mode){
 				el.selected = true;
 			}
 		});

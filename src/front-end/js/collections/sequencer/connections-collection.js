@@ -56,7 +56,6 @@ var ConnectionsCollection = Backbone.Collection.extend({
 				
 		}.bind(this));
 
-		console.log("ConnectionsCollection::import", this.toJSON());
 	},
 	findByPort: function(port){
 		var portType = port.get("type");

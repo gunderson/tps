@@ -107,7 +107,7 @@ var Page = Backbone.Layout.extend({
 			.velocity("stop")
 			.velocity({
 				translateX: [0, startX],
-				translateY: [0, startY]
+				translateY: [0, startY],
 				// translateX: [startX, 0],
 				// translateY: [startY, 0]
 			},{
@@ -140,7 +140,7 @@ var Page = Backbone.Layout.extend({
 			.velocity("stop")
 			.velocity({
 				translateX: [endX, 0],
-				translateY: [endY, 0]
+				translateY: [endY, 0],
 				// translateX: [0, endX],
 				// translateY: [0, endY]
 			},{

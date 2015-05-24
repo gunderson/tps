@@ -98,6 +98,7 @@ var PatternModel = Backbone.Model.extend({
 		output.scene = output.scene.get("sceneId");
 		//track
 		output.track = output.track.get("trackId");
+		delete output.controller;
 		delete output.values;
 		return output;
 	},
@@ -280,6 +281,8 @@ var PatternModel = Backbone.Model.extend({
 			delete source.copyRequest;
 			delete source.track;
 			delete source.scene;
+			delete source.sceneId;
+			delete source.trackId;
 			this.set(source);
 			this.import(this.get("scene"));
 			this.get("scene").getLongestMeasureLength();
@@ -368,7 +371,8 @@ var PatternModel = Backbone.Model.extend({
 		var values			= this.master.getValues().pitch;
 
 		var pitchesPositions = _.map(peakIndicies, function(index){
-			return Math.round((values[index] + 0.5) * availableNotes.length);
+			// map values from -1,1 to 0,1
+			return Math.floor((values[index] + 1) * 0.5 * availableNotes.length);
 		});
 		var key		= scene.get("key");
 		var pitches	= _.map(pitchesPositions, function(pitchPosition){
