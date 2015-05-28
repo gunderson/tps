@@ -10,7 +10,8 @@ var Router = Backbone.Router.extend({
 		"pattern-editor/:sceneId/:trackId": "pattern-editor",
 		"sound-board": "sound-board",
 		"soundcloud": "soundcloud",
-		"pattern-editor": "pattern-editor"
+		"pattern-editor": "pattern-editor",
+		"load-data-page": "load-data-page"
 	}
 });
 

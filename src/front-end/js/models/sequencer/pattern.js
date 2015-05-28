@@ -151,6 +151,7 @@ var PatternModel = Backbone.Model.extend({
 		this.master.getValues(true);
 		var peaksAboveThreshold = this.getRhythm();
 		var pitches = this.getPitches(peaksAboveThreshold);
+		var durations = this.getDurations(peaksAboveThreshold);
 
 		values = {
 			pitches:pitches, 
@@ -381,6 +382,10 @@ var PatternModel = Backbone.Model.extend({
 		// console.log("pitches", pitches);
 
 		return pitches;
+	},
+	getDurations: function(peakIndicies){
+		var scene			= this.get("scene");
+		
 	},
 
 	destroyConnections: function( component ){

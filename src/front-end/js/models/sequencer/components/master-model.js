@@ -21,10 +21,17 @@ var Model = ComponentModel.extend({
 					id: _.uniqueId("i_"),
 					partner: null,
 					defaultValue: 0
+				},
+				{
+					control: "duration",
+					type: "input",
+					id: _.uniqueId("i_"),
+					partner: null,
+					defaultValue: 1
 				}
 			]),
 			type: "master",
-			threshold: 0.75
+			threshold: 0.5
 		});
 	},
 
@@ -37,7 +44,8 @@ var Model = ComponentModel.extend({
 		console.log('MasterModel', this.get("ports").models);
 		values = {
 			rhythm: this.get("ports").findWhere({control: "rhythm"}).get("values"),
-			pitch: this.get("ports").findWhere({control: "pitch"}).get("values")
+			pitch: this.get("ports").findWhere({control: "pitch"}).get("values"),
+			duration: this.get("ports").findWhere({control: "duration"}).get("values")
 		};
 		return values;
 	}

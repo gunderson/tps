@@ -73,6 +73,7 @@ var settings = {
         data      : "./src/front-end/data",
         assets    : "./src/front-end/assets",
         dist      : "./dist/front-end",
+        datasets  : ["presets"],
         port      : 3000
     },
     livereloadport: 35729
@@ -274,18 +275,20 @@ gulp.task("process-data", [
 );
 
 function processData(role) {
-    for (var i in settings.languages) {
-        var lang = settings.languages[i];
+    var datasets = settings.languages.slice().concat(settings[role].datasets);
+
+    for (var i in datasets) {
+        var dataname = datasets[i];
         var src = [
-            settings[role].src + '/../data/**/*.json',
-            settings[role].data + '/' + lang + '/**/*.json'
+            // settings[role].src + '/../data/**/*.json',
+            settings[role].data + '/' + dataname + '/**/*.json'
         ];
         var dest = settings[role].data;
         gulp.src(src)
             .pipe(joinData({
-                fileName: lang + ".json",
+                fileName: dataname + ".json",
                 dest: dest,
-                bases: [lang, "data"]
+                bases: [dataname, "data"]
             }))
             .pipe(gulp.dest(dest))
             .pipe(gulp.dest(settings[role].dist + "/data"));

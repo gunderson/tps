@@ -74,6 +74,7 @@ var View = ComponentView.extend({
 		return {
 			rhythmInputId: ports.findWhere({type: "input", control: "rhythm"}).id,
 			pitchInputId: ports.findWhere({type: "input", control: "pitch"}).id,
+			durationInputId: ports.findWhere({type: "input", control: "duration"}).id,
 			scaleBias: pattern.get("scaleBias"),
 			scaleResolution: pattern.get("scaleResolution"),
 			numOctaves: pattern.get("numOctaves"),

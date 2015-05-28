@@ -41,11 +41,10 @@ var SceneCollection = Backbone.Collection.extend({
 		});
 	},
 	getActiveScene: function(){
-		var activeScene = this.findWhere({active: true});
-		if (!activeScene){
-			activeScene = this.at(0).set({active: true});
-		}
-		return activeScene;
+		// return the active scene
+		// if no scenes are active
+		// then set scene 0 to active and return it
+		return this.findWhere({active: true}) || this.at(0).set({active: true});
 	},
 	onSetActive: function(model, activated, changed){
 		// only change when a scene is activated
