@@ -105,11 +105,16 @@ var SequencerModel = Backbone.Model.extend({
 	onChangeCurrentScene: function(){
 
 	},
+	// autosave to localstorage
+	
+	autosave: function(){
+
+	},
 	save: function(){
 			// console.log("pre-stringify",JSON.stringify(this.export()));
 		try{
 			var filecontents = JSON.stringify(this.export());
-			console.log(filecontents);
+			// console.log(filecontents);
 			var $a = $("a#saver").attr({
 				href: "data:application/json;," + filecontents,
 				download: "autopeggiator_" + btoa(Date.now().toString().split("").reverse().join("")).substr(0,5)

@@ -5,8 +5,8 @@ var _ = require("underscore");
 //-------------------------------------------------------------
 // Top Level Models
 
-var SoundcloudModel        = require("./models/soundcloud-player-model");
 var SequencerModel         = require("./models/sequencer/sequencer");
+var LoadDataPageModel      = require("./models/load-data-page-model");
 
 //-------------------------------------------------------------
 // Controllers
@@ -24,22 +24,18 @@ sequencer.model.setController(sequencer);
 
 var AbstractPage           = require("./views/pages/Page-view");
 var MainMenu               = require("./views/ui/main-menu-view");
-var HomePage               = require("./views/pages/home-view");
-var AboutPage              = require("./views/pages/about-view");
+var LoadDataPage           = require("./views/pages/load-data-page-view");
 var PatternEditorPage      = require("./views/pages/pattern-editor-view");
 var SequencerPage          = require("./views/pages/sequencer-view");
-var SoundcloudPage         = require("./views/pages/soundcloud-view");
 var SoundBoardPage         = require("./views/pages/sound-board-view");
 
 // Instances
 
 var pages = {
-    "#home"           : new HomePage({route: "/"}),
-    "#about"          : new AboutPage({route: "/about"}),
-    // "#soundcloud"     : new SoundcloudPage({model: new SoundcloudModel(), route: "/soundcloud"}),
-    "#pattern-editor" : new PatternEditorPage({controller: sequencer, route: "/pattern-editor"}),
-    "#sound-board"    : new SoundBoardPage({controller: sequencer, route: "/sound-board"}),
-    "#sequencer"      : new SequencerPage({controller: sequencer, route: "/sequencer"}),
+    "#load-data-page"   : new LoadDataPage({model: new LoadDataPageModel(), route: "/"}),
+    "#pattern-editor"   : new PatternEditorPage({controller: sequencer, route: "/pattern-editor"}),
+    "#sound-board"      : new SoundBoardPage({controller: sequencer, route: "/sound-board"}),
+    "#sequencer"        : new SequencerPage({controller: sequencer, route: "/sequencer"}),
 };
 
 var overlays = {
@@ -69,6 +65,9 @@ module.exports = AbstractPage.extend({
         // assign controller to each view
         _.each(this.views, function(v){
     		v.appController = _this.controller;
+            if (v.model){
+                v.model.appController = _this.controller;
+            }
     	});
 
         $(window).on('orientationchange', this.onOrientationChange);

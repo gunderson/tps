@@ -73,6 +73,14 @@ var Page = AbstractPage.extend({
 
 		this.listenTo(controller.model, "change:copyRequest", this.onChangeCopyRequest);
 	},
+	fetch: function(){
+		// short circuit fetching
+		var def = $.Deferred();
+		_.defer(function(){
+			def.resolve();
+		});
+		return def;
+	},
 	beforeRender: function(){
 	},
 	afterRender: function(){

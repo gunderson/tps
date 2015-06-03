@@ -66,6 +66,7 @@
     "mongoose": "^3.8.20",
     "node-twitter-api": "^1.5.0",
     "npm": "^2.5.0",
+    "operative": "^0.4.4",
     "q": "^1.1.2",
     "request": "^2.48.0",
     "serialport": "^1.4.6",

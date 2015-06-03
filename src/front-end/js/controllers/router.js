@@ -3,15 +3,11 @@ require("backbone");
 var Router = Backbone.Router.extend({
 
 	routes: {
-		"": "home",
-		"home": "home",
-		"about": "about",
+		"": "load-data-page",
+		"load-data-page": "load-data-page",
 		"sequencer": "sequencer",
 		"pattern-editor/:sceneId/:trackId": "pattern-editor",
 		"sound-board": "sound-board",
-		"soundcloud": "soundcloud",
-		"pattern-editor": "pattern-editor",
-		"load-data-page": "load-data-page"
 	}
 });
 

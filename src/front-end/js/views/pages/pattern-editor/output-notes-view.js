@@ -7,8 +7,8 @@ var View = Backbone.Layout.extend({
 	initialize: function(options){
 	},
 	beforeRender: function(){
-		console.log("OutputNotesView::beforeRender", this.model)
-		console.trace();
+		// console.log("OutputNotesView::beforeRender", this.model)
+		// console.trace();
 	},
 	afterRender: function(){
 		//scale everthing!
@@ -41,8 +41,8 @@ var View = Backbone.Layout.extend({
 		this.listenTo(model, "change",	this.render);
 	},
 	serialize: function(){
-		console.log("OutputNotesView::serialize", this.el)
-		console.trace();
+		// console.log("OutputNotesView::serialize", this.el)
+		// console.trace();
 		return _.extend(
 			this.model.toJSON(), 
 			this.model.get("scene").toJSON());

@@ -275,14 +275,19 @@ gulp.task("process-data", [
 );
 
 function processData(role) {
-    var datasets = settings.languages.slice().concat(settings[role].datasets);
+    compileData(settings.languages.slice(), role, true);
+    compileData(settings[role].datasets, role);
+}
 
+function compileData(datasets, role, addSharedData){
     for (var i in datasets) {
         var dataname = datasets[i];
         var src = [
-            // settings[role].src + '/../data/**/*.json',
             settings[role].data + '/' + dataname + '/**/*.json'
         ];
+        if (addSharedData) {
+            src.push(settings[role].src + '/../data/**/*.json');
+        }
         var dest = settings[role].data;
         gulp.src(src)
             .pipe(joinData({
