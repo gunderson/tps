@@ -13,6 +13,14 @@ var TrackView = Backbone.Layout.extend({
 		this.listenTo(this.model, "change:solo", this.onChangeSolo);
 		this.listenTo(this.model, "change:mute", this.onChangeMute);
 	},
+	afterRender: function(){
+		var model = this.model;
+		this.$(".instrument option").each(function(){
+			if (this.value === model.get("instrument").name){
+				$(this).prop("selected", true);
+			}
+		});
+	},
 	onChangeSolo: function(){
 		if (this.model.get("solo")){
 			this.$("button.solo").addClass("active");
@@ -34,7 +42,7 @@ var TrackView = Backbone.Layout.extend({
 		this.model.toggleMute();
 	},
 	onChangeInstrument: function(e){
-		this.model.set("instrument", e.target.value);
+		this.model.set("instrument", {name: e.target.value});
 	}
 });
 

@@ -26,6 +26,13 @@ var SequencerModel = Backbone.Model.extend({
 
 		$(window).on("keydown", this.onKeyDown.bind(this));
 	},
+	setAppController: function(appController){
+		this.appController = appController;
+		this.listenTo(appController, "generate", this.onAppGenerate);
+	},
+	onAppGenerate: function(preset){
+		this.import(preset);
+	},
 	play: function(){
 		var scenes = this.get("scenes");
 		var activeScene = scenes.getActiveScene();

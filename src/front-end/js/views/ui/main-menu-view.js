@@ -10,8 +10,6 @@ var MainMenu = Backbone.Layout.extend({
 	el: "#main-menu",
 	initialize: function(){
 	},
-
-
 	//input events
 	onHandleClick: function(){
 		$("html").toggleClass("menu-open");

@@ -73,7 +73,7 @@ var settings = {
         data      : "./src/front-end/data",
         assets    : "./src/front-end/assets",
         dist      : "./dist/front-end",
-        datasets  : ["presets"],
+        datasets  : ["presets", "markers"],
         port      : 3000
     },
     livereloadport: 35729

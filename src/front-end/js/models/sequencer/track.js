@@ -11,7 +11,8 @@ var TrackModel = Backbone.Model.extend({
 			},
 			trackId: 0,
 			solo: false,
-			mute: false
+			mute: false,
+			instruments: require("../../music/Instruments")
 		};
 	},
 	initialize: function(){

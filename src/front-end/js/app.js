@@ -35,7 +35,7 @@ var pages = {
     "#load-data-page"   : new LoadDataPage({model: new LoadDataPageModel(), route: "/"}),
     "#pattern-editor"   : new PatternEditorPage({controller: sequencer, route: "/pattern-editor"}),
     "#sound-board"      : new SoundBoardPage({controller: sequencer, route: "/sound-board"}),
-    "#sequencer"        : new SequencerPage({controller: sequencer, route: "/sequencer"}),
+    "#sequencer"        : new SequencerPage({controller: sequencer, model: sequencer.model, route: "/sequencer"}),
 };
 
 var overlays = {
@@ -64,9 +64,8 @@ module.exports = AbstractPage.extend({
         });
         // assign controller to each view
         _.each(this.views, function(v){
-    		v.appController = _this.controller;
-            if (v.model){
-                v.model.appController = _this.controller;
+            if (v.setAppController){
+                v.setAppController(_this.controller);
             }
     	});
 

@@ -1,4 +1,55 @@
 var jade = require('jade/runtime'); module.exports = {
+"sequencer/fader": function(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+
+buf.push("<div class=\"fader\"></div>");;return buf.join("");
+},
+"sequencer/pattern-overview": function(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+;var locals_for_with = (locals || {});(function (sceneId, trackId) {
+buf.push("<div class=\"pattern-overview\"><a" + (jade.attr("href", "#/pattern-editor/" + (sceneId) + "/" + (trackId) + "", true, false)) + " class=\"content\"><div class=\"pattern-graph\"></div></a><div class=\"copy-indicator\"><div class=\"execute-copy-button\"></div><div class=\"copy-to-toggle-button\"><div class=\"copy-off\"></div><div class=\"copy-on\"></div></div></div><div class=\"settings-buttons\"><div class=\"button-1 copy-button fa fa-copy\"></div><div class=\"button-1 settings-button fa fa-cog\"></div></div><div class=\"settings\"><label class=\"key\">Key Root<select><option value=\"ga\">a flat</option><option value=\"a\" selected=\"selected\">a</option><option value=\"ab\">b flat</option><option value=\"b\">b</option><option value=\"c\">c</option><option value=\"cd\">d flat</option><option value=\"d\">d</option><option value=\"de\">e flat</option><option value=\"e\">e</option><option value=\"f\">f</option><option value=\"fg\">g flat</option><option value=\"g\">g</option></select></label><label class=\"mode\">Key Mode<select><option value=\"\">Major</option><option value=\"m\">Minor</option></select></label><label class=\"length\">Length<select><option value=\"1\">1</option><option value=\"2\">2</option><option value=\"4\" selected=\"selected\">4</option><option value=\"8\">8</option><option value=\"16\">16</option><option value=\"32\">32</option></select></label></div></div>");}.call(this,"sceneId" in locals_for_with?locals_for_with.sceneId:typeof sceneId!=="undefined"?sceneId:undefined,"trackId" in locals_for_with?locals_for_with.trackId:typeof trackId!=="undefined"?trackId:undefined));;return buf.join("");
+},
+"sequencer/scene": function(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+;var locals_for_with = (locals || {});(function (sceneId) {
+buf.push("<div class=\"scene\"><div class=\"scene-id\">" + (jade.escape((jade_interp = sceneId + 1) == null ? '' : jade_interp)) + "<div class=\"button-1 delete-button fa fa-close\"></div><div class=\"buttons\"><div class=\"button-1 duplicate-button fa fa-plus\"></div><div class=\"button-1 settings-button fa fa-cog\"></div></div><div class=\"settings\"><label class=\"key\">Key Root<select><option value=\"ga\">a flat</option><option value=\"a\" selected=\"selected\">a</option><option value=\"ab\">b flat</option><option value=\"b\">b</option><option value=\"c\">c</option><option value=\"cd\">d flat</option><option value=\"d\">d</option><option value=\"de\">e flat</option><option value=\"e\">e</option><option value=\"f\">f</option><option value=\"fg\">g flat</option><option value=\"g\">g</option></select></label><label class=\"mode\">Mode<select><option value=\"\" selected=\"selected\">Major</option><option value=\"m\">Minor</option></select></label><label class=\"repeat\">Repeat<select><option value=\"1\" selected=\"selected\">1x</option><option value=\"2\">2x</option><option value=\"4\">4x</option><option value=\"8\">8x</option></select></label></div></div><div class=\"patterns\"></div></div>");}.call(this,"sceneId" in locals_for_with?locals_for_with.sceneId:typeof sceneId!=="undefined"?sceneId:undefined));;return buf.join("");
+},
+"sequencer/track": function(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+;var locals_for_with = (locals || {});(function (instruments) {
+buf.push("<div class=\"track\"><div class=\"content\"><div class=\"button button-0 solo\">Solo</div><div class=\"button button-0 mute\">Mute</div><select class=\"instrument\">");
+// iterate instruments
+;(function(){
+  var $$obj = instruments;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var instrument = $$obj[$index];
+
+buf.push("<option" + (jade.attr("value", "" + (instrument.name) + "", true, false)) + ">" + (jade.escape((jade_interp = instrument.name) == null ? '' : jade_interp)) + "</option>");
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var instrument = $$obj[$index];
+
+buf.push("<option" + (jade.attr("value", "" + (instrument.name) + "", true, false)) + ">" + (jade.escape((jade_interp = instrument.name) == null ? '' : jade_interp)) + "</option>");
+    }
+
+  }
+}).call(this);
+
+buf.push("</select></div></div>");}.call(this,"instruments" in locals_for_with?locals_for_with.instruments:typeof instruments!=="undefined"?instruments:undefined));;return buf.join("");
+},
 "pattern-editor/output-notes": function(locals) {
 var buf = [];
 var jade_mixins = {};
@@ -59,34 +110,6 @@ buf.push("</div>");
 }
 buf.push("</div>");
 }}.call(this,"length" in locals_for_with?locals_for_with.length:typeof length!=="undefined"?length:undefined,"beatsPerMeasure" in locals_for_with?locals_for_with.beatsPerMeasure:typeof beatsPerMeasure!=="undefined"?beatsPerMeasure:undefined,"availableNotes" in locals_for_with?locals_for_with.availableNotes:typeof availableNotes!=="undefined"?availableNotes:undefined,"key" in locals_for_with?locals_for_with.key:typeof key!=="undefined"?key:undefined));;return buf.join("");
-},
-"sequencer/fader": function(locals) {
-var buf = [];
-var jade_mixins = {};
-var jade_interp;
-
-buf.push("<div class=\"fader\"></div>");;return buf.join("");
-},
-"sequencer/pattern-overview": function(locals) {
-var buf = [];
-var jade_mixins = {};
-var jade_interp;
-;var locals_for_with = (locals || {});(function (sceneId, trackId) {
-buf.push("<div class=\"pattern-overview\"><a" + (jade.attr("href", "#/pattern-editor/" + (sceneId) + "/" + (trackId) + "", true, false)) + " class=\"content\"><div class=\"pattern-graph\"></div></a><div class=\"copy-indicator\"><div class=\"execute-copy-button\"></div><div class=\"copy-to-toggle-button\"><div class=\"copy-off\"></div><div class=\"copy-on\"></div></div></div><div class=\"settings-buttons\"><div class=\"button-1 copy-button fa fa-copy\"></div><div class=\"button-1 settings-button fa fa-cog\"></div></div><div class=\"settings\"><label class=\"key\">Key Root<select><option value=\"ga\">a flat</option><option value=\"a\" selected=\"selected\">a</option><option value=\"ab\">b flat</option><option value=\"b\">b</option><option value=\"c\">c</option><option value=\"cd\">d flat</option><option value=\"d\">d</option><option value=\"de\">e flat</option><option value=\"e\">e</option><option value=\"f\">f</option><option value=\"fg\">g flat</option><option value=\"g\">g</option></select></label><label class=\"mode\">Key Mode<select><option value=\"\">Major</option><option value=\"m\">Minor</option></select></label><label class=\"length\">Length<select><option value=\"1\">1</option><option value=\"2\">2</option><option value=\"4\" selected=\"selected\">4</option><option value=\"8\">8</option><option value=\"16\">16</option><option value=\"32\">32</option></select></label></div></div>");}.call(this,"sceneId" in locals_for_with?locals_for_with.sceneId:typeof sceneId!=="undefined"?sceneId:undefined,"trackId" in locals_for_with?locals_for_with.trackId:typeof trackId!=="undefined"?trackId:undefined));;return buf.join("");
-},
-"sequencer/scene": function(locals) {
-var buf = [];
-var jade_mixins = {};
-var jade_interp;
-;var locals_for_with = (locals || {});(function (sceneId) {
-buf.push("<div class=\"scene\"><div class=\"scene-id\">" + (jade.escape((jade_interp = sceneId + 1) == null ? '' : jade_interp)) + "<div class=\"button-1 delete-button fa fa-close\"></div><div class=\"buttons\"><div class=\"button-1 duplicate-button fa fa-plus\"></div><div class=\"button-1 settings-button fa fa-cog\"></div></div><div class=\"settings\"><label class=\"key\">Key Root<select><option value=\"ga\">a flat</option><option value=\"a\" selected=\"selected\">a</option><option value=\"ab\">b flat</option><option value=\"b\">b</option><option value=\"c\">c</option><option value=\"cd\">d flat</option><option value=\"d\">d</option><option value=\"de\">e flat</option><option value=\"e\">e</option><option value=\"f\">f</option><option value=\"fg\">g flat</option><option value=\"g\">g</option></select></label><label class=\"mode\">Mode<select><option value=\"\" selected=\"selected\">Major</option><option value=\"m\">Minor</option></select></label><label class=\"repeat\">Repeat<select><option value=\"1\" selected=\"selected\">1x</option><option value=\"2\">2x</option><option value=\"4\">4x</option><option value=\"8\">8x</option></select></label></div></div><div class=\"patterns\"></div></div>");}.call(this,"sceneId" in locals_for_with?locals_for_with.sceneId:typeof sceneId!=="undefined"?sceneId:undefined));;return buf.join("");
-},
-"sequencer/track": function(locals) {
-var buf = [];
-var jade_mixins = {};
-var jade_interp;
-
-buf.push("<div class=\"track\"><div class=\"content\"><div class=\"button button-0 solo\">Solo</div><div class=\"button button-0 mute\">Mute</div><select class=\"instrument\"><option value=\"prophet_3\">prophet_3</option><option value=\"piano\">piano</option></select></div></div>");;return buf.join("");
 },
 "sound-board/instrument": function(locals) {
 var buf = [];
