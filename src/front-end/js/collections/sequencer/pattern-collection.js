@@ -3,6 +3,7 @@ var PatternModel = require("../../models/sequencer/pattern");
 
 var PatternCollection = Backbone.Collection.extend({
 	model: PatternModel,
+	comparator: "trackId",
 	initialize: function(){
 	},
 	export: function(){

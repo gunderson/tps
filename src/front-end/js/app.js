@@ -69,6 +69,8 @@ module.exports = AbstractPage.extend({
             }
     	});
 
+        this.listenTo(this.controller, "generate-complete", this.onGenerateComplete);
+
         $(window).on('orientationchange', this.onOrientationChange);
         this.onOrientationChange();
 
@@ -77,7 +79,9 @@ module.exports = AbstractPage.extend({
         this.listenTo(this.router, 'route', this.onRoute);
         Backbone.history.start();
     },
-
+    onGenerateComplete: function(){
+        this.router.navigate("/sequencer", {trigger: true});
+    },
     onOrientationChange: function (e) {
         // alert('onOrientationChange', window.orientation);
         if (Math.abs(window.orientation) == 90) {

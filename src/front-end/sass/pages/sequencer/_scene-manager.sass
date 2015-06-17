@@ -4,6 +4,17 @@
 	overflow-x: hidden
 	overflow-y: auto
 	color: #fff
+	&.dragging
+		.drag-holder
+			display: block
+	.drag-holder
+		z-index: 10
+		display: none
+		position: absolute
+		top: 0
+		left: 0
+		width: 100%
+		height: 100%
 	.scenes
 	#add-new-scene-button
 		order: 1

@@ -34,7 +34,7 @@ function Sequencer(options){
 function play(){
 	if (!this.playing){
 		this.playing = true;
-		_startTime = audioContext.currentTime * 1000;
+		_startTime = (audioContext.currentTime * 1000) - (_currentTick * _millisPerTick);
 		this.trigger("play");
 		this.tick();
 	}
@@ -61,6 +61,7 @@ function reset(){
 	beatInMeasure	= 0;
 	_currentTick	= -1;
 	_last16th		= -1;
+	_lastBeat		= -1;
 	this.trigger("reset");
 }
 
@@ -87,7 +88,7 @@ var _beatsPerMeasure		= 4,
 
 	_lastTick				= 0,
 	_lastTickTime			= 0,
-	_currentTick			= -1,
+	_currentTick			= 0,
 
 	_last16th				= -1,
 	_lastBeat				= 0,
@@ -96,36 +97,38 @@ var _beatsPerMeasure		= 4,
 
 function tick(){
 	var now 			= audioContext.currentTime * 1000,
-		duration		= now - _startTime,
+		// duration		= now - _startTime,
 		_this			= this;
 
 	_lastTick 			= _currentTick;
-	_currentTick		= (duration / _millisPerTick) >> 0;
+	_currentTick		+= 1;//= (duration / _millisPerTick) >> 0;
 
 	var lastTickTime	= _lastTick * _millisPerTick + _startTime,
 		nextTickTime	= lastTickTime + _millisPerTick,
-		nextTickDelta	=  nextTickTime - now,
-		next16th		= (((duration / _millisPer16th) >> 0) + 1),
+		nextTickDelta	= nextTickTime - now,
+		next16th		= _last16th + 1,//(((duration / _millisPer16th) >> 0) + 1),
 		next16thTime	= next16th * _millisPer16th + _startTime,
 		next16thDelta	= next16thTime - now;
 
 	if (
 		// if next16thTime is less than now + _scheduleAhead
-		next16thTime < now + 100 &&
+		// next16thTime <= now + 100 &&
+		next16thTime <= now &&
 		// and next16th > last16th
 		next16th > _last16th
 	){
 		_last16th = next16th;
 		// schedule 16ths for next16thTime in audiocontext
 
+
 		// if this 16th is divisible by 4
-		if (next16th % 4 === 0){
-			//trigger a beat
+		if ((next16th+1) % 4 === 0){
+			//advance a beat
 			_lastBeat++;
 
 			// if this beat is divisible by _beatsPerMeasure
 			if (_lastBeat % _beatsPerMeasure === 0){
-				//trigger a measure
+				//advance a measure
 				_lastMeasure++;
 			}
 		}
@@ -165,6 +168,7 @@ function getStatus(schedule){
 
 function setMeasure(index){
 	_lastMeasure = index;
+	_lastBeat = 0;
 }
 
 function recalculateTiming(){

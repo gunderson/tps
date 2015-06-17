@@ -7,6 +7,7 @@ function onMouseDown(e){
   startValue = parseFloat(target.value);
   document.addEventListener("mousemove", onMouseMove);
   document.addEventListener("mouseup", onMouseUp);
+  document.addEventListener("mouseleave", onMouseUp);
   e.stopImmediatePropagation();
 }
 function onMouseMove(e){
@@ -24,6 +25,7 @@ function onMouseMove(e){
 function onMouseUp(e){
   document.removeEventListener("mousemove", onMouseMove);
   document.removeEventListener("mouseup", onMouseUp);
+  document.removeEventListener("mouseleave", onMouseUp);
   target.blur();
 }
 

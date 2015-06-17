@@ -8,10 +8,12 @@ var SceneView = Backbone.Layout.extend({
 	keep: true,
 	template: "sequencer/scene",
 	events: {
-		"click": "setCurrentScene",
+		"click .scene-id": "setCurrentScene",
 		"click .settings-button": "onClickSettingsButton",
 		"click .remove-button": "onClickRemoveButton",
 		"click .duplicate-button": "onClickDuplicateButton",
+		"mousedown .scene-id": "onMouseDown",
+		"mousedown select": "cancelDrag",
 		"change .scene-id>.settings>label.key>select,.scene-id>.settings>label.mode>select ": "onChangeKeyUI",
 		"change .scene-id>.settings>label.repeat>select": "onChangeRepeatUI",
 
@@ -19,6 +21,7 @@ var SceneView = Backbone.Layout.extend({
 	initialize: function(options){
 		this.listenTo(this.model, "pattern:add", this.onAddPattern);
 		this.listenTo(this.model, "change:active", this.onChangeActive);
+		this.listenTo(this.model, "change:sceneId", this.render);
 	},
 	beforeRender: function(){
 		// make a fresh slate
@@ -33,9 +36,9 @@ var SceneView = Backbone.Layout.extend({
 	},
 	afterRender: function(){
 		//select key in settings
-		var length = this.model.get("length");
-		this.$(".settings label.length option").each(function(i, el){
-			if (parseInt(el.value, 10) === length){
+		var repeat = this.model.get("repeat");
+		this.$(".settings label.repeat option").each(function(i, el){
+			if (parseInt(el.value, 10) === repeat){
 				el.selected = true;
 			}
 		});
@@ -56,6 +59,45 @@ var SceneView = Backbone.Layout.extend({
 			}
 		});
 	},
+
+	dragging: false,
+	dragStartX: 0,
+	dragStartY: 0,
+	minDragDist: 4,
+	dragDist: 0,
+	onMouseDown: function(e){
+		this.dragStartX = e.pageX;
+		this.dragStartY = e.pageY;
+		this.dragging = true;
+		$(window)
+			.on("mousemove.drag-check", this.considerDrag.bind(this))
+			.on("mouseup.drag-check mouseleave.drag-check", this.cancelDrag.bind(this));
+		console.log("SceneView::onMouseDown");
+	},
+	considerDrag: function(e){
+		e.preventDefault();
+		console.log("SceneView::considerDrag");
+		var dx = e.pageX - this.dragStartX;
+		var dy = e.pageY - this.dragStartY;
+		var dist = Math.sqrt((dx*dx)+(dy*dy));
+		if (this.minDragDist < dist){
+			this.trigger("begin-drag-scene", {
+				scene: this, 
+				event: e, 
+				offset: {
+					x: this.dragStartX, 
+					y: this.dragStartY
+				}
+			});
+			this.cancelDrag();
+		}
+	},
+	cancelDrag: function(){
+		console.log("SceneView::cancelDrag");
+		this.dragging = false;
+		$(window).off(".drag-check");
+	},
+
 	onChangeActive: function(model, value){
 		if (!value){
 			this.$(".sixteenth").removeClass("playing");
@@ -79,10 +121,10 @@ var SceneView = Backbone.Layout.extend({
 		this.model.destroy();
 	},
 	onClickDuplicateButton: function(){
-
+		this.model.triggerDuplicate();
 	},
 	setCurrentScene: function(){
-		this.model.setCurrentScene();
+		this.model.setNextScene(this);
 	},
 	onChangeKeyUI: function(e){
 		var $settings = this.$(".settings");

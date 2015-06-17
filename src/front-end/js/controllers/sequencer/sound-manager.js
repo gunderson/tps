@@ -44,7 +44,7 @@ function SoundManager(){
 		load: function(instruments){
 			//ensure input is an array
 			if (!$.isArray(instruments)) instruments = [instruments];
-			console.log("SoundManager loading instruments: ", instruments);
+			// console.log("SoundManager loading instruments: ", instruments);
 			//create promises for each instrument to load
 			var promises = [];
 			if (this.loading.state() === "resolved"){
@@ -84,7 +84,7 @@ function SoundManager(){
 			var s = Theory.scale;
 			var octave = parseInt(note.slice(-1), 10);
 			var num = s.indexOf(note.substr(0,note.length - 1)) + (octave * 12);
-			console.log("note2num", note, num);
+			// console.log("note2num", note, num);
 			return num;
 		}
 	};

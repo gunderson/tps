@@ -32,6 +32,7 @@ var SequencerModel = Backbone.Model.extend({
 	},
 	onAppGenerate: function(preset){
 		this.import(preset);
+		this.appController.trigger("generate-complete");
 	},
 	play: function(){
 		var scenes = this.get("scenes");
@@ -51,6 +52,9 @@ var SequencerModel = Backbone.Model.extend({
 		this.controller = controller;
 		this.listenTo(controller, "16th", this.on16th);
 		this.listenTo(controller, "play stop", this.onChangePlay);
+	},
+	duplicateScene: function(scene){
+		this.get("scenes").importOne(scene.export(), scene.get("sceneId"));
 	},
 
 	triggerCopyRequest: function(pattern){
@@ -72,23 +76,33 @@ var SequencerModel = Backbone.Model.extend({
 		// get active scene
 		var scenes = this.get("scenes");
 		var activeScene = scenes.getActiveScene();
+		var updatedStatus = {currentSceneId: activeScene.get("sceneId")};
 
 		// check how long it is against current 16th
 		if (status.currentMeasure >= activeScene.get("maxNumMeasures")){
-			status.currentMeasure = 0;
+				console.log("=========== advance scene?", this.get("repeat"), status.currentMeasure, activeScene.get("maxNumMeasures"))
 			this.controller.setMeasure(0);
-			if (this.get("repeat")){
+			if (!(this.get("repeat") - 1)){
 				// advance the scene
-				if (!this.get("loop")){
+				if (!this.get("loop") && this.get("nextSceneId") > -1){
 
 					activeScene.set("active", false);
 
 					var nextSceneId = this.get("nextSceneId") || 1 + activeScene.get("sceneId");
+					this.set("nextSceneId", null);
 					activeScene = scenes.findWhere({sceneId: nextSceneId});
+
 					
 					if (activeScene){
 						activeScene.set("active", true);
 						this.set("repeat", activeScene.get("repeat"));
+
+						updatedStatus = {
+							currentSceneId: activeScene.get("sceneId"),
+							currentBeat: 0,
+							currentMeasure: 0
+						};
+
 					} else {
 						this.set({
 							"currentSceneId": 0,
@@ -105,9 +119,7 @@ var SequencerModel = Backbone.Model.extend({
 
 		}
 
-		this.trigger("16th", _.extend(status, {
-			currentSceneId: activeScene.get("sceneId")
-		}));
+		this.trigger("16th", _.extend(status,updatedStatus));
 	},
 	onChangeCurrentScene: function(){
 

@@ -4,6 +4,7 @@ var SceneModel = require("../../models/sequencer/scene");
 
 var SceneCollection = Backbone.Collection.extend({
 	model: SceneModel,
+	comparator: "sceneId",
 	initialize: function(){
 		this.on("add", this.onAdd);
 		this.on("change:active", this.onSetActive);
@@ -13,17 +14,21 @@ var SceneCollection = Backbone.Collection.extend({
 			return scene.export();
 		});
 	},
+	clear: function(){
+
+	},
 	import: function(scenes){
 		this.each(function(scene){
 			scene.destroy();
 		});
 		this.reset(scenes);
-		this.each(function(scene){
-			scene.set({
-				"controller": this.controller
-			});
-			scene.import();
-		}.bind(this));
+		this.each(this.importOne.bind(this));
+	},
+	importOne: function(scene){
+		scene.set({
+			"controller": this.controller
+		});
+		scene.import();
 	},
 	triggerCopyRequest: function(source){
 		this.each(function(scene){
@@ -58,9 +63,10 @@ var SceneCollection = Backbone.Collection.extend({
 	},
 	onAdd: function(sceneModel, collection){
 		sceneModel.set({
-			sceneId: this.indexOf(sceneModel),
+			sceneId: this.length - 1,
 			trackCollection: this.trackCollection
 		});
+		console.log("SceneCollection::onAdd",this.indexOf(sceneModel), sceneModel.get("sceneId"))
 	}
 });
 

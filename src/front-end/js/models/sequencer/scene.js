@@ -6,7 +6,7 @@ var SceneModel = Backbone.Model.extend({
 	defaults: function(){
 		var settings = {
 			// controller: null,
-			sceneId: 0,
+			sceneId: null,
 			patterns: new PatternCollection([]),
 			ticksPerBeat: 128,
 			beatsPerMeasure: 4, // should match the song beatsPerMeasure
@@ -14,7 +14,8 @@ var SceneModel = Backbone.Model.extend({
 			currentMeasure: 0,
 			maxNumMeasures: 1,
 			active: false,
-			repeat: 1
+			repeat: 1,
+			repeated: 0
 		};
 		settings.tickWidth = (Math.PI * 2) / settings.ticksPerBeat;
 		return settings;
@@ -33,6 +34,7 @@ var SceneModel = Backbone.Model.extend({
 	},
 	setPatternListeners: function(){
 		var patterns = this.get("patterns");
+		this.on("change:sceneId", this.onChangeSceneId, this);
 		this.listenTo(patterns, "edit-pattern", this.onEditPattern);
 		this.listenTo(patterns, "add", this.onAddPattern);
 		this.listenTo(patterns, "add remove change:length", this.getLongestMeasureLength);
@@ -42,7 +44,11 @@ var SceneModel = Backbone.Model.extend({
 	},
 
 	// Event Listeners --------------------------------------------------------------
-
+	onChangeSceneId: function(sceneId){
+		this.get("patterns").each(function(pattern){
+			pattern.set("sceneId", sceneId);
+		});
+	},
 	onAddPattern: function(model){
 		this.trigger("pattern:add", model);
 	},
@@ -78,6 +84,7 @@ var SceneModel = Backbone.Model.extend({
 		} else {
 			this.trigger("16th", _.extend(sceneStatus, status));
 		}
+		console.log(status);
 	},
 	
 	onRemovePattern: function(){
@@ -91,6 +98,9 @@ var SceneModel = Backbone.Model.extend({
 
 
 	// Directives --------------------------------------------------------------
+	triggerDuplicate: function(){
+		this.trigger("duplicate", this);
+	},
 	triggerCopyRequest: function(sourcePattern){
 		this.trigger("copy-request", sourcePattern);
 	},
@@ -136,8 +146,8 @@ var SceneModel = Backbone.Model.extend({
 			}, 1)
 		);
 	},
-	setCurrentScene: function(){
-		this.get("controller").model.set("currentSceneId", this.id);
+	setNextScene: function(){
+		this.get("controller").model.set("nextSceneId", this.get("sceneId"));
 	},
 	cleanup:function(){
 	}
