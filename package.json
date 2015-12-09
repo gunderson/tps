@@ -72,6 +72,7 @@
     "serialport": "^1.4.6",
     "snapsvg": "git://github.com/sethvincent/Snap.svg#a34b8af69b",
     "soundcloud-node": "0.0.10",
+    "three.js": "^0.73.0",
     "twit": "^1.1.18",
     "underscore": "^1.7.0",
     "velocity-animate": "^1.1.0"

@@ -43,6 +43,10 @@ var TwitterDataCollection = Backbone.Collection.extend({
 			},
 			//callback
 			function(err, data) {
+				if (err) console.log("ERROR", err);
+
+				console.log("DATA", data);
+
 				var lastOrder = this.length > 0 ? this.last().get("order") : 0;
 				this.add(this.parseFromTwitter(err, data));
 				this.each(function(tweet) {

@@ -22,6 +22,9 @@ var Page = AbstractPage.extend({
     },
     onClickGetSongsFromTwitter: function() {
         $.get("http://localhost:3030/songs/cycle");
+    },
+    getAccessToken: function(){
+        
     }
 });
 
