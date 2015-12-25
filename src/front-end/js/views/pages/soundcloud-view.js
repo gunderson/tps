@@ -16,22 +16,23 @@ var Page = AbstractPage.extend({
 	events: {
 		"click button.advance": "onClickAdvance",
 		"click button.play": "onClickPlay",
-		"click button.stop": "onClickStop"
+		"click button.stop": "onClickStop",
+		"click button.fullscreem": "onClickFullScreen"
 	},
 	initialize: function(){
 		this.player = new Audio();
 		this.loader = new SoundCloudLoader(this.player);
 		this.audioSource = new SoundCloudAudioSource(this.player);
-		this.visualizer = new Visualizer({
-			audioSource: this.audioSource,
-			canvas: this.$("#visualizer")[0]
-		});
 		this.player.addEventListener('ended', this.onSongEnd.bind(this));
 		this.listenTo(this.model.get("current"), "change reset", this.onChangeCurrent);
 		this.listenTo(this.model.get("next"), "change reset", this.onChangeNext);
 	},
 
 	afterRender: function(){
+		this.visualizer = new Visualizer({
+			audioSource: this.audioSource,
+			container: this.$("#visualizer")[0]
+		});
 	},
 	onChangeCurrent: function(){
 		this.updateSongTitles();
@@ -92,6 +93,16 @@ var Page = AbstractPage.extend({
     	this.visualizer.stop();
     },
 
+    onClickFullScreen: function(){
+
+    },
+
+    onFullScreen: function(){
+
+    },
+    onNormalScreen: function(){
+
+    },
 
 
 	transitionIn: function(){

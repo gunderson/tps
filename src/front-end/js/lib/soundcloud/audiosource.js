@@ -17,7 +17,7 @@ prefixMethod("AudioContext");
 var MicrophoneAudioSource = function() {
     var self = this;
     this.volume = 0;
-    this.streamData = new Uint8Array(128);
+    this.streamData = new Uint8Array(1024);
     var analyser;
 
     var sampleAudioStream = function() {
@@ -35,7 +35,7 @@ var MicrophoneAudioSource = function() {
         var audioCtx = new window.AudioContext();
         var mic = audioCtx.createMediaStreamSource(stream);
         analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
+        analyser.fftSize = 1024;
         mic.connect(analyser);
         setInterval(sampleAudioStream, 20);
     }, function(){ alert("error getting microphone input."); });
@@ -46,7 +46,7 @@ var SoundCloudAudioSource = function(player) {
     var analyser;
     var audioCtx = new window.AudioContext();
     analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 256;
+    analyser.fftSize = 2048;
     var source = audioCtx.createMediaElementSource(player);
     source.connect(analyser);
     analyser.connect(audioCtx.destination);
@@ -62,7 +62,7 @@ var SoundCloudAudioSource = function(player) {
     setInterval(sampleAudioStream, 20);
     // public properties and methods
     this.volume = 0;
-    this.streamData = new Uint8Array(128);
+    this.streamData = new Uint8Array(analyser.frequencyBinCount);
     this.playStream = function(streamUrl) {
         // get the input stream from the audio element
         player.addEventListener('ended', function(){
