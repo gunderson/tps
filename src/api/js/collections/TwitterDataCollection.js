@@ -37,7 +37,7 @@ var TwitterDataCollection = Backbone.Collection.extend({
 	fetchFromTwitter: function() {
 		var deferred = Q.defer();
 		T.get('search/tweets', {
-				q: '#audiovortex -RT',
+				q: '#bluejay -RT',
 				result_type: "recent",
 				count: 100
 			},
@@ -45,7 +45,7 @@ var TwitterDataCollection = Backbone.Collection.extend({
 			function(err, data) {
 				if (err) console.log("ERROR", err);
 
-				console.log("DATA", data);
+				// console.log("DATA", JSON.stringify(data, null, "  "));
 
 				var lastOrder = this.length > 0 ? this.last().get("order") : 0;
 				this.add(this.parseFromTwitter(err, data));
@@ -66,6 +66,7 @@ var TwitterDataCollection = Backbone.Collection.extend({
 			.each(function(tweet) {
 				tweet._id = tweet.id_str;
 				tweet.soundcloud_url = parseSoundcloudURL(tweet.entities.urls);
+				console.log(tweet.soundcloud_url)
 			})
 			.filter(function(tweet) {
 				var rtPosition = tweet.text.toLowerCase().indexOf("rt @");
@@ -75,7 +76,9 @@ var TwitterDataCollection = Backbone.Collection.extend({
 					">@");
 				return tweet.soundcloud_url && rtPosition == -1;
 			});
-		return data.statuses;
+
+		console.log(soundcloudTweets);
+		return soundcloudTweets;
 	},
 	getSoundCloudInfo: function(model) {
 		return model.getSoundCloudInfo();
@@ -276,6 +279,7 @@ var TwitterDataCollection = Backbone.Collection.extend({
 			// Insert a multiple documents
 			_this.each(function(model, i) {
 				var deferral = deferrals[i];
+				// console.log("Setting Collection \n", model.toJSON());
 				tweets.update({
 						_id: model.id
 					}, {
@@ -310,11 +314,12 @@ function getDB() {
 
 //takes an array of url objects from Twitter API
 //returns an array of just soundcloud urls
-function parseSoundcloudURL(array) {
-	var obj = _.find(array, function(obj) {
-		return obj.expanded_url.indexOf("soundcloud.com") > -1;
+function parseSoundcloudURL(urlArray) {
+	var obj = _.find(urlArray, function(urlObj) {
+		if (!urlObj) return false; 
+		return urlObj.expanded_url.indexOf("soundcloud.com") > -1;
 	});
-	return obj.expanded_url;
+	return obj ? obj.expanded_url : undefined;
 }
 
 

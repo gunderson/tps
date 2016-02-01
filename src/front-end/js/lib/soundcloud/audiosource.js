@@ -14,10 +14,11 @@ prefixMethod("AudioContext");
  */
 
 
-var MicrophoneAudioSource = function() {
+var MicrophoneAudioSource = function(fftsize) {
     var self = this;
+    fftsize = fftsize || 2048;
     this.volume = 0;
-    this.streamData = new Uint8Array(1024);
+    this.streamData = new Uint8Array(fftsize);
     var analyser;
 
     var sampleAudioStream = function() {
@@ -35,18 +36,19 @@ var MicrophoneAudioSource = function() {
         var audioCtx = new window.AudioContext();
         var mic = audioCtx.createMediaStreamSource(stream);
         analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 1024;
+        analyser.fftSize = fftsize;
         mic.connect(analyser);
         setInterval(sampleAudioStream, 20);
     }, function(){ alert("error getting microphone input."); });
 };
 
-var SoundCloudAudioSource = function(player) {
+var SoundCloudAudioSource = function(player, fftsize) {
+    fftsize = fftsize || 2048;
     var self = this;
     var analyser;
     var audioCtx = new window.AudioContext();
     analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 2048;
+    analyser.fftSize = fftsize;
     var source = audioCtx.createMediaElementSource(player);
     source.connect(analyser);
     analyser.connect(audioCtx.destination);
@@ -54,16 +56,20 @@ var SoundCloudAudioSource = function(player) {
         analyser.getByteFrequencyData(self.streamData);
         // calculate an overall volume value
         var total = 0;
-        for (var i = 0; i < 80; i++) { // get the volume from the first 80 bins, else it gets too loud with treble
+        // for (var i = 0; i < 80; i++) { // get the volume from the first 80 bins, else it gets too loud with treble
+        //     total += self.streamData[i];
+        // } 
+        for(var i in self.streamData) {
             total += self.streamData[i];
         }
         self.volume = total;
     };
-    setInterval(sampleAudioStream, 20);
+    setInterval(sampleAudioStream, 1000/60);
     // public properties and methods
     this.volume = 0;
     this.streamData = new Uint8Array(analyser.frequencyBinCount);
     this.playStream = function(streamUrl) {
+        console.log(streamUrl);
         // get the input stream from the audio element
         player.addEventListener('ended', function(){
             self.directStream('coasting');
@@ -71,6 +77,9 @@ var SoundCloudAudioSource = function(player) {
         player.setAttribute('src', streamUrl);
         player.play();
     };
+    this.currentTime = function(){
+        return player.currentTime;
+    }
 };
 if (typeof module === "object"){
 	module.exports = {

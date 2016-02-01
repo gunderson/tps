@@ -17,7 +17,7 @@ var express = require("express");
 var bodyParser = require('body-parser');
 var _ = require("underscore");
 var request = require("request");
-var SerialPort = require("serialport");
+// var SerialPort = require("serialport");
 
 // var serialPort = new SerialPort.SerialPort("/dev/tty.usbmodem1411", {
 // 	baudrate: 19200,
@@ -144,7 +144,7 @@ module.exports = function(app, server, _options) {
 				tweet.set(req.body);
 			})
 			.then(function() {
-				tweet.save
+				tweet.save()
 			})
 			.then(function() {
 				ResponseUtils.sendData(res, {

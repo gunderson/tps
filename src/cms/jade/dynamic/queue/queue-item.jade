@@ -7,6 +7,10 @@ tr.queue-item
 			option(value="#{constants.MODERATION_STATUS.ELEVATED}", selected=moderationStatus == constants.MODERATION_STATUS.ELEVATED) #{copy.shared.MODERATION_STATUS.ELEVATED}
 			option(value="#{constants.MODERATION_STATUS.ACCEPTED}", selected=moderationStatus == constants.MODERATION_STATUS.ACCEPTED) #{copy.shared.MODERATION_STATUS.ACCEPTED}
 			option(value="#{constants.MODERATION_STATUS.PUBLISHED}", selected=moderationStatus == constants.MODERATION_STATUS.PUBLISHED) #{copy.shared.MODERATION_STATUS.PUBLISHED}
+		select.queue-status
+			option(value="#{constants.QUEUE_STATUS.UNQUEUED}", selected=queueStatus == constants.QUEUE_STATUS.UNQUEUED)  #{copy.shared.QUEUE_STATUS.UNQUEUED}
+			option(value="#{constants.QUEUE_STATUS.QUEUED}", selected=queueStatus == constants.QUEUE_STATUS.QUEUED)  #{copy.shared.QUEUE_STATUS.QUEUED}
+			option(value="#{constants.QUEUE_STATUS.PLAYING}", selected=queueStatus == constants.QUEUE_STATUS.PLAYING)  #{copy.shared.QUEUE_STATUS.PLAYING}
 	td.user 
 		h2 #{user.name}
 		a(href="http://twitter.com/#{user.screen_name}") @#{user.screen_name}

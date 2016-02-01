@@ -7,7 +7,8 @@ var View = Backbone.Layout.extend({
 	el: false,
 	template: "queue/queue-item",
 	events: {
-		"change select.moderation-status": "onChangeStatus"
+		"change select.moderation-status": "onChangeModerationStatus",
+		"change select.queue-status": "onChangeQueueStatus"
 	},
 	updateOrder: function(newOrder){
 		this.model.set("order", newOrder);
@@ -21,9 +22,16 @@ var View = Backbone.Layout.extend({
 		console.log(this.model.toJSON());
 		return _.extend({}, this.model.toJSON(), {copy: this.copy, constants: constants});
 	},
-	onChangeStatus: function(e){
+	onChangeModerationStatus: function(e){
 		this.model
 			.set({"moderationStatus": e.target.value})
+			.save();
+	},
+	onChangeQueueStatus: function(e){
+		console.log('change')
+		// if (e.target.value === constants.QUEUE_STATUS.PLAYING) return ;
+		this.model
+			.set({"queueStatus": e.target.value})
 			.save();
 	},
 });

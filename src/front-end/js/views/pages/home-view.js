@@ -10,7 +10,10 @@ var Page = AbstractPage.extend({
     events: {
         "click button.trigger": "onClickTriggerButton",
         "click button.triggerAll": "onClickTriggerAllButton",
-        "click button.getSongsFromTwitter": "onClickGetSongsFromTwitter"
+        "click button.getSongsFromTwitter": "onClickGetSongsFromTwitter",
+    },
+    initialize: function(){
+        
     },
     onClickTriggerButton: function(e) {
         $.get("http://localhost:3030/pulse/trigger/" + $(e.target).data(
@@ -25,6 +28,9 @@ var Page = AbstractPage.extend({
     },
     getAccessToken: function(){
         
+    },
+    onClickGoFullScreen: function(){
+
     }
 });
 

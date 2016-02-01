@@ -11,53 +11,51 @@ prefixMethod("cancelAnimationFrame");
 
 
 var Visualizer = function(options) {
-    var audioSource = options.audioSource;
-    var container = options.container;
-    //var ctx = canvas.getContext("2d");
-    var loopFrame;
     var streamData = new Uint8Array(1024);
     var prevStreamData = new Uint8Array(1024);
     var prevStreamData2 = new Uint8Array(1024);
-    var isPlaying = false;
-    var inc = 0;
 
     var THE_ORIGIN = new THREE.Vector3(0,0,0);
     Math.PHI = 2.399963229728653;
 
-    this.play = play;
-    this.stop = stop;
     this.setup = setup;
+    this.update = update;
+    this.render = render;
+    this.reset = reset;
+    this.setSize = setSize;
+    this.renderer = null;
+
+
+    var WIDTH = 720, HEIGHT = 420;
 
         // ------------------------------------
 
     var tick = 0;
     var prevTick = -1;
-    var prevFFTData = _.filledArray(1024, 0);
 
-    function update(time, fftData) {
-        tick = time / millisPerTick;
-        // if (prevTick != tick){
-        //     getParticles(30, {birthday: time});
-        // }
+    function update(fftData, time, _tick) {
+        tick = _tick;
+        var tickDelta = tick - prevTick;
 
-        colorMapOffset.x += colorMapDrift.x;
-        colorMapOffset.y += colorMapDrift.y;
+        colorMapOffset.x += tickDelta * colorMapDrift.x;
+        colorMapOffset.y += tickDelta * colorMapDrift.y;
 
         activeParticles.forEach(function(p, i){
-            updateParticle(p, time, fftData[i]);
+            updateParticle(p, tick, fftData[i]);
         });
 
-        var cameraTick = Math.PI * 2 * ((tick % 1080) / 1080);
-        //camera.rotation.z =  cameraTick
-        //camera.position.x = Math.cos(cameraTick) * WIDTH * 0.25
-        //camera.position.y = Math.sin(cameraTick) * HEIGHT * 0.25
-        //camera.lookAt(center);
+
+        // var cameraTick = Math.PI * 2 * ((tick % 2048) / 2048);
+        // camera.rotation.z =  cameraTick;
+        // camera.position.x = Math.cos(cameraTick) * WIDTH * 0.125
+        // camera.position.y = Math.sin(cameraTick) * HEIGHT * 0.125
+        // camera.lookAt(center);
         prevTick = tick;
 
 
         prevStreamData2 = new Uint8Array(prevStreamData.buffer.slice());
         prevStreamData = new Uint8Array(streamData.buffer.slice());
-        streamData = new Uint8Array(audioSource.streamData.buffer.slice());
+        streamData = fftData;
 
         // normalize stream data
 
@@ -74,50 +72,16 @@ var Visualizer = function(options) {
         //         return val;
         //     })
         // );
-
-
-
-        inc++;
-
     }
 
-    // function draw(){
-    //     //cheap clear
-    //     canvas.width = canvas.width;
-    //     var barWidth = canvas.width / (streamData.length >> 0);
-    //     ctx.fillStyle = "#ff0000";
 
-    //     for (var i = 0, endi = streamData.length; i < endi; i+=1){
-    //         var val = streamData[i];
-    //         var barHeight = (canvas.height * streamData[i] / 0xff);
-    //         if (i == 0x42 || i == 0x20) {
-    //             ctx.fillStyle = "#0000ff";
-    //         } else {
-    //             ctx.fillStyle = "#ff0000";
-    //         }
-    //         ctx.fillRect((i >> 0) * (barWidth + 1), canvas.height - barHeight, barWidth, barHeight);
-    //     }
-    //     //detect a peak
-    //     i = 0x42;
-    //     if (prevStreamData2[i] < prevStreamData[i] && prevStreamData[i] > streamData[i]){
-    //         // $.get("http://localhost:3030/pulse/trigger/3");
-    //     }
-    //     i = 0x20;
-    //     if (prevStreamData2[i] < prevStreamData[i] && prevStreamData[i] > streamData[i]){
-    //         // $.get("http://localhost:3030/pulse/trigger/4");
-    //     }
-    // }
-
-    // function loop(){
-    //     update();
-    //     draw();
-    //     if (isPlaying) requestAnimationFrame(loop);
-    // }
-
+    function render() {
+        renderer.render(scene, camera);
+    }
 
     // ------------------------------------
 
-    var WIDTH,HEIGHT,center,particleDestination;
+    var center,particleDestination;
 
     // set some camera attributes
     var VIEW_ANGLE,ASPECT,NEAR,FAR;
@@ -128,26 +92,20 @@ var Visualizer = function(options) {
     var standardGeometry;
 
     function setup(){
-        activeParticles.forEach(function(p){
-            scene.remove(p);
-        });
-        activeParticles = [];
-
+        activeParticles.forEach(recycleParticle);
         // set the scene size
-        WIDTH = $(container).width();
-        HEIGHT = $(container).height();
         center = new THREE.Vector3(0, 0, 0);
-        particleDestination = new THREE.Vector3(0, 0, 900);
+        particleDestination = new THREE.Vector3(0, 0, 2000);
 
         // set some camera attributes
-        VIEW_ANGLE = 90;
+        VIEW_ANGLE = 40;
         ASPECT = WIDTH / HEIGHT;
         NEAR = 0.01;
         FAR = 4000;
 
         // create a WebGL renderer, camera
         // and a scene
-        renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
+        this.renderer = renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
         renderer.autoClear = true;
         camera = new THREE.PerspectiveCamera(
             VIEW_ANGLE,
@@ -162,7 +120,7 @@ var Visualizer = function(options) {
         // so pull it back
         camera.position.x = 0;
         camera.position.y = 0;
-        camera.position.z = 1000;
+        camera.position.z = 2200;
         camera.lookAt(new THREE.Vector3(0, 0, -10));
 
         // add the camera to the scene
@@ -173,9 +131,9 @@ var Visualizer = function(options) {
         scene.add( light );
 
         standardGeometry = new THREE.CylinderGeometry(
-            (WIDTH + HEIGHT) * 0.12, // upper radius
-            (WIDTH + HEIGHT) * 0.12, // lower radius
-            100, // height
+            120, // upper radius
+            120, // lower radius
+            220, // height
             3 // segments
         );
         standardGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
@@ -184,10 +142,8 @@ var Visualizer = function(options) {
         // start the renderer
         renderer.setSize(WIDTH, HEIGHT);
 
-        // attach the render-supplied DOM element
-        container.appendChild(renderer.domElement);
-
         loadColorMap();
+        return this;
     }
 
 
@@ -201,8 +157,12 @@ var Visualizer = function(options) {
     });
 
 
-
-
+    function setSize(WIDTH, HEIGHT){
+        camera.aspect = WIDTH / HEIGHT;
+        renderer.setSize(WIDTH, HEIGHT);
+        renderer.domElement.width = WIDTH;
+        renderer.domElement.height = HEIGHT;
+    }
 
     // ------------------------------------
 
@@ -232,12 +192,11 @@ var Visualizer = function(options) {
     var rows = 32, cols = 32, totalChannels = rows * cols;
 
     function setupParticles(){
-        getParticles(totalChannels, {birthday: Date.now()})
+        getParticles(totalChannels, {birthday: tick})
             .forEach(function(p,i){
                 setupParticle(p, {index: i});
             });
     }
-
 
     // ------------------------------------
 
@@ -253,16 +212,24 @@ var Visualizer = function(options) {
 
         // assign particles to home positions
         // p.computeGridPosition(cols, rows);
-        p.computeSpiralPosition();
+        p.computeSpiralGridPosition(cols, rows);
+        // p.computeSpiralPosition();
 
         p.angle = Math.atan2(p.homePosition.y, p.homePosition.x);
-        p.speed = 0.5;
+        p.speed = -100;
         
-        var color = getRGB(colorMap, colorMapData, p.homePosition.x *0.5, p.homePosition.y* 0.5);
+        var color = getRGB(colorMap, colorMapData, p.homePosition.x *0.25, p.homePosition.y* 0.25);
         p.material.color = new THREE.Color(color);
     }
 
-    var spiralStartIndex = 1;
+    function resizeParticle(p){
+
+    }
+
+    // ------------------------------------
+
+
+    var spiralStartIndex = 0;
 
     function computeSpiralPosition(){
         var finalRadius = Math.sqrt (activeParticles.length + spiralStartIndex);
@@ -271,8 +238,8 @@ var Visualizer = function(options) {
         var angle = p.index * Math.PHI; //Golden angle relative to TWO_PI
         
         p.homePosition = new THREE.Vector3(
-            Math.cos(angle) * Math.sqrt(p.index + spiralStartIndex) * 2 * (WIDTH / finalRadius),
-            Math.sin(angle) * Math.sqrt(p.index + spiralStartIndex) * 2 * (HEIGHT / finalRadius),
+            Math.cos(angle) * Math.sqrt(p.index + spiralStartIndex) * 2 * (720 / finalRadius),
+            Math.sin(angle) * Math.sqrt(p.index + spiralStartIndex) * 2 * (480 / finalRadius),
             0
         );
 
@@ -282,6 +249,8 @@ var Visualizer = function(options) {
         p.position.y = p.homePosition.y;       
     }
 
+    // ------------------------------------
+
     function computeGridPosition(cols, rows){
         var p = this;
         p.gridPosition = {x: p.index % cols, y: Math.floor(p.index / cols), z: 0};
@@ -290,7 +259,78 @@ var Visualizer = function(options) {
         p.homePosition.z = 0;
 
         p.position.x = p.homePosition.x;       
-        p.position.y = p.homePosition.y;       
+        p.position.y = p.homePosition.y;
+        p.position.z = p.particleDestination.z;      
+    }
+
+    // ------------------------------------
+
+    var currentGridPosition = {x:(cols / 2) - 1, y: (rows / 2) - 1};
+    var sideIndex = 0;
+    var sideLength = 1;
+    var sidePosition = 0;
+
+
+    // ------------------------------------
+
+    function computeSpiralGridPosition(cols, rows){
+        var p = this;
+        switch(sideIndex){
+          case 0:
+              p.gridPosition = _.extend({},currentGridPosition);
+              currentGridPosition.x++;
+              report();
+              if (++sidePosition >= sideLength){
+                sidePosition = 0;
+                sideIndex++;
+              }
+            break;
+          case 1:
+              p.gridPosition = _.extend({},currentGridPosition);
+              currentGridPosition.y++;
+              report();
+              if (++sidePosition >= sideLength){
+                sidePosition = 0;
+                sideIndex++;
+              }
+            break;
+          case 2:
+              p.gridPosition = _.extend({},currentGridPosition);
+              currentGridPosition.x--; 
+              report();
+              if (++sidePosition >= sideLength){
+                sidePosition = 0;
+                sideIndex++;
+              }
+            break;
+          case 3:
+              p.gridPosition = _.extend({},currentGridPosition);
+              currentGridPosition.y--;    
+              report();
+              if (++sidePosition >= sideLength){
+                sidePosition = 0;
+                sideIndex = 0;
+                currentGridPosition.x--;
+                currentGridPosition.y--;
+                sideLength += 2;
+              }
+
+              break;
+        }
+
+
+        p.homePosition.x = ((p.gridPosition.x / cols) * 3200) - (3200 / 2);
+        p.homePosition.y = ((p.gridPosition.y / rows) * 1800) - (1800 / 2);
+        p.homePosition.z = 0;
+
+
+        p.position.x = p.homePosition.x;       
+        p.position.y = p.homePosition.y;
+        p.position.z = particleDestination.z;  
+
+        function report(){
+           // console.log({index: p.index, sideIndex: sideIndex, sidePosition: sidePosition, sideLength: sideLength}, currentGridPosition);
+        }
     }
 
     // ------------------------------------
@@ -311,9 +351,9 @@ var Visualizer = function(options) {
             ),
             {
                 index: 0,
-                age: 0,
-                lifespan: 2000,
-                birthday: startTime,
+                age: 1,
+                lifespan: 120,
+                birthday: tick,
                 peak:255,
                 endTime: this.birthday + this.lifespan,
                 homePosition: {x:0,y:0,z:0},
@@ -321,6 +361,7 @@ var Visualizer = function(options) {
                 getLevel: getLevel,
                 computeGridPosition: computeGridPosition,
                 computeSpiralPosition: computeSpiralPosition,
+                computeSpiralGridPosition: computeSpiralGridPosition,
             }, options);
        
 
@@ -331,7 +372,7 @@ var Visualizer = function(options) {
                 //reset to new peak
                 this.peak = level;
                 this.age = 0;
-                p.birthday = Date.now();
+                p.birthday = tick;
             }
         }
 
@@ -344,8 +385,8 @@ var Visualizer = function(options) {
 
     // ------------------------------------
 
-    function updateParticle(p, time, level){
-        p.age = (time - p.birthday) / p.lifespan;  
+    function updateParticle(p, tick, level){
+        p.age = (tick - p.birthday) / p.lifespan;  
 
         p.setLevel(level);
         
@@ -354,10 +395,15 @@ var Visualizer = function(options) {
             p.age = 1;
         }
 
-        // p.position.x = p.homePosition.x + p.age * Math.cos(p.angle) * p.speed;
-        // p.position.y = p.homePosition.y + p.age * Math.sin(p.angle) * p.speed;
+
+        p.position.x = p.homePosition.x + (1-p.age) * Math.cos(p.angle) * p.speed;
+        p.position.y = p.homePosition.y + (1-p.age) * Math.sin(p.angle) * p.speed;
         p.position.z = (particleDestination.z * (p.peak / 255)) * (1-p.age);
-        p.material.opacity = (1-p.age) * 0.12;
+
+        // less opaque with age
+        // less opaque with higher index 
+
+        p.material.opacity = (1-p.age) * (0.14);// + (0.10 * (1 - (p.index / 1024))));
 
 
         var color = getRGB(colorMap, colorMapData, (p.homePosition.x + WIDTH) * 0.5, (p.homePosition.y+ HEIGHT) * 0.5);
@@ -371,40 +417,14 @@ var Visualizer = function(options) {
 
     // ------------------------------------
 
-    var startTime = Date.now();
-    var ticksPerSecond = 60;
-    var millisPerTick = 1000 / ticksPerSecond;
-    var now = startTime;
-    var animationFrameID = null, updateIntervalID = null;
 
-    function play() {
-        if (animationFrameID === null) {
-            onAnimationFrame();
-        }
-        if (updateIntervalID === null){
-            updateIntervalID = setInterval(onUpdateInterval, 1000 / 60);
-        }
+    function reset(){
+        activeParticles.forEach(function(p){
+            p.age = 0;
+            p.birthday = 0;
+            p.level = 0;
+        });
     }
-
-    function stop() {
-        cancelAnimationFrame(animationFrameID);
-        animationFrameID = null;
-        clearInterval(updateIntervalID);
-        updateIntervalID = null;
-    }
-
-    var fftData;
-
-    function onUpdateInterval(){
-        update(Date.now(), streamData);
-    }
-
-    function onAnimationFrame() {
-        animationFrameID = requestAnimationFrame(onAnimationFrame);
-        renderer.render(scene, camera);
-    }
-
-
 
 
 
@@ -418,7 +438,11 @@ var Visualizer = function(options) {
     var colorMapDrift = {x:0.001,y:0.003};
 
     function loadColorMap() {
+         // var imgSrc = "http://www.theorigin.net/participlejs/img/colormap0.jpg";
+         // var imgSrc = "http://www.theorigin.net/silkbrush/img/comp54.jpg";
          var imgSrc = "http://www.theorigin.net/silkbrush/img/colormap.png";
+         // var imgSrc = "/assets/images/colormap_0.jpg";
+         // var imgSrc = "/assets/images/colormap_1.jpg";
      //var imgSrc = "http://www.theorigin.net/silkbrush/img/capsecone.jpg";
         colorMap = new Image();
         colorMap.crossOrigin = "anonymous";
@@ -448,8 +472,8 @@ var Visualizer = function(options) {
     }
 
 
-    setup();
-
+    setup.call(this);
+    return this;
 
 };
 
