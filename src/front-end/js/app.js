@@ -5,7 +5,7 @@ var _ = require("underscore");
 //-------------------------------------------------------------
 // Top Level Models
 
-var SoundcloudPlayerModel     = require("./models/soundcloud-player-model");
+var SoundcloudPlayerModel = require("./models/soundcloud-player-model");
 
 //-------------------------------------------------------------
 // Controllers
@@ -13,21 +13,23 @@ var SoundcloudPlayerModel     = require("./models/soundcloud-player-model");
 
 // Instances
 
-var router                 = require("./controllers/router");
+var router         = require("./controllers/router");
 
 //-------------------------------------------------------------
 // Top level Views
 
-var AbstractPage           = require("./views/pages/Page-view");
-var MainMenu               = require("./views/ui/main-menu-view");
-var HomePage               = require("./views/pages/home-view");
-var SoundCloudPage         = require("./views/pages/soundcloud-view");
+var AbstractPage   = require("./views/pages/Page-view");
+var MainMenu       = require("./views/ui/main-menu-view");
+var HomePage       = require("./views/pages/home-view");
+var SoundCloudPage = require("./views/pages/soundcloud-view");
+var FilePlayerPage = require("./views/pages/file-player-page-view");
 
 // Instances
 
 var pages = {
-    "#home"          : new HomePage({route: "/"}),
-    "#soundcloud"          : new SoundCloudPage({model: new SoundcloudPlayerModel(), route: "/soundcloud"}),
+    "#home"       : new HomePage({route: "/"}),
+    "#soundcloud" : new SoundCloudPage({model: new SoundcloudPlayerModel(), route: "/soundcloud"}),
+    "#file-player" : new FilePlayerPage({route: "/file-player"}),
 };
 
 var overlays = {
@@ -35,7 +37,7 @@ var overlays = {
 };
 
 var ui = {
-    "#main-menu"      : new MainMenu()
+    "#main-menu"  : new MainMenu()
 };
 
 
@@ -61,8 +63,6 @@ module.exports = AbstractPage.extend({
             }
     	});
 
-        this.listenTo(this.controller, "generate-complete", this.onGenerateComplete);
-
         $(window).on('orientationchange', this.onOrientationChange);
         this.onOrientationChange();
 
@@ -70,9 +70,6 @@ module.exports = AbstractPage.extend({
         this.router.pages = pages;
         this.listenTo(this.router, 'route', this.onRoute);
         Backbone.history.start();
-    },
-    onGenerateComplete: function(){
-        this.router.navigate("/sequencer", {trigger: true});
     },
     onOrientationChange: function (e) {
         // alert('onOrientationChange', window.orientation);

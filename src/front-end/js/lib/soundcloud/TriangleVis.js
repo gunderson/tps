@@ -24,6 +24,7 @@ var Visualizer = function(options) {
     this.reset = reset;
     this.setSize = setSize;
     this.renderer = null;
+    this.fftSize = 1024;
 
 
     var WIDTH = 720, HEIGHT = 420;
@@ -40,6 +41,17 @@ var Visualizer = function(options) {
         colorMapOffset.x += tickDelta * colorMapDrift.x;
         colorMapOffset.y += tickDelta * colorMapDrift.y;
 
+
+        var segs = Math.floor(fftData.length / this.fftSize);
+
+        fftData = _.map(_.range(this.fftSize), function(i){
+            return _.reduce(fftData.slice(i * segs, (i+1) * segs), function(a,b){
+                return a+b;
+            }, 0) / segs;
+        });
+
+
+
         activeParticles.forEach(function(p, i){
             updateParticle(p, tick, fftData[i]);
         });
@@ -53,8 +65,8 @@ var Visualizer = function(options) {
         prevTick = tick;
 
 
-        prevStreamData2 = new Uint8Array(prevStreamData.buffer.slice());
-        prevStreamData = new Uint8Array(streamData.buffer.slice());
+        prevStreamData2 = prevStreamData;
+        prevStreamData = streamData;
         streamData = fftData;
 
         // normalize stream data

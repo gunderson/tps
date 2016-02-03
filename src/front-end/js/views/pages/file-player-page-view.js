@@ -2,8 +2,7 @@ require("backbone");
 require("backbone.layoutmanager");
 var AbstractPage = require("./Page-view");
 
-var SoundCloudAudioSource = require("../../lib/soundcloud/audiosource").FileAudioSource;
-var SoundCloudLoader = require("../../lib/soundcloud/soundcloudloader");
+var FileAudioSource = require("../../lib/soundcloud/audiosource").FileAudioSource;
 var TriangleVis = require("../../lib/soundcloud/TriangleVis");
 var TunnelVis = require("../../lib/soundcloud/TunnelVis");
 var GroundVis = require("../../lib/soundcloud/GroundVis");
@@ -14,28 +13,28 @@ var AnimationPlayer = require("../../lib/soundcloud/AnimationPlayer");
 var Page = AbstractPage.extend({
 	keep: true,
 	row:1,
-	col:1,
+	col:2,
 	playing: false,
-	el: "#soundcloud",
+	el: "#file-player",
 	events: {
-		"click button.advance": "onClickAdvance",
 		"click button.play": "onClickPlay",
 		"click button.stop": "onClickStop",
-        "click button.goFullScreen": "onClickGoFullScreen"
+        "click button.goFullScreen": "onClickGoFullScreen",
+        "change input#file-picker": "onChangeFile",
+        "change select#vis-picker": "onChangeVis",
 	},
 	initialize: function(){
-		this.setupSoundCloudPlayer();
-		this.player.addEventListener('ended', this.onSongEnd.bind(this));
-		this.listenTo(this.model.get("current"), "change reset", this.onChangeCurrent);
-		this.listenTo(this.model.get("next"), "change reset", this.onChangeNext);
+		// this.player.addEventListener('ended', this.onSongEnd.bind(this));
 		
-		// visualizers.push(new GroundVis());
-		// visualizers.push(new TunnelVis());
-		visualizers.push(new TriangleVis());
 		visualizers.push(new ColumnVis());
+		visualizers.push(new TriangleVis());
+		visualizers.push(new TunnelVis());
+		visualizers.push(new GroundVis());
 
+		this.setupPlayer(2048);
 		this.onFullScreen = this.onFullScreen.bind(this);
 		this.onKeyPress = this.onKeyPress.bind(this);
+
 	},
 
 	afterRender: function(){
@@ -47,57 +46,30 @@ var Page = AbstractPage.extend({
 		this.animationPlayer.setVisualizer(visualizers[0]);
 		//$("#soundcloud .content").append(this.player);
 	},
-	onChangeCurrent: function(){
-		this.updateSongTitles();
-		if (this.playing){
-			this.onClickPlay();
-		}
+	onChangeVis: function(e){
+		var index = e.target.value;
+		this.animationPlayer.setVisualizer(visualizers[index]);
 	},
-	onChangeNext: function(){
-		this.updateSongTitles();
-	},
-	updateSongTitles:function(){
-		var currentModel = this.model.get("current");
-		var nextModel = this.model.get("next");
-		var currentURL = currentModel.get("soundcloud_url");
-		var nextextURL = nextModel.get("soundcloud_url");
 
-		var currentText = currentModel.get("soundcloudData") ? currentModel.get("soundcloudData").title : currentURL;
-		var nextText = nextModel.get("soundcloudData") ? nextModel.get("soundcloudData").title : nextextURL;
-
-		this.$(".now-playing a").attr("href", currentURL).text(currentText);
-		this.$(".up-next a").attr("href", nextextURL).text(nextText);
+	onChangeFile: function(e){
+		var file = e.target.files[0];
+		this.fileAddress = "file:///"+file.path;
 	},
-    onClickAdvance: function(){
-    	this.model.advance();
-    },
+	
     onSongEnd: function(){
-    	this.model.advance();
     },
     onClickPlay: function(){
     	this.playing = true;
     	var deferred = $.Deferred();
-    	if (this.model.get("current").get("soundcloud_url")){
-    		this.loader.loadStream(this.model.get("current").get("soundcloud_url"),
-    			function(song){
-    				//on success
-					// this.player.play();
-					this.audioSource.playStream(this.loader.streamUrl());
-					this.animationPlayer.play();
-					deferred.resolve();
-    			}.bind(this), function(){
-    				//on error
-					deferred.reject();
-    			});
+
+    	if (!this.fileAddress){
+			deferred.reject();
     	} else {
-    		this.model.start()
-	    		.done(function(){
-	    			this.audioSource.playStream(this.loader.streamUrl());
-					// this.player.play();
-					this.animationPlayer.play();
-					deferred.resolve();
-	    		}.bind(this));
+			this.audioSource.playStream(this.fileAddress);
+			this.animationPlayer.play();
+			deferred.resolve();
     	}
+
     	return deferred.promise;
     },
     onClickStop: function(){
@@ -111,6 +83,7 @@ var Page = AbstractPage.extend({
     },
 
     onFullScreen: function(){
+    	console.log("!!!!!!!!!!!!!!")
     	this.animationPlayer.onFullScreen();
     },
     onNormalScreen: function(){
@@ -136,6 +109,8 @@ var Page = AbstractPage.extend({
 	transitionInComplete: function(){
 		this.animationPlayer.play();
 
+		console.log("&&&&&&&&")
+
 		$(document)
 			.on("webkitfullscreenchange fullscreenchange", this.onFullScreen)
 			.on("keypress", this.onKeyPress);
@@ -151,16 +126,15 @@ var Page = AbstractPage.extend({
 	transitionOutComplete: function(){
 
 	},
-	setupSoundCloudPlayer: setupSoundCloudPlayer
+	setupPlayer: setupPlayer
 });
 
 var visualizers = [];
 
-function setupSoundCloudPlayer(){
+function setupPlayer(fftSize){
 	this.player = new Audio();
 	// this.player.controls = true;
-	this.loader = new SoundCloudLoader(this.player);
-	this.audioSource = new SoundCloudAudioSource(this.player, 2048);
+	this.audioSource = new FileAudioSource(this.player, fftSize);
 }
 
 module.exports = Page;

@@ -87,6 +87,7 @@ var Page = Backbone.Layout.extend({
 			console.log("No Previous Page");
 			this.$el.show();
 			this.trigger("transitionInComplete");
+			this.transitionInComplete && this.transitionInComplete();
 			return this;
 		}
 
@@ -115,6 +116,8 @@ var Page = Backbone.Layout.extend({
 				duration: PAGE_TRANSITION_TIME,
 				complete: function(){
 					_this.trigger("transitionInComplete");
+					_this.transitionInComplete && _this.transitionInComplete();
+
 				}
 			});
 		return this;
@@ -148,6 +151,7 @@ var Page = Backbone.Layout.extend({
 				duration: PAGE_TRANSITION_TIME,
 				complete: function(){
 					_this.trigger("transitionOutComplete");
+					_this.transitionOutComplete && _this.transitionOutComplete();
 				}
 			});
 		return this;

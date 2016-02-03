@@ -22,6 +22,20 @@ var Visualizer = function(options) {
     this.reset = reset;
     this.setSize = setSize;
     this.renderer = null;
+    this.fftSize = 32;
+    this.controls = {
+        cameraPosition: null,
+        cameraFocus: null,
+        viewAngle: 0,
+        numLayers: 0,
+        particlesPerLayer: 0,
+        layerWidth: 0,
+        depth: 0,
+        alpha: 0,
+        alphaDropoff: 0,
+        colormapScale: 0,
+        colormapMix: 0
+    };
 
 
     var WIDTH = 720, HEIGHT = 420;
@@ -37,6 +51,17 @@ var Visualizer = function(options) {
 
         colorMapOffset.x += tickDelta * colorMapDrift.x;
         colorMapOffset.y += tickDelta * colorMapDrift.y;
+
+        var segs = Math.floor(fftData.length / this.fftSize);
+
+        fftData = _.map(_.range(this.fftSize), function(i){
+            return _.reduce(fftData.slice(i * segs, (i+1) * segs), function(a,b){
+                return a+b;
+            }, 0) / segs;
+        });
+
+
+
 
         var lastRing = _.chain(activeParticles)
             
@@ -249,7 +274,7 @@ var Visualizer = function(options) {
 
         p.homePosition = new THREE.Vector3(
             dir * particleDistance * p.positionIndex + 5 * Math.cos(Math.TAU * p.layerIndex / numLayers),
-            -200 + p.positionIndex,
+            0,//-200 + p.positionIndex,
             p.ringIndex * layerDepth
         );
 
@@ -453,9 +478,9 @@ var Visualizer = function(options) {
         
         if (p.age === 0){
             
-            var scale = 3 * peakLevel;
-            // p.scale.set(1,scale,1);
-            p.position.y = ((scale * height * 0.5) + p.homePosition.y);
+            var scale = 2 * peakLevel;
+            p.scale.set(1,scale + 0.5,1);
+            // p.position.y = ((scale * height * 0.5) + p.homePosition.y);
             p.position.x = p.homePosition.x;
             // p.position.y = p.homePosition.y;
         }
@@ -468,10 +493,10 @@ var Visualizer = function(options) {
         // less opaque with age
         // less opaque with higher index 
 
-        p.material.opacity = 0.03 * Math.pow(peakLevel, 2);
+        p.material.opacity = 0.035 * Math.pow(peakLevel, 0.5);
 
 
-        var color = getRGB(colorMap, colorMapData, (p.homePosition.x + p.position.z) * 0.5, (p.homePosition.y+ p.position.z) * 0.5);
+        var color = getRGB(colorMap, colorMapData, (p.homePosition.x + p.position.z) * 0.25, (p.homePosition.y+ p.position.z) * 0.25);
         p.material.color = new THREE.Color(color);
         
 

@@ -22,6 +22,7 @@ var Visualizer = function(options) {
     this.reset = reset;
     this.setSize = setSize;
     this.renderer = null;
+    this.fftSize = 32;
 
 
     var WIDTH = 720, HEIGHT = 420;
@@ -37,6 +38,16 @@ var Visualizer = function(options) {
 
         colorMapOffset.x += tickDelta * colorMapDrift.x;
         colorMapOffset.y += tickDelta * colorMapDrift.y;
+
+        var segs = Math.floor(fftData.length / this.fftSize);
+
+        fftData = _.map(_.range(this.fftSize), function(i){
+            return _.reduce(fftData.slice(i * segs, (i+1) * segs), function(a,b){
+                return a+b;
+            }, 0) / segs;
+        });
+
+
 
         var lastRing = _.chain(activeParticles)
             
@@ -96,7 +107,7 @@ var Visualizer = function(options) {
         particleDestination = new THREE.Vector3(0, 0, 4000);
 
         // set some camera attributes
-        VIEW_ANGLE = 100;
+        VIEW_ANGLE = 80;
         ASPECT = WIDTH / HEIGHT;
         NEAR = 0.01;
         FAR = 10000;
@@ -118,7 +129,7 @@ var Visualizer = function(options) {
         // so pull it back
         camera.position.x = 0;
         camera.position.y = 0;
-        camera.position.z = -300;
+        camera.position.z = -400;
         camera.lookAt(new THREE.Vector3(0, 0, 0));
 
         // add the camera to the scene
@@ -131,7 +142,7 @@ var Visualizer = function(options) {
         standardGeometry = new THREE.CylinderGeometry(
             200, // upper radius
             200, // lower radius
-            400, // height
+            450, // height
             3 // segments
         );
         standardGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( Math.PI / 2 ) );
@@ -233,7 +244,7 @@ var Visualizer = function(options) {
     var numLayers = 32;
     var layerSize = 1800;
     var particleDistance = layerSize / particlesPerLayer;
-    var layerDepth = 1200 / numLayers;
+    var layerDepth = 1800 / numLayers;
 
     var buffers = _.map(_.range(numLayers), function(){
         return _.filledArray(particlesPerLayer);
@@ -445,7 +456,7 @@ var Visualizer = function(options) {
     function updateParticle(p, tick, level){
         p.setLevel(level);
         p.age = (tick - p.birthday) / p.lifespan;  
-        var height = 400;
+        var height = 450;
         var peakLevel = p.peak / 255;
 
 
@@ -455,7 +466,8 @@ var Visualizer = function(options) {
         if (p.age === 0){
             
             var scale = 1 * (peakLevel + 0.01);
-            p.scale.set(1,scale,1);
+            scale = Math.pow(scale, 0.5);
+            p.scale.set(0.5,scale,1);
             // p.position.y = p.homePosition.y;
             p.position.y = ((-p.top * scale * height * 0.5) + p.homePosition.y);
             p.position.x = p.homePosition.x;
@@ -470,7 +482,7 @@ var Visualizer = function(options) {
         // less opaque with age
         // less opaque with higher index 
 
-        p.material.opacity = 0.09 * Math.pow(peakLevel, 0.5);
+        p.material.opacity = 0.09 * Math.pow(peakLevel, 0.25);
 
 
         var color = getRGB(colorMap, colorMapData, (p.homePosition.x + p.position.z) * 0.25, (p.homePosition.y+ p.position.z) * 0.25);

@@ -22,6 +22,7 @@ var Visualizer = function(options) {
     this.reset = reset;
     this.setSize = setSize;
     this.renderer = null;
+    this.fftSize = 32;
 
 
     var WIDTH = 720, HEIGHT = 420;
@@ -37,6 +38,15 @@ var Visualizer = function(options) {
 
         colorMapOffset.x += tickDelta * colorMapDrift.x;
         colorMapOffset.y += tickDelta * colorMapDrift.y;
+
+       var segs = Math.floor(fftData.length / this.fftSize);
+
+        fftData = _.map(_.range(this.fftSize), function(i){
+            return _.reduce(fftData.slice(i * segs, (i+1) * segs), function(a,b){
+                return a+b;
+            }, 0) / segs;
+        });
+
 
         var lastRing = _.chain(activeParticles)
             
@@ -96,7 +106,7 @@ var Visualizer = function(options) {
         particleDestination = new THREE.Vector3(0, 0, 2000);
 
         // set some camera attributes
-        VIEW_ANGLE = 90;
+        VIEW_ANGLE = 50;
         ASPECT = WIDTH / HEIGHT;
         NEAR = 0.01;
         FAR = 4000;
@@ -118,7 +128,7 @@ var Visualizer = function(options) {
         // so pull it back
         camera.position.x = 0;
         camera.position.y = 0;
-        camera.position.z = -200;
+        camera.position.z = -400;
         camera.lookAt(new THREE.Vector3(0, 0, 1000));
 
         // add the camera to the scene
@@ -129,8 +139,8 @@ var Visualizer = function(options) {
         scene.add( light );
 
         standardGeometry = new THREE.CylinderGeometry(
-            140, // upper radius
-            140, // lower radius
+            90, // upper radius
+            90, // lower radius
             220, // height
             4 // segments
         );
@@ -230,7 +240,7 @@ var Visualizer = function(options) {
     // ------------------------------------
 
     var particlesPerRing = 25;
-    var numRings = 60;
+    var numRings = 48;
     var ringRadius = 250;
     var ringDepth = 1000 / numRings;
 
@@ -421,6 +431,7 @@ var Visualizer = function(options) {
 
     function updateParticle(p, tick, level){
         p.age = (tick - p.birthday) / p.lifespan;  
+        var peakLevel = p.peak / 255;
 
         p.setLevel(level);
         
@@ -431,15 +442,16 @@ var Visualizer = function(options) {
 
         p.ringIndex  = p.ringIndex - 1 > 0  ? p.ringIndex - 1 : numRings;
 
-        p.position.x = ((p.age * 0.5) + 0.5) * p.homePosition.x * p.peak / 255;
-        p.position.y = ((p.age * 0.5) + 0.5) * p.homePosition.y * p.peak / 255;
+        p.position.x = ((p.age * 0.5) + 0.95) * p.homePosition.x * peakLevel;
+        p.position.y = ((p.age * 0.5) + 0.95) * p.homePosition.y * peakLevel;
         p.position.z = p.ringIndex * ringDepth;
 
         // less opaque with age
         // less opaque with higher index 
 
-        p.material.opacity = 0.09 * Math.pow(p.peak / 255, 4);
-        // p.scale.setY( (1-p.age) * (1) );
+        // p.scale.setY( (1.01-p.age) * (1) );
+        p.material.opacity = 0.035 * Math.pow(peakLevel, 0.25);
+
 
 
         var color = getRGB(colorMap, colorMapData, (p.homePosition.x + p.position.z) * 0.25, (p.homePosition.y+ p.position.z) * 0.25);

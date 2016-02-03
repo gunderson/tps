@@ -42,7 +42,7 @@ var MicrophoneAudioSource = function(fftsize) {
     }, function(){ alert("error getting microphone input."); });
 };
 
-var SoundCloudAudioSource = function(player, fftsize) {
+var FileAudioSource = function(player, fftsize) {
     fftsize = fftsize || 2048;
     var self = this;
     var analyser;
@@ -52,19 +52,20 @@ var SoundCloudAudioSource = function(player, fftsize) {
     var source = audioCtx.createMediaElementSource(player);
     source.connect(analyser);
     analyser.connect(audioCtx.destination);
+    analyser.smoothingTimeConstant = 0.1;
     var sampleAudioStream = function() {
         analyser.getByteFrequencyData(self.streamData);
-        // calculate an overall volume value
-        var total = 0;
-        // for (var i = 0; i < 80; i++) { // get the volume from the first 80 bins, else it gets too loud with treble
+        // // calculate an overall volume value
+        // var total = 0;
+        // // for (var i = 0; i < 80; i++) { // get the volume from the first 80 bins, else it gets too loud with treble
+        // //     total += self.streamData[i];
+        // // } 
+        // for(var i in self.streamData) {
         //     total += self.streamData[i];
-        // } 
-        for(var i in self.streamData) {
-            total += self.streamData[i];
-        }
-        self.volume = total;
+        // }
+        // self.volume = total;
     };
-    setInterval(sampleAudioStream, 1000/60);
+    this.intervalId = setInterval(sampleAudioStream, 1000/60);
     // public properties and methods
     this.volume = 0;
     this.streamData = new Uint8Array(analyser.frequencyBinCount);
@@ -77,13 +78,36 @@ var SoundCloudAudioSource = function(player, fftsize) {
         player.setAttribute('src', streamUrl);
         player.play();
     };
+
+    this.setFFTSize = function(fftsize){
+        // this.stopSampling();
+        // analyser.disconnect();
+        // source.disconnect();
+        // analyser = audioCtx.createAnalyser();
+        // analyser.fftSize = fftsize;
+        // source.connect(analyser);
+        // analyser.connect(audioCtx.destination);
+        // this.intervalId = setInterval(sampleAudioStream, 1000/60);
+
+    };
+    
+    this.stopSampling = function(){
+        clearInterval(this.intervalId);
+    };
+
+    this.destroy = function(){
+        this.stopSampling();
+        source.disconnect();
+        analyser.disconnect();
+    };
+
     this.currentTime = function(){
         return player.currentTime;
-    }
+    };
 };
 if (typeof module === "object"){
 	module.exports = {
-		SoundCloudAudioSource: SoundCloudAudioSource,
+		FileAudioSource: FileAudioSource,
 		MicrophoneAudioSource: MicrophoneAudioSource
 	};
 }
