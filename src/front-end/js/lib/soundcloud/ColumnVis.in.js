@@ -23,7 +23,19 @@ var Visualizer = function(options) {
     this.setSize = setSize;
     this.renderer = null;
     this.fftSize = 32;
-
+    this.controls = {
+        cameraPosition: null,
+        cameraFocus: null,
+        viewAngle: 0,
+        numLayers: 0,
+        particlesPerLayer: 0,
+        layerWidth: 0,
+        depth: 0,
+        alpha: 0,
+        alphaDropoff: 0,
+        colormapScale: 0,
+        colormapMix: 0
+    };
 
     var renderer,
         WIDTH = 720, 
@@ -46,6 +58,7 @@ var Visualizer = function(options) {
                 return a+b;
             }, 0) / segs;
         });
+
 
 
 
@@ -107,7 +120,7 @@ var Visualizer = function(options) {
         particleDestination = new THREE.Vector3(0, 0, 4000);
 
         // set some camera attributes
-        VIEW_ANGLE = 40;
+        VIEW_ANGLE = 50;
         ASPECT = WIDTH / HEIGHT;
         NEAR = 0.01;
         FAR = 10000;
@@ -129,8 +142,8 @@ var Visualizer = function(options) {
         // so pull it back
         camera.position.x = 0;
         camera.position.y = 0;
-        camera.position.z = 2200;
-        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        camera.position.z = -500;
+        camera.lookAt(new THREE.Vector3(0, 0, 400));
 
         // add the camera to the scene
         scene.add(camera);
@@ -140,12 +153,12 @@ var Visualizer = function(options) {
         scene.add( light );
 
         standardGeometry = new THREE.CylinderGeometry(
-            200, // upper radius
-            200, // lower radius
-            450, // height
-            4 // segments
+            120, // upper radius
+            120, // lower radius
+            500, // height
+            3 // segments
         );
-        standardGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( Math.PI / 2 ) );
+        // standardGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
 
 
         // start the renderer
@@ -240,11 +253,11 @@ var Visualizer = function(options) {
 
     // ------------------------------------
 
-    var particlesPerLayer = 48;
-    var numLayers = 32;
-    var layerSize = 1800;
+    var particlesPerLayer = 16;
+    var numLayers = 64;
+    var layerSize = 1200;
     var particleDistance = layerSize / particlesPerLayer;
-    var layerDepth = 800 / numLayers;
+    var layerDepth = 1200 / numLayers;
 
     var buffers = _.map(_.range(numLayers), function(){
         return _.filledArray(particlesPerLayer);
@@ -256,12 +269,11 @@ var Visualizer = function(options) {
         p.positionIndex = p.index % particlesPerLayer;
         p.layerIndex = Math.floor(p.index / particlesPerLayer);
         
-        p.top = p.positionIndex % 2 === 1 ? 1 : -1;
-        var dir = p.positionIndex % 4 < 2 ? 1 : -1;
+        var dir = p.positionIndex % 2 === 1 ? 1 : -1;
 
         p.homePosition = new THREE.Vector3(
             dir * particleDistance * p.positionIndex + 5 * Math.cos(Math.TAU * p.layerIndex / numLayers),
-            400 * p.top,
+            0,//-200 + p.positionIndex,
             p.ringIndex * layerDepth
         );
 
@@ -456,7 +468,7 @@ var Visualizer = function(options) {
     function updateParticle(p, tick, level){
         p.setLevel(level);
         p.age = (tick - p.birthday) / p.lifespan;  
-        var height = 450;
+        var height = 150;
         var peakLevel = p.peak / 255;
 
 
@@ -465,11 +477,9 @@ var Visualizer = function(options) {
         
         if (p.age === 0){
             
-            var scale = 1.65 * (peakLevel + 0.01);
-            // scale = Math.pow(scale, 0.25);
-            p.scale.set(1,scale,1);
-            // p.position.y = p.homePosition.y;
-            p.position.y = ((-p.top * scale * height * 0.5) + p.homePosition.y);
+            var scale = 2 * peakLevel;
+            p.scale.set(1,scale + 0.5,1);
+            // p.position.y = ((scale * height * 0.5) + p.homePosition.y);
             p.position.x = p.homePosition.x;
             // p.position.y = p.homePosition.y;
         }
@@ -482,10 +492,10 @@ var Visualizer = function(options) {
         // less opaque with age
         // less opaque with higher index 
 
-        p.material.opacity = 0.1 * Math.pow(peakLevel, 0.5);
+        p.material.opacity = 0.035 * Math.pow(peakLevel, 0.5);
 
 
-        var color = getRGB(colorMap, colorMapData, (p.homePosition.x + p.position.z) * 0.15, (p.homePosition.y+ p.position.z) * 0.15);
+        var color = getRGB(colorMap, colorMapData, (p.homePosition.x + p.position.z) * 0.25, (p.homePosition.y+ p.position.z) * 0.25);
         p.material.color = new THREE.Color(color);
         
 
@@ -514,7 +524,7 @@ var Visualizer = function(options) {
     var colorMapCtx;
     var colorMapData;
     var colorMapOffset = {x:0,y:0};
-    var colorMapDrift = {x:0.001,y:0.0012};
+    var colorMapDrift = {x:0.001,y:0.003};
 
     function loadColorMap() {
          // var imgSrc = "http://www.theorigin.net/participlejs/img/colormap0.jpg";
@@ -522,7 +532,7 @@ var Visualizer = function(options) {
          // var imgSrc = "http://www.theorigin.net/silkbrush/img/comp54.jpg";
          // var imgSrc = "assets/images/colormap_1.jpg"; 
          // var imgSrc = "/assets/images/colormap_0.jpg";
-         // var imgSrc = "/assets/images/colormap_4.jpg";
+         // var imgSrc = "/assets/images/colormap_1.jpg";
      // var imgSrc = "http://www.theorigin.net/silkbrush/img/capsecone.jpg";
         colorMap = new Image();
         colorMap.crossOrigin = "anonymous";

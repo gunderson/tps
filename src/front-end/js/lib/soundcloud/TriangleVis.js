@@ -11,9 +11,9 @@ prefixMethod("cancelAnimationFrame");
 
 
 var Visualizer = function(options) {
-    var streamData = new Uint8Array(1024);
-    var prevStreamData = new Uint8Array(1024);
-    var prevStreamData2 = new Uint8Array(1024);
+    var streamData = new Uint8Array(2048);
+    var prevStreamData = new Uint8Array(2048);
+    var prevStreamData2 = new Uint8Array(2048);
 
     var THE_ORIGIN = new THREE.Vector3(0,0,0);
     Math.PHI = 2.399963229728653;
@@ -107,17 +107,17 @@ var Visualizer = function(options) {
         activeParticles.forEach(recycleParticle);
         // set the scene size
         center = new THREE.Vector3(0, 0, 0);
-        particleDestination = new THREE.Vector3(0, 0, 2000);
+        particleDestination = new THREE.Vector3(0, 0, 5000);
 
         // set some camera attributes
-        VIEW_ANGLE = 40;
+        VIEW_ANGLE = 50;
         ASPECT = WIDTH / HEIGHT;
         NEAR = 0.01;
-        FAR = 4000;
+        FAR = 10000;
 
         // create a WebGL renderer, camera
         // and a scene
-        this.renderer = renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
+        renderer = options.renderer || new THREE.WebGLRenderer({preserveDrawingBuffer: true});
         renderer.autoClear = true;
         camera = new THREE.PerspectiveCamera(
             VIEW_ANGLE,
@@ -132,7 +132,7 @@ var Visualizer = function(options) {
         // so pull it back
         camera.position.x = 0;
         camera.position.y = 0;
-        camera.position.z = 2200;
+        camera.position.z = 6000;
         camera.lookAt(new THREE.Vector3(0, 0, -10));
 
         // add the camera to the scene
@@ -143,9 +143,9 @@ var Visualizer = function(options) {
         scene.add( light );
 
         standardGeometry = new THREE.CylinderGeometry(
-            120, // upper radius
-            120, // lower radius
-            220, // height
+            260, // upper radius
+            260, // lower radius
+            620, // height
             3 // segments
         );
         standardGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
@@ -202,6 +202,8 @@ var Visualizer = function(options) {
     // ------------------------------------
 
     var rows = 32, cols = 32, totalChannels = rows * cols;
+    var gridWidth = 6400,
+        gridHeight = 3600;
 
     function setupParticles(){
         getParticles(totalChannels, {birthday: tick})
@@ -266,8 +268,8 @@ var Visualizer = function(options) {
     function computeGridPosition(cols, rows){
         var p = this;
         p.gridPosition = {x: p.index % cols, y: Math.floor(p.index / cols), z: 0};
-        p.homePosition.x = ((p.gridPosition.x / cols) * WIDTH) - (WIDTH*0.5);
-        p.homePosition.y = ((p.gridPosition.y / rows) * HEIGHT) - (HEIGHT*0.5);
+        p.homePosition.x = (1 - Math.pow((p.gridPosition.x / cols) * WIDTH, 6)) - (WIDTH*0.5);
+        p.homePosition.y = (1 - Math.pow((p.gridPosition.y / rows) * HEIGHT, 6)) - (HEIGHT*0.5);
         p.homePosition.z = 0;
 
         p.position.x = p.homePosition.x;       
@@ -331,8 +333,16 @@ var Visualizer = function(options) {
         }
 
 
-        p.homePosition.x = ((p.gridPosition.x / cols) * 3200) - (3200 / 2);
-        p.homePosition.y = ((p.gridPosition.y / rows) * 1800) - (1800 / 2);
+        p.homePosition.x = ((p.gridPosition.x / cols) * gridWidth) - (gridWidth*0.5);
+        p.homePosition.y = ((p.gridPosition.y / rows) * gridHeight) - (gridHeight*0.5);
+
+        p.centerdGridPosition = {
+            x: p.gridPosition.x - 0.5 * cols,
+            y: p.gridPosition.y - 0.5 * rows
+        };
+
+        // p.homePosition.x = ((Math.pow(centerdGridPosition / 0.5 * cols, 2)) * gridWidth) - (gridWidth*0.5);
+        // p.homePosition.y = ((Math.pow(centerdGridPosition / 0.5 * rows, 2)) * gridHeight) - (gridHeight*0.5);
         p.homePosition.z = 0;
 
 
@@ -366,7 +376,7 @@ var Visualizer = function(options) {
                 age: 1,
                 lifespan: 120,
                 birthday: tick,
-                peak:255,
+                peak:0,
                 endTime: this.birthday + this.lifespan,
                 homePosition: {x:0,y:0,z:0},
                 setLevel: setLevel,
@@ -415,10 +425,10 @@ var Visualizer = function(options) {
         // less opaque with age
         // less opaque with higher index 
 
-        p.material.opacity = (1-p.age) * (0.14);// + (0.10 * (1 - (p.index / 1024))));
+        p.material.opacity = (1-p.age) * Math.pow((p.peak / 255), 1.25) * (0.24);// + (0.10 * (1 - (p.index / 1024))));
 
 
-        var color = getRGB(colorMap, colorMapData, (p.homePosition.x + WIDTH) * 0.5, (p.homePosition.y+ HEIGHT) * 0.5);
+        var color = getRGB(colorMap, colorMapData, Math.pow(p.gridPosition.x / cols, 1) * 750, Math.pow(p.gridPosition.y / rows, 1) * 750);
         p.material.color = new THREE.Color(color);
         
 

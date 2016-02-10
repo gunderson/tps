@@ -43,7 +43,6 @@ var AnimationPlayer = function(options) {
 
 
         visualizer.setSize(WIDTH, HEIGHT);
-        this.$el.empty().append(visualizer.renderer.domElement);
     }
 
     function onFullScreen(e){
@@ -84,7 +83,7 @@ var AnimationPlayer = function(options) {
 
     function onUpdateInterval(){
     	if (!visualizer) return;
-    	time = this.audioPlayer.currentTime;
+    	time = audioSource.currentTime();
         tick = time * 1000 / millisPerTick;
 
         // console.log(time, tick);

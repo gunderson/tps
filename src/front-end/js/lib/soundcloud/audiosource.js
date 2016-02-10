@@ -13,22 +13,26 @@ prefixMethod("AudioContext");
  * The MicrophoneAudioSource uses the getUserMedia interface to get real-time data from the user's microphone. Not used currently but included for possible future use.
  */
 
+ navigator.getUserMedia = navigator.getUserMedia ||
+                          navigator.webkitGetUserMedia ||
+                          navigator.mozGetUserMedia;
+
 
 var MicrophoneAudioSource = function(fftsize) {
     var self = this;
+    var startTime = Date.now();
     fftsize = fftsize || 2048;
     this.volume = 0;
-    this.streamData = new Uint8Array(fftsize);
     var analyser;
 
     var sampleAudioStream = function() {
         analyser.getByteFrequencyData(self.streamData);
         // calculate an overall volume value
-        var total = 0;
-        for(var i in self.streamData) {
-            total += self.streamData[i];
-        }
-        self.volume = total;
+        // var total = 0;
+        // for(var i in self.streamData) {
+        //     total += self.streamData[i];
+        // }
+        // self.volume = total;
     };
 
     // get the input stream from the microphone
@@ -38,8 +42,19 @@ var MicrophoneAudioSource = function(fftsize) {
         analyser = audioCtx.createAnalyser();
         analyser.fftSize = fftsize;
         mic.connect(analyser);
-        setInterval(sampleAudioStream, 20);
-    }, function(){ alert("error getting microphone input."); });
+        this.streamData = new Uint8Array(analyser.frequencyBinCount);
+        this.intervalId = setInterval(sampleAudioStream, 1000/60);
+    }.bind(this), function(){ alert("error getting microphone input."); });
+
+    this.currentTime = function(){
+        return (Date.now() - startTime) / 1000;
+    };
+
+    this.destroy = function(){
+        this.stopSampling();
+        source.disconnect();
+        analyser.disconnect();
+    };
 };
 
 var FileAudioSource = function(player, fftsize) {

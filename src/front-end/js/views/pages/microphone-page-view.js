@@ -3,15 +3,14 @@ require("backbone.layoutmanager");
 var THREE = require("three.js");
 var AbstractPage = require("./Page-view");
 
-
-var FileAudioSource = require("../../lib/soundcloud/audiosource").FileAudioSource;
+var AudioSource = require("../../lib/soundcloud/audiosource").MicrophoneAudioSource;
 var TriangleVis = require("../../lib/soundcloud/TriangleVis");
 var TunnelVis = require("../../lib/soundcloud/TunnelVis");
 var GroundVis = require("../../lib/soundcloud/GroundVis");
 var GroundVisIn = require("../../lib/soundcloud/GroundVis.in");
 var ColumnVis = require("../../lib/soundcloud/ColumnVis");
-var ColumnVisIn = require("../../lib/soundcloud/ColumnVis.in");
 var ColumnVisRight = require("../../lib/soundcloud/ColumnVis.right");
+var ColumnVisIn = require("../../lib/soundcloud/ColumnVis.in");
 var AnimationPlayer = require("../../lib/soundcloud/AnimationPlayer");
 
 //abstract page class
@@ -20,12 +19,11 @@ var Page = AbstractPage.extend({
 	row:1,
 	col:2,
 	playing: false,
-	el: "#file-player",
+	el: "#microphone",
 	events: {
 		"click button.play": "onClickPlay",
 		"click button.stop": "onClickStop",
         "click button.goFullScreen": "onClickGoFullScreen",
-        "change input#file-picker": "onChangeFile",
         "change select#vis-picker": "onChangeVis",
 	},
 	initialize: function(){
@@ -43,7 +41,7 @@ var Page = AbstractPage.extend({
 		visualizers.push(new ColumnVisIn(visualizerOptions));
 		visualizers.push(new ColumnVisRight(visualizerOptions));
 
-		this.setupPlayer(2048);
+		this.setupAudio(2048);
 		this.onFullScreen = this.onFullScreen.bind(this);
 		this.onKeyPress = this.onKeyPress.bind(this);
 
@@ -53,7 +51,6 @@ var Page = AbstractPage.extend({
 		this.animationPlayer = new AnimationPlayer({
 			audioSource: this.audioSource,
 			container: this.$("#visualizer")[0],
-			audioPlayer: this.player
 		});
         this.$("#visualizer").append(this.renderer.domElement);
 		this.animationPlayer.setVisualizer(visualizers[0]);
@@ -81,19 +78,13 @@ var Page = AbstractPage.extend({
     	this.playing = true;
     	var deferred = $.Deferred();
 
-    	if (!this.fileAddress){
-			deferred.reject();
-    	} else {
-			this.audioSource.playStream(this.fileAddress);
-			this.animationPlayer.play();
-			deferred.resolve();
-    	}
+		this.animationPlayer.play();
+		deferred.resolve();
 
     	return deferred.promise;
     },
     onClickStop: function(){
     	this.playing = false;
-    	this.player.pause();
     	this.animationPlayer.stop();
     },
 
@@ -127,7 +118,7 @@ var Page = AbstractPage.extend({
 		AbstractPage.prototype.transitionIn.apply(this, arguments);
 	},
 	transitionInComplete: function(){
-		this.animationPlayer.play();
+		// this.animationPlayer.play();
 
 		$(document)
 			.on("webkitfullscreenchange fullscreenchange", this.onFullScreen)
@@ -144,15 +135,13 @@ var Page = AbstractPage.extend({
 	transitionOutComplete: function(){
 
 	},
-	setupPlayer: setupPlayer
+	setupAudio: setupAudio
 });
 
 var visualizers = [];
 
-function setupPlayer(fftSize){
-	this.player = new Audio();
-	// this.player.controls = true;
-	this.audioSource = new FileAudioSource(this.player, fftSize);
+function setupAudio(fftSize){
+	this.audioSource = new AudioSource(fftSize);
 }
 
 module.exports = Page;

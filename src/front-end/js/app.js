@@ -23,13 +23,15 @@ var MainMenu       = require("./views/ui/main-menu-view");
 var HomePage       = require("./views/pages/home-view");
 var SoundCloudPage = require("./views/pages/soundcloud-view");
 var FilePlayerPage = require("./views/pages/file-player-page-view");
+var MicrophonePage = require("./views/pages/microphone-page-view");
 
 // Instances
 
 var pages = {
-    "#home"       : new HomePage({route: "/"}),
-    "#soundcloud" : new SoundCloudPage({model: new SoundcloudPlayerModel(), route: "/soundcloud"}),
+    "#home"        : new HomePage({route: "/"}),
+    "#soundcloud"  : new SoundCloudPage({model: new SoundcloudPlayerModel(), route: "/soundcloud"}),
     "#file-player" : new FilePlayerPage({route: "/file-player"}),
+    "#microphone"  : new MicrophonePage({route: "/microphone"}),
 };
 
 var overlays = {

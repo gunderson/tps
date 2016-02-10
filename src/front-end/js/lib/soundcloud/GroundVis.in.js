@@ -21,9 +21,7 @@ var Visualizer = function(options) {
     this.render = render;
     this.reset = reset;
     this.setSize = setSize;
-    this.renderer = null;
     this.fftSize = 32;
-
 
     var renderer,
         WIDTH = 720, 
@@ -96,7 +94,7 @@ var Visualizer = function(options) {
     var VIEW_ANGLE,ASPECT,NEAR,FAR;
 
     // get the DOM element to attach to
-    var camera, scene;
+    var renderer, camera, scene;
 
     var standardGeometry;
 
@@ -107,7 +105,7 @@ var Visualizer = function(options) {
         particleDestination = new THREE.Vector3(0, 0, 4000);
 
         // set some camera attributes
-        VIEW_ANGLE = 40;
+        VIEW_ANGLE = 60;
         ASPECT = WIDTH / HEIGHT;
         NEAR = 0.01;
         FAR = 10000;
@@ -129,7 +127,7 @@ var Visualizer = function(options) {
         // so pull it back
         camera.position.x = 0;
         camera.position.y = 0;
-        camera.position.z = 2200;
+        camera.position.z = -800;
         camera.lookAt(new THREE.Vector3(0, 0, 0));
 
         // add the camera to the scene
@@ -142,7 +140,7 @@ var Visualizer = function(options) {
         standardGeometry = new THREE.CylinderGeometry(
             200, // upper radius
             200, // lower radius
-            450, // height
+            430, // height
             4 // segments
         );
         standardGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( Math.PI / 2 ) );
@@ -244,7 +242,7 @@ var Visualizer = function(options) {
     var numLayers = 32;
     var layerSize = 1800;
     var particleDistance = layerSize / particlesPerLayer;
-    var layerDepth = 800 / numLayers;
+    var layerDepth = 1000 / numLayers;
 
     var buffers = _.map(_.range(numLayers), function(){
         return _.filledArray(particlesPerLayer);
@@ -465,9 +463,9 @@ var Visualizer = function(options) {
         
         if (p.age === 0){
             
-            var scale = 1.65 * (peakLevel + 0.01);
+            var scale = 1 * (peakLevel + 0.01);
             // scale = Math.pow(scale, 0.25);
-            p.scale.set(1,scale,1);
+            p.scale.set(0.5,scale,1);
             // p.position.y = p.homePosition.y;
             p.position.y = ((-p.top * scale * height * 0.5) + p.homePosition.y);
             p.position.x = p.homePosition.x;
@@ -514,7 +512,7 @@ var Visualizer = function(options) {
     var colorMapCtx;
     var colorMapData;
     var colorMapOffset = {x:0,y:0};
-    var colorMapDrift = {x:0.001,y:0.0012};
+    var colorMapDrift = {x:0.001,y:0.003};
 
     function loadColorMap() {
          // var imgSrc = "http://www.theorigin.net/participlejs/img/colormap0.jpg";
@@ -522,7 +520,7 @@ var Visualizer = function(options) {
          // var imgSrc = "http://www.theorigin.net/silkbrush/img/comp54.jpg";
          // var imgSrc = "assets/images/colormap_1.jpg"; 
          // var imgSrc = "/assets/images/colormap_0.jpg";
-         // var imgSrc = "/assets/images/colormap_4.jpg";
+         // var imgSrc = "/assets/images/colormap_1.jpg";
      // var imgSrc = "http://www.theorigin.net/silkbrush/img/capsecone.jpg";
         colorMap = new Image();
         colorMap.crossOrigin = "anonymous";

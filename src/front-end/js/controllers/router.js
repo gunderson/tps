@@ -7,6 +7,7 @@ var Router = Backbone.Router.extend({
 		"home": "home",
 		"soundcloud": "soundcloud",
 		"file-player": "file-player",
+		"microphone": "microphone",
 	}
 });
 

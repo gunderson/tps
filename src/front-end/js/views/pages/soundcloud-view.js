@@ -1,5 +1,6 @@
 require("backbone");
 require("backbone.layoutmanager");
+var THREE = require("three.js");
 var AbstractPage = require("./Page-view");
 
 var SoundCloudAudioSource = require("../../lib/soundcloud/audiosource").FileAudioSource;
@@ -7,7 +8,10 @@ var SoundCloudLoader = require("../../lib/soundcloud/soundcloudloader");
 var TriangleVis = require("../../lib/soundcloud/TriangleVis");
 var TunnelVis = require("../../lib/soundcloud/TunnelVis");
 var GroundVis = require("../../lib/soundcloud/GroundVis");
+var GroundVisIn = require("../../lib/soundcloud/GroundVis.in");
 var ColumnVis = require("../../lib/soundcloud/ColumnVis");
+var ColumnVisRight = require("../../lib/soundcloud/ColumnVis.right");
+var ColumnVisIn = require("../../lib/soundcloud/ColumnVis.in");
 var AnimationPlayer = require("../../lib/soundcloud/AnimationPlayer");
 
 //abstract page class
@@ -21,7 +25,8 @@ var Page = AbstractPage.extend({
 		"click button.advance": "onClickAdvance",
 		"click button.play": "onClickPlay",
 		"click button.stop": "onClickStop",
-        "click button.goFullScreen": "onClickGoFullScreen"
+        "click button.goFullScreen": "onClickGoFullScreen",
+        "change select#vis-picker": "onChangeVis",
 	},
 	initialize: function(){
 		this.setupSoundCloudPlayer();
@@ -29,10 +34,18 @@ var Page = AbstractPage.extend({
 		this.listenTo(this.model.get("current"), "change reset", this.onChangeCurrent);
 		this.listenTo(this.model.get("next"), "change reset", this.onChangeNext);
 		
-		// visualizers.push(new GroundVis());
-		// visualizers.push(new TunnelVis());
-		visualizers.push(new TriangleVis());
-		visualizers.push(new ColumnVis());
+		this.renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
+		visualizerOptions = {
+			renderer: this.renderer
+        };
+
+		visualizers.push(new TriangleVis(visualizerOptions));
+		visualizers.push(new TunnelVis(visualizerOptions));
+		visualizers.push(new GroundVis(visualizerOptions));
+		visualizers.push(new GroundVisIn(visualizerOptions));
+		visualizers.push(new ColumnVis(visualizerOptions));
+		visualizers.push(new ColumnVisIn(visualizerOptions));
+		visualizers.push(new ColumnVisRight(visualizerOptions));
 
 		this.onFullScreen = this.onFullScreen.bind(this);
 		this.onKeyPress = this.onKeyPress.bind(this);
@@ -44,8 +57,15 @@ var Page = AbstractPage.extend({
 			container: this.$("#visualizer")[0],
 			audioPlayer: this.player
 		});
+        this.$("#visualizer").append(this.renderer.domElement);
+
 		this.animationPlayer.setVisualizer(visualizers[0]);
 		//$("#soundcloud .content").append(this.player);
+		var $options = _.map(visualizers, function(v, i){
+			return $("<option>")
+				.val(i).text(i);
+		});
+		this.$("#vis-picker").append($options);
 	},
 	onChangeCurrent: function(){
 		this.updateSongTitles();
@@ -55,6 +75,10 @@ var Page = AbstractPage.extend({
 	},
 	onChangeNext: function(){
 		this.updateSongTitles();
+	},
+	onChangeVis: function(e){
+		var index = e.target.value;
+		this.animationPlayer.setVisualizer(visualizers[index]);
 	},
 	updateSongTitles:function(){
 		var currentModel = this.model.get("current");
@@ -117,16 +141,18 @@ var Page = AbstractPage.extend({
     },
 
     onKeyPress: function(e){
-    	console.log(e)
-    	switch(e.keyCode){
-    		case 32:
-    			e.preventDefault();
-    			if (this.playing){
-    				this.onClickStop();
-    			} else {
-    				this.onClickPlay();
-    			}
-    		break;
+    	console.log(e);
+    	if (e.keyCode === 32){ // space
+			e.preventDefault();
+			if (this.playing){
+				this.onClickStop();
+			} else {
+				this.onClickPlay();
+			}
+    	} else if (e.keyCode >= 49 && e.keyCode <= 58){ // 1-9
+    		var visId = e.keyCode - 49;
+    		this.$("select#vis-picker").val(visId);
+			this.animationPlayer.setVisualizer(visualizers[visId]);
     	}
     },
 

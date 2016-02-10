@@ -25,12 +25,13 @@ var Visualizer = function(options) {
     this.fftSize = 32;
 
 
-    var WIDTH = 720, HEIGHT = 420;
 
-        // ------------------------------------
+    var renderer,
+        WIDTH = 720, 
+        HEIGHT = 420,
+        tick = 0,
+        prevTick = -1;
 
-    var tick = 0;
-    var prevTick = -1;
 
     function update(fftData, time, _tick) {
         tick = _tick;
@@ -95,7 +96,7 @@ var Visualizer = function(options) {
     var VIEW_ANGLE,ASPECT,NEAR,FAR;
 
     // get the DOM element to attach to
-    var renderer, camera, scene;
+    var camera, scene;
 
     var standardGeometry;
 
@@ -113,7 +114,7 @@ var Visualizer = function(options) {
 
         // create a WebGL renderer, camera
         // and a scene
-        this.renderer = renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
+        renderer = options.renderer || new THREE.WebGLRenderer({preserveDrawingBuffer: true});
         renderer.autoClear = true;
         camera = new THREE.PerspectiveCamera(
             VIEW_ANGLE,
@@ -253,7 +254,7 @@ var Visualizer = function(options) {
         var p = this;
 
         p.positionIndex = p.index % particlesPerRing;
-        p.angle = p.positionIndex * Math.TAU * 2.5 / particlesPerRing;
+        p.angle = p.positionIndex * Math.TAU * 7 / particlesPerRing;
         p.ringIndex = Math.floor(p.index / particlesPerRing);
         
         p.homePosition = new THREE.Vector3(
@@ -397,7 +398,7 @@ var Visualizer = function(options) {
                 age: 1,
                 lifespan: numRings,
                 birthday: tick,
-                peak:255,
+                peak:0,
                 endTime: this.birthday + this.lifespan,
                 homePosition: {x:0,y:0,z:0},
                 setLevel: setLevel,
@@ -442,15 +443,15 @@ var Visualizer = function(options) {
 
         p.ringIndex  = p.ringIndex - 1 > 0  ? p.ringIndex - 1 : numRings;
 
-        p.position.x = ((p.age * 0.5) + 0.95) * p.homePosition.x * peakLevel;
-        p.position.y = ((p.age * 0.5) + 0.95) * p.homePosition.y * peakLevel;
+        p.position.x = ((p.age * 0.5) + 0.5) * p.homePosition.x * (1-peakLevel);
+        p.position.y = ((p.age * 0.5) + 0.5) * p.homePosition.y * (1-peakLevel);
         p.position.z = p.ringIndex * ringDepth;
 
         // less opaque with age
         // less opaque with higher index 
 
         // p.scale.setY( (1.01-p.age) * (1) );
-        p.material.opacity = 0.035 * Math.pow(peakLevel, 0.25);
+        p.material.opacity = 0.035 * Math.pow(peakLevel, 1);
 
 
 

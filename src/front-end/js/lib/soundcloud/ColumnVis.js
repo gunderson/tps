@@ -38,12 +38,13 @@ var Visualizer = function(options) {
     };
 
 
-    var WIDTH = 720, HEIGHT = 420;
 
-        // ------------------------------------
-
-    var tick = 0;
-    var prevTick = -1;
+    var renderer,
+        WIDTH = 720, 
+        HEIGHT = 420,
+        tick = 0,
+        prevTick = -1;
+        
 
     function update(fftData, time, _tick) {
         tick = _tick;
@@ -110,7 +111,7 @@ var Visualizer = function(options) {
     var VIEW_ANGLE,ASPECT,NEAR,FAR;
 
     // get the DOM element to attach to
-    var renderer, camera, scene;
+    var camera, scene;
 
     var standardGeometry;
 
@@ -121,14 +122,14 @@ var Visualizer = function(options) {
         particleDestination = new THREE.Vector3(0, 0, 4000);
 
         // set some camera attributes
-        VIEW_ANGLE = 50;
+        VIEW_ANGLE = 90;
         ASPECT = WIDTH / HEIGHT;
         NEAR = 0.01;
         FAR = 10000;
 
         // create a WebGL renderer, camera
         // and a scene
-        this.renderer = renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
+        renderer = options.renderer || new THREE.WebGLRenderer({preserveDrawingBuffer: true});
         renderer.autoClear = true;
         camera = new THREE.PerspectiveCamera(
             VIEW_ANGLE,
@@ -143,8 +144,8 @@ var Visualizer = function(options) {
         // so pull it back
         camera.position.x = 0;
         camera.position.y = 0;
-        camera.position.z = -500;
-        camera.lookAt(new THREE.Vector3(0, 0, 400));
+        camera.position.z = 1500;
+        camera.lookAt(new THREE.Vector3(0, 0, 600));
 
         // add the camera to the scene
         scene.add(camera);
@@ -479,7 +480,7 @@ var Visualizer = function(options) {
         if (p.age === 0){
             
             var scale = 2 * peakLevel;
-            p.scale.set(1,scale + 0.5,1);
+            p.scale.set(1,scale + 0.05,1);
             // p.position.y = ((scale * height * 0.5) + p.homePosition.y);
             p.position.x = p.homePosition.x;
             // p.position.y = p.homePosition.y;
@@ -493,7 +494,7 @@ var Visualizer = function(options) {
         // less opaque with age
         // less opaque with higher index 
 
-        p.material.opacity = 0.035 * Math.pow(peakLevel, 0.5);
+        p.material.opacity = 0.07 * peakLevel//Math.pow(peakLevel, 2);
 
 
         var color = getRGB(colorMap, colorMapData, (p.homePosition.x + p.position.z) * 0.25, (p.homePosition.y+ p.position.z) * 0.25);
