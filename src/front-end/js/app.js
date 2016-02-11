@@ -1,3 +1,5 @@
+"use strict";
+
 require("backbone");
 require("backbone.layoutmanager");
 var _ = require("underscore");
@@ -24,6 +26,8 @@ var HomePage       = require("./views/pages/home-view");
 var SoundCloudPage = require("./views/pages/soundcloud-view");
 var FilePlayerPage = require("./views/pages/file-player-page-view");
 var MicrophonePage = require("./views/pages/microphone-page-view");
+
+
 
 // Instances
 

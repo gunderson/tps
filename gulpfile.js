@@ -236,6 +236,7 @@ function processBrowserify(role) {
 
     var bundle = function() {
         return bundler
+            .on('error', function(err) { console.error(err); this.emit('end'); })
             .bundle()
             .pipe(source('index.js'))
             .pipe(buffer())

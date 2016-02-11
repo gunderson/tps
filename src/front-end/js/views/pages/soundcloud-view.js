@@ -1,4 +1,7 @@
-require("backbone");
+"use strict";
+
+var _ = require("underscore");
+var $ = require("jquery");require("backbone");
 require("backbone.layoutmanager");
 var THREE = require("three.js");
 var AbstractPage = require("./Page-view");
@@ -25,8 +28,8 @@ var Page = AbstractPage.extend({
 		"click button.advance": "onClickAdvance",
 		"click button.play": "onClickPlay",
 		"click button.stop": "onClickStop",
-        "click button.goFullScreen": "onClickGoFullScreen",
-        "change select#vis-picker": "onChangeVis",
+		"click button.goFullScreen": "onClickGoFullScreen",
+		"change select#vis-picker": "onChangeVis"
 	},
 	initialize: function(){
 		this.setupSoundCloudPlayer();
@@ -35,9 +38,9 @@ var Page = AbstractPage.extend({
 		this.listenTo(this.model.get("next"), "change reset", this.onChangeNext);
 		
 		this.renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
-		visualizerOptions = {
+		var visualizerOptions = {
 			renderer: this.renderer
-        };
+		};
 
 		visualizers.push(new TriangleVis(visualizerOptions));
 		visualizers.push(new TunnelVis(visualizerOptions));
@@ -57,12 +60,12 @@ var Page = AbstractPage.extend({
 			container: this.$("#visualizer")[0],
 			audioPlayer: this.player
 		});
-        this.$("#visualizer").append(this.renderer.domElement);
+		this.$("#visualizer").append(this.renderer.domElement);
 
 		this.animationPlayer.setVisualizer(visualizers[0]);
 		//$("#soundcloud .content").append(this.player);
 		var $options = _.map(visualizers, function(v, i){
-			return $("<option>")
+			return this.$("<option>")
 				.val(i).text(i);
 		});
 		this.$("#vis-picker").append($options);
@@ -92,69 +95,69 @@ var Page = AbstractPage.extend({
 		this.$(".now-playing a").attr("href", currentURL).text(currentText);
 		this.$(".up-next a").attr("href", nextextURL).text(nextText);
 	},
-    onClickAdvance: function(){
-    	this.model.advance();
-    },
-    onSongEnd: function(){
-    	this.model.advance();
-    },
-    onClickPlay: function(){
-    	this.playing = true;
-    	var deferred = $.Deferred();
-    	if (this.model.get("current").get("soundcloud_url")){
-    		this.loader.loadStream(this.model.get("current").get("soundcloud_url"),
-    			function(song){
-    				//on success
+	onClickAdvance: function(){
+		this.model.advance();
+	},
+	onSongEnd: function(){
+		this.model.advance();
+	},
+	onClickPlay: function(){
+		this.playing = true;
+		var deferred = $.Deferred();
+		if (this.model.get("current").get("soundcloud_url")){
+			this.loader.loadStream(this.model.get("current").get("soundcloud_url"),
+				function(song){
+					//on success
 					// this.player.play();
 					this.audioSource.playStream(this.loader.streamUrl());
 					this.animationPlayer.play();
 					deferred.resolve();
-    			}.bind(this), function(){
-    				//on error
+				}.bind(this), function(){
+					//on error
 					deferred.reject();
-    			});
-    	} else {
-    		this.model.start()
-	    		.done(function(){
-	    			this.audioSource.playStream(this.loader.streamUrl());
+				});
+		} else {
+			this.model.start()
+				.done(function(){
+					this.audioSource.playStream(this.loader.streamUrl());
 					// this.player.play();
 					this.animationPlayer.play();
 					deferred.resolve();
-	    		}.bind(this));
-    	}
-    	return deferred.promise;
-    },
-    onClickStop: function(){
-    	this.playing = false;
-    	this.player.pause();
-    	this.animationPlayer.stop();
-    },
+				}.bind(this));
+		}
+		return deferred.promise;
+	},
+	onClickStop: function(){
+		this.playing = false;
+		this.player.pause();
+		this.animationPlayer.stop();
+	},
 
-    onClickGoFullScreen: function(){
-    	this.animationPlayer.el.webkitRequestFullScreen();
-    },
+	onClickGoFullScreen: function(){
+		this.animationPlayer.el.webkitRequestFullScreen();
+	},
 
-    onFullScreen: function(){
-    	this.animationPlayer.onFullScreen();
-    },
-    onNormalScreen: function(){
-    },
+	onFullScreen: function(){
+		this.animationPlayer.onFullScreen();
+	},
+	onNormalScreen: function(){
+	},
 
-    onKeyPress: function(e){
-    	console.log(e);
-    	if (e.keyCode === 32){ // space
+	onKeyPress: function(e){
+		console.log(e);
+		if (e.keyCode === 32){ // space
 			e.preventDefault();
 			if (this.playing){
 				this.onClickStop();
 			} else {
 				this.onClickPlay();
 			}
-    	} else if (e.keyCode >= 49 && e.keyCode <= 58){ // 1-9
-    		var visId = e.keyCode - 49;
-    		this.$("select#vis-picker").val(visId);
+		} else if (e.keyCode >= 49 && e.keyCode <= 58){ // 1-9
+			var visId = e.keyCode - 49;
+			this.$("select#vis-picker").val(visId);
 			this.animationPlayer.setVisualizer(visualizers[visId]);
-    	}
-    },
+		}
+	},
 
 	transitionIn: function(){
 		AbstractPage.prototype.transitionIn.apply(this, arguments);

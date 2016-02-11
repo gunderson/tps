@@ -1,3 +1,7 @@
+"use strict";
+
+var _ = require("underscore");
+var $ = require("jquery");
 require("backbone");
 require("backbone.layoutmanager");
 var THREE = require("three.js");
@@ -24,16 +28,16 @@ var Page = AbstractPage.extend({
 	events: {
 		"click button.play": "onClickPlay",
 		"click button.stop": "onClickStop",
-        "click button.goFullScreen": "onClickGoFullScreen",
-        "change input#file-picker": "onChangeFile",
-        "change select#vis-picker": "onChangeVis",
+		"click button.goFullScreen": "onClickGoFullScreen",
+		"change input#file-picker": "onChangeFile",
+		"change select#vis-picker": "onChangeVis"
 	},
 	initialize: function(){
 		// this.player.addEventListener('ended', this.onSongEnd.bind(this));
 		this.renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
-		visualizerOptions = {
+		var visualizerOptions = {
 			renderer: this.renderer
-        };
+		};
 
 		visualizers.push(new TriangleVis(visualizerOptions));
 		visualizers.push(new TunnelVis(visualizerOptions));
@@ -55,17 +59,15 @@ var Page = AbstractPage.extend({
 			container: this.$("#visualizer")[0],
 			audioPlayer: this.player
 		});
-        this.$("#visualizer").append(this.renderer.domElement);
+		this.$("#visualizer").append(this.renderer.domElement);
 		this.animationPlayer.setVisualizer(visualizers[0]);
 		//$("#soundcloud .content").append(this.player);
 
-		var $options = _.map(visualizers, function(v, i){
-			return $("<option>")
-				.val(i).text(i);
-		});
+		var $options = _.map(visualizers, (v,i) => this.$("<option>").val(i).text(i) );
 		this.$("#vis-picker").append($options);
 	},
 	onChangeVis: function(e){
+		e;
 		var index = this.$("#vis-picker").val();
 		this.animationPlayer.setVisualizer(visualizers[index]);
 	},
@@ -75,53 +77,53 @@ var Page = AbstractPage.extend({
 		this.fileAddress = "file:///"+file.path;
 	},
 	
-    onSongEnd: function(){
-    },
-    onClickPlay: function(){
-    	this.playing = true;
-    	var deferred = $.Deferred();
+	onSongEnd: function(){
+	},
+	onClickPlay: function(){
+		this.playing = true;
+		var deferred = $.Deferred();
 
-    	if (!this.fileAddress){
+		if (!this.fileAddress){
 			deferred.reject();
-    	} else {
+		} else {
 			this.audioSource.playStream(this.fileAddress);
 			this.animationPlayer.play();
 			deferred.resolve();
-    	}
+		}
 
-    	return deferred.promise;
-    },
-    onClickStop: function(){
-    	this.playing = false;
-    	this.player.pause();
-    	this.animationPlayer.stop();
-    },
+		return deferred.promise;
+	},
+	onClickStop: function(){
+		this.playing = false;
+		this.player.pause();
+		this.animationPlayer.stop();
+	},
 
-    onClickGoFullScreen: function(){
-    	this.animationPlayer.el.webkitRequestFullScreen();
-    },
+	onClickGoFullScreen: function(){
+		this.animationPlayer.el.webkitRequestFullScreen();
+	},
 
-    onFullScreen: function(){
-    	this.animationPlayer.onFullScreen();
-    },
-    onNormalScreen: function(){
-    },
+	onFullScreen: function(){
+		this.animationPlayer.onFullScreen();
+	},
+	onNormalScreen: function(){
+	},
 
-    onKeyPress: function(e){
-    	console.log(e);
-    	if (e.keyCode === 32){
+	onKeyPress: function(e){
+		console.log(e);
+		if (e.keyCode === 32){
 			e.preventDefault();
 			if (this.playing){
 				this.onClickStop();
 			} else {
 				this.onClickPlay();
 			}
-    	} else if (e.keyCode >= 49 && e.keyCode <= 58){
-    		var visId = e.keyCode - 49;
-    		this.$("select#vis-picker").val(visId);
+		} else if (e.keyCode >= 49 && e.keyCode <= 58){
+			var visId = e.keyCode - 49;
+			this.$("select#vis-picker").val(visId);
 			this.animationPlayer.setVisualizer(visualizers[visId]);
-    	}
-    },
+		}
+	},
 
 	transitionIn: function(){
 		AbstractPage.prototype.transitionIn.apply(this, arguments);

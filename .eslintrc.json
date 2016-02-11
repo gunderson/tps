@@ -1,0 +1,22 @@
+{
+	"extends": "eslint:recommended",
+    "ecmaFeatures": {
+        "blockBindings": true,
+        "forOf": true,
+        "jsx": false
+    },
+    "rules": {
+        "semi": 2,
+        "no-console": 0
+    },
+    "globals": {
+        "console": true,
+        "document": true,
+        "window": true
+    },
+    "env": {
+        "browser": true,
+        "commonjs": true,
+        "es6": true
+    }
+}
