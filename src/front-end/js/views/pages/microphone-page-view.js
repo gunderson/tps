@@ -15,13 +15,17 @@ var GroundVisIn = require("../../lib/soundcloud/GroundVis.in");
 var ColumnVis = require("../../lib/soundcloud/ColumnVis");
 var ColumnVisRight = require("../../lib/soundcloud/ColumnVis.right");
 var ColumnVisIn = require("../../lib/soundcloud/ColumnVis.in");
+var ColumnVisCirc = require("../../lib/soundcloud/ColumnVis.circ");
+var ConcentricSlopeScuplture = require("../../lib/sculptures/Concentric.slope");
+var ConcentricRandomScuplture = require("../../lib/sculptures/Concentric.random");
+var GridWaveScuplture = require("../../lib/sculptures/Grid.wave");
 var AnimationPlayer = require("../../lib/soundcloud/AnimationPlayer");
 
 //abstract page class
 var Page = AbstractPage.extend({
 	keep: true,
-	row:1,
-	col:2,
+	row: 1,
+	col: 2,
 	playing: false,
 	el: "#microphone",
 	events: {
@@ -30,13 +34,19 @@ var Page = AbstractPage.extend({
 		"click button.goFullScreen": "onClickGoFullScreen",
 		"change select#vis-picker": "onChangeVis"
 	},
-	initialize: function(){
+	initialize: function() {
 		// this.player.addEventListener('ended', this.onSongEnd.bind(this));
-		this.renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
+		this.renderer = new THREE.WebGLRenderer({
+			preserveDrawingBuffer: true
+		});
 		var visualizerOptions = {
 			renderer: this.renderer
 		};
 
+		visualizers.push(new ConcentricRandomScuplture(visualizerOptions));
+		visualizers.push(new GridWaveScuplture(visualizerOptions));
+		visualizers.push(new ConcentricSlopeScuplture(visualizerOptions));
+		visualizers.push(new ColumnVisCirc(visualizerOptions));
 		visualizers.push(new TriangleVis(visualizerOptions));
 		visualizers.push(new TunnelVis(visualizerOptions));
 		visualizers.push(new GroundVis(visualizerOptions));
@@ -51,7 +61,7 @@ var Page = AbstractPage.extend({
 
 	},
 
-	afterRender: function(){
+	afterRender: function() {
 		this.animationPlayer = new AnimationPlayer({
 			audioSource: this.audioSource,
 			container: this.$("#visualizer")[0]
@@ -60,26 +70,22 @@ var Page = AbstractPage.extend({
 		this.animationPlayer.setVisualizer(visualizers[0]);
 		//$("#soundcloud .content").append(this.player);
 
-		var $options = _.map(visualizers, function(v, i){
-			return this.$("<option>")
-				.val(i).text(i);
-		});
+		var $options = _.map(visualizers, (v, i) => $("<option />").val(i).text(i));
 		this.$("#vis-picker").append($options);
 	},
-	onChangeVis: function(e){
+	onChangeVis: function(e) {
 		e;
 		var index = this.$("#vis-picker").val();
 		this.animationPlayer.setVisualizer(visualizers[index]);
 	},
 
-	onChangeFile: function(e){
+	onChangeFile: function(e) {
 		var file = e.target.files[0];
-		this.fileAddress = "file:///"+file.path;
+		this.fileAddress = "file:///" + file.path;
 	},
-	
-	onSongEnd: function(){
-	},
-	onClickPlay: function(){
+
+	onSongEnd: function() {},
+	onClickPlay: function() {
 		this.playing = true;
 		var deferred = $.Deferred();
 
@@ -88,48 +94,49 @@ var Page = AbstractPage.extend({
 
 		return deferred.promise;
 	},
-	onClickStop: function(){
+	onClickStop: function() {
 		this.playing = false;
 		this.animationPlayer.stop();
 	},
 
-	onClickGoFullScreen: function(){
+	onClickGoFullScreen: function() {
 		this.animationPlayer.el.webkitRequestFullScreen();
 	},
 
-	onFullScreen: function(){
+	onFullScreen: function() {
 		this.animationPlayer.onFullScreen();
 	},
-	onNormalScreen: function(){
-	},
+	onNormalScreen: function() {},
 
-	onKeyPress: function(e){
+	onKeyPress: function(e) {
 		console.log(e);
-		if (e.keyCode === 32){
+		if (e.keyCode === 32) {
 			e.preventDefault();
-			if (this.playing){
+			if (this.playing) {
 				this.onClickStop();
 			} else {
 				this.onClickPlay();
 			}
-		} else if (e.keyCode >= 49 && e.keyCode <= 58){
+		} else if (e.keyCode >= 49 && e.keyCode <= 58) {
 			var visId = e.keyCode - 49;
 			this.$("select#vis-picker").val(visId);
 			this.animationPlayer.setVisualizer(visualizers[visId]);
 		}
 	},
 
-	transitionIn: function(){
+	transitionIn: function() {
 		AbstractPage.prototype.transitionIn.apply(this, arguments);
 	},
-	transitionInComplete: function(){
+	transitionInComplete: function() {
 		// this.animationPlayer.play();
 
 		$(document)
 			.on("webkitfullscreenchange fullscreenchange", this.onFullScreen)
 			.on("keypress", this.onKeyPress);
+
+		setTimeout(this.onClickPlay.bind(this), 1000);
 	},
-	transitionOut: function(){
+	transitionOut: function() {
 		AbstractPage.prototype.transitionOut.apply(this, arguments);
 		this.animationPlayer.stop();
 
@@ -137,7 +144,7 @@ var Page = AbstractPage.extend({
 			.off("webkitfullscreenchange fullscreenchange", this.onFullScreen)
 			.off("keypress", this.onKeyPress);
 	},
-	transitionOutComplete: function(){
+	transitionOutComplete: function() {
 
 	},
 	setupAudio: setupAudio
@@ -145,7 +152,7 @@ var Page = AbstractPage.extend({
 
 var visualizers = [];
 
-function setupAudio(fftSize){
+function setupAudio(fftSize) {
 	this.audioSource = new AudioSource(fftSize);
 }
 

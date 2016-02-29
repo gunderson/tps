@@ -36,8 +36,6 @@ var Visualizer = function(options) {
 		colormapMix: 0
 	};
 
-
-
 	var renderer,
 		WIDTH = 720,
 		HEIGHT = 420,
@@ -75,6 +73,11 @@ var Visualizer = function(options) {
 		// camera.position.x = Math.cos(cameraTick) * WIDTH * 0.125
 		// camera.position.y = Math.sin(cameraTick) * HEIGHT * 0.125
 		// camera.lookAt(center);
+
+		camera.angle += 0.01;
+		camera.position.x = camera.radius * Math.cos(camera.angle);
+		camera.position.z = camera.radius * Math.sin(camera.angle);
+		camera.lookAt(THE_ORIGIN);
 		prevTick = tick;
 
 
@@ -120,7 +123,7 @@ var Visualizer = function(options) {
 		particleDestination = new THREE.Vector3(0, 0, 4000);
 
 		// set some camera attributes
-		VIEW_ANGLE = 90;
+		VIEW_ANGLE = 50;
 		ASPECT = WIDTH / HEIGHT;
 		NEAR = 0.01;
 		FAR = 10000;
@@ -143,9 +146,11 @@ var Visualizer = function(options) {
 		// the camera starts at 0,0,0
 		// so pull it back
 		camera.position.x = 0;
-		camera.position.y = 0;
-		camera.position.z = 1500;
-		camera.lookAt(new THREE.Vector3(0, 0, 600));
+		camera.position.y = 200;
+		camera.position.z = 600;
+		camera.angle = 0;
+		camera.radius = 600;
+		camera.lookAt(new THREE.Vector3(0, 100, 0));
 
 		// add the camera to the scene
 		scene.add(camera);
@@ -153,14 +158,28 @@ var Visualizer = function(options) {
 		// add light to the scene
 		var light = new THREE.AmbientLight(0xffffff); // soft white light
 		scene.add(light);
+		var light1 = new THREE.PointLight(0xffffff); // soft white light
+		light1.position.x = 600;
+		light1.position.z = 600;
+		scene.add(light1);
+		var light2 = new THREE.PointLight(0xffffff); // soft white light
+		light2.position.x = -600;
+		light2.position.z = 600;
+		scene.add(light2);
 
-		standardGeometry = new THREE.CylinderGeometry(
-			120, // upper radius
-			120, // lower radius
-			500, // height
-			3 // segments
+		// standardGeometry = new THREE.CylinderGeometry(
+		// 	120, // upper radius
+		// 	120, // lower radius
+		// 	500, // height
+		// 	3 // segments
+		// );
+
+		standardGeometry = new THREE.BoxGeometry(
+			80, // x
+			80, // y
+			4 // z
 		);
-		// standardGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
+		// standardGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( Math.PI / 2 ) );
 
 
 		// start the renderer
@@ -174,10 +193,9 @@ var Visualizer = function(options) {
 	// create the sphere's material
 	var standardMaterial = new THREE.MeshLambertMaterial({
 		color: 0xffffff,
-		transparent: true,
-		blending: THREE.AdditiveBlending,
-		opacity: 0,
-
+		// transparent: true,
+		// blending: THREE.AdditiveBlending,
+		opacity: 1
 	});
 
 
@@ -187,6 +205,50 @@ var Visualizer = function(options) {
 		renderer.domElement.width = WIDTH;
 		renderer.domElement.height = HEIGHT;
 	}
+
+
+
+	// ------------------------------------
+	// Camera Controls
+
+	var mouseOn = false;
+	var mouseStartX = 0;
+	var mousePrevX = 0;
+
+	function onMouseDown(e) {
+		window.onmousemove = onMouseMove;
+		window.onmouseup = onMouseUp;
+		window.onmouseleave = onMouseUp;
+		mouseStartX = e.pageX;
+		mousePrevX = e.pageX;
+
+	}
+
+	function onMouseUp() {
+		window.onmousemove = null;
+		window.onmouseup = null;
+		window.onmouseleave = null;
+	}
+
+	function onMouseMove(e) {
+		var dx = (e.pageX - mousePrevX) / window.innerWidth;
+		mousePrevX = e.pageX;
+		camera.angle += dx * 2;
+		camera.position.x = camera.radius * Math.cos(camera.angle);
+		camera.position.z = camera.radius * Math.sin(camera.angle);
+		camera.lookAt(THE_ORIGIN);
+	}
+
+	function toggleMouse() {
+		if (!mouseOn) {
+			mouseOn = true;
+			window.onmousedown = onMouseDown;
+		} else {
+			mouseOn = false;
+			window.onmousedown = null;
+		}
+	}
+
 
 	// ------------------------------------
 
@@ -213,12 +275,12 @@ var Visualizer = function(options) {
 
 	// ------------------------------------
 
-	var rows = 32,
-		cols = 32,
-		totalChannels = rows * cols;
+	var rows = 16,
+		cols = 4,
+		totalChannels = 64;
 
 	function setupParticles() {
-		getParticles(numLayers * particlesPerLayer, {
+		getParticles(totalChannels, {
 				birthday: tick
 			})
 			.forEach(function(p, i) {
@@ -243,16 +305,19 @@ var Visualizer = function(options) {
 		// assign particles to home positions
 		// p.computeGridPosition(cols, rows);
 		// p.computeSpiralGridPosition(cols, rows);
-		// p.computeSpiralPosition();
+		p.computeSpiralPosition();
 		// p.computeRingPosition();
-		p.computeGroundPosition();
+		// p.computeGroundPosition();
 
-		// p.lookAt(new THREE.Vector3(0, p.index * ringDepth, 0));
+		// p.lookAt(new THREE.Vector3(0, p.homePosition.y + 15, 0));
 
-		// p.angle = Math.atan2(p.homePosition.y, p.homePosition.x);
+		p.angle = Math.atan2(p.homePosition.x, p.homePosition.z);
+
+		p.rotation.y = p.angle;
+
 		p.speed = -100;
 
-		var color = getRGB(colorMap, colorMapData, p.homePosition.x * 2, p.homePosition.y * 2);
+		var color = getRGB(colorMap, colorMapData, p.homePosition.x * 2, p.homePosition.z * 2);
 		p.material.color = new THREE.Color(color);
 	}
 
@@ -323,15 +388,26 @@ var Visualizer = function(options) {
 		var angle = p.index * Math.PHI; //Golden angle relative to TWO_PI
 
 		p.homePosition = new THREE.Vector3(
-			Math.cos(angle) * Math.sqrt(p.index + spiralStartIndex) * 2 * (720 / finalRadius),
-			Math.sin(angle) * Math.sqrt(p.index + spiralStartIndex) * 2 * (480 / finalRadius),
-			0
+			Math.cos(angle) * Math.sqrt(p.index + spiralStartIndex) * 40,
+			0,
+			Math.sin(angle) * Math.sqrt(p.index + spiralStartIndex) * 40
 		);
 
-		// console.table(p.homePosition)
+		console.log(Math.sqrt(p.index + spiralStartIndex) * 40);
+
+		var indexScale = (p.index / activeParticles.length);
+
+		var homeRatioX = 2 * p.homePosition.x / 500;
+		var homeRatioY = 2 * p.homePosition.z / 500;
+
+		p.homePosition.y = 50 * (Math.cos(homeRatioX * 1 * Math.TAU) + Math.sin(homeRatioY * 1 * Math.TAU)) + 0 * homeRatioX + 0 * homeRatioY;
 
 		p.position.x = p.homePosition.x;
 		p.position.y = p.homePosition.y;
+		p.position.z = p.homePosition.z;
+
+		p.scale.setX((0.5 * (indexScale) + 0.5));
+
 	}
 
 	// ------------------------------------
@@ -455,10 +531,10 @@ var Visualizer = function(options) {
 			setLevel: setLevel,
 			getLevel: getLevel,
 			// computeGridPosition: computeGridPosition,
-			// computeSpiralPosition: computeSpiralPosition,
+			computeSpiralPosition: computeSpiralPosition,
 			// computeSpiralGridPosition: computeSpiralGridPosition,
 			// computeRingPosition: computeRingPosition,
-			computeGroundPosition: computeGroundPosition
+			// computeGroundPosition: computeGroundPosition
 		}, options);
 
 
@@ -494,24 +570,24 @@ var Visualizer = function(options) {
 
 		if (p.age === 0) {
 
-			var scale = 2 * peakLevel;
-			p.scale.set(1, scale + 0.05, 1);
+			//var scale = 2 * peakLevel;
+			// p.scale.set(1, scale + 0.5, 1);
 			// p.position.y = ((scale * height * 0.5) + p.homePosition.y);
-			p.position.x = p.homePosition.x;
+			// p.position.x = p.homePosition.x;
 			// p.position.y = p.homePosition.y;
 		}
 
 
 
-		p.position.z = p.layerIndex * layerDepth;
+		//p.position.z = p.layerIndex * layerDepth;
 
 		// less opaque with age
 		// less opaque with higher index
 
-		p.material.opacity = 0.07 * peakLevel //Math.pow(peakLevel, 2);
+		// p.material.opacity = 0.035 * Math.pow(peakLevel, 0.5);
 
 
-		var color = getRGB(colorMap, colorMapData, (p.homePosition.x + p.position.z) * 0.25, (p.homePosition.y + p.position.z) * 0.25);
+		var color = getRGB(colorMap, colorMapData, (p.homePosition.x + p.position.z) * 0.1, (p.homePosition.y + p.position.z) * 0.1);
 		p.material.color = new THREE.Color(color);
 
 
@@ -543,8 +619,8 @@ var Visualizer = function(options) {
 		y: 0
 	};
 	var colorMapDrift = {
-		x: 0.001,
-		y: 0.003
+		x: 0.001 * 0.5,
+		y: 0.00231 * 0.5
 	};
 
 	function loadColorMap() {
@@ -568,6 +644,7 @@ var Visualizer = function(options) {
 		colorMapCtx.drawImage(colorMap, 0, 0, 100, 100);
 		colorMapData = colorMapCtx.getImageData(0, 0, 100, 100);
 		setupParticles();
+		toggleMouse();
 	}
 
 	function getRGB(colorMap, colorMapData, x, y) {

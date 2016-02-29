@@ -36,8 +36,6 @@ var Visualizer = function(options) {
 		colormapMix: 0
 	};
 
-
-
 	var renderer,
 		WIDTH = 720,
 		HEIGHT = 420,
@@ -70,11 +68,11 @@ var Visualizer = function(options) {
 			.value();
 
 
-		// var cameraTick = Math.PI * 2 * ((tick % 2048) / 2048);
-		// camera.rotation.z =  cameraTick;
-		// camera.position.x = Math.cos(cameraTick) * WIDTH * 0.125
-		// camera.position.y = Math.sin(cameraTick) * HEIGHT * 0.125
-		// camera.lookAt(center);
+		var cameraTick = Math.PI * 2 * ((tick % 2048) / 2048);
+		camera.rotation.z = cameraTick;
+		camera.position.x = Math.cos(cameraTick) * WIDTH * 0.125
+		camera.position.y = Math.sin(cameraTick) * HEIGHT * 0.125
+		camera.lookAt(center);
 		prevTick = tick;
 
 
@@ -120,7 +118,7 @@ var Visualizer = function(options) {
 		particleDestination = new THREE.Vector3(0, 0, 4000);
 
 		// set some camera attributes
-		VIEW_ANGLE = 90;
+		VIEW_ANGLE = 50;
 		ASPECT = WIDTH / HEIGHT;
 		NEAR = 0.01;
 		FAR = 10000;
@@ -144,8 +142,8 @@ var Visualizer = function(options) {
 		// so pull it back
 		camera.position.x = 0;
 		camera.position.y = 0;
-		camera.position.z = 1500;
-		camera.lookAt(new THREE.Vector3(0, 0, 600));
+		camera.position.z = -500;
+		camera.lookAt(new THREE.Vector3(0, 0, 400));
 
 		// add the camera to the scene
 		scene.add(camera);
@@ -160,7 +158,7 @@ var Visualizer = function(options) {
 			500, // height
 			3 // segments
 		);
-		// standardGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
+		// standardGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( Math.PI / 2 ) );
 
 
 		// start the renderer
@@ -176,8 +174,7 @@ var Visualizer = function(options) {
 		color: 0xffffff,
 		transparent: true,
 		blending: THREE.AdditiveBlending,
-		opacity: 0,
-
+		opacity: 0
 	});
 
 
@@ -495,7 +492,7 @@ var Visualizer = function(options) {
 		if (p.age === 0) {
 
 			var scale = 2 * peakLevel;
-			p.scale.set(1, scale + 0.05, 1);
+			p.scale.set(1, scale + 0.5, 1);
 			// p.position.y = ((scale * height * 0.5) + p.homePosition.y);
 			p.position.x = p.homePosition.x;
 			// p.position.y = p.homePosition.y;
@@ -508,7 +505,7 @@ var Visualizer = function(options) {
 		// less opaque with age
 		// less opaque with higher index
 
-		p.material.opacity = 0.07 * peakLevel //Math.pow(peakLevel, 2);
+		p.material.opacity = 0.035 * Math.pow(peakLevel, 0.5);
 
 
 		var color = getRGB(colorMap, colorMapData, (p.homePosition.x + p.position.z) * 0.25, (p.homePosition.y + p.position.z) * 0.25);

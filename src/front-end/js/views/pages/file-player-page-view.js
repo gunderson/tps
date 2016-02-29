@@ -63,7 +63,7 @@ var Page = AbstractPage.extend({
 		this.animationPlayer.setVisualizer(visualizers[0]);
 		//$("#soundcloud .content").append(this.player);
 
-		var $options = _.map(visualizers, (v,i) => this.$("<option>").val(i).text(i) );
+		var $options = _.map(visualizers, (v,i) => $("<option />").val(i).text(i) );
 		this.$("#vis-picker").append($options);
 	},
 	onChangeVis: function(e){
