@@ -74,7 +74,7 @@ var Visualizer = function(options) {
 		// camera.position.y = Math.sin(cameraTick) * HEIGHT * 0.125
 		// camera.lookAt(center);
 
-		camera.angle += 0.01;
+		camera.angle += 0.005;
 		camera.position.x = camera.radius * Math.cos(camera.angle);
 		camera.position.z = camera.radius * Math.sin(camera.angle);
 		camera.lookAt(THE_ORIGIN);
